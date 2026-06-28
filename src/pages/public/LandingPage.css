@@ -1,0 +1,137 @@
+/* Navbar */
+.mc-navbar {
+  background-color: rgba(246, 250, 248, 0.85);
+  backdrop-filter: blur(10px);
+  padding: 15px 0;
+}
+
+.mc-logo {
+  color: var(--mc-primary);
+  font-weight: 700;
+  font-size: 1.5rem;
+  text-decoration: none;
+}
+
+.mc-logo-img {
+  height: 35px; 
+  width: auto;
+  object-fit: contain;
+}
+
+/* Custom Buttons */
+.btn-mc-primary {
+  background-color: var(--mc-primary);
+  color: white;
+  border: none;
+  padding: 10px 24px;
+  border-radius: 50px; /* Pill shape */
+  font-weight: 500;
+  transition: all 0.3s ease;
+}
+
+.btn-mc-primary:hover {
+  background-color: var(--mc-primary-hover);
+  color: white;
+  transform: scale(1.05);
+}
+
+.btn-mc-outline {
+  background-color: transparent;
+  color: var(--mc-primary);
+  border: 2px solid var(--mc-primary);
+  padding: 10px 24px;
+  border-radius: 50px;
+  font-weight: 500;
+  transition: all 0.3s ease;
+}
+
+.btn-mc-outline:hover {
+  background-color: var(--mc-primary);
+  color: white;
+}
+
+/* Hero Section */
+.mc-hero {
+  min-height: 100vh; /* Takes up the full screen height */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 120px 20px 120px 20px; /* Generous padding top and bottom */
+  position: relative;
+}
+
+.mc-hero-title {
+  color: var(--mc-primary);
+  font-size: 3.5rem;
+  font-weight: 600;
+  margin-bottom: 20px;
+}
+
+.mc-hero-subtitle {
+  color: var(--mc-text-light);
+  font-size: 1.2rem;
+  max-width: 700px;
+  margin: 0 auto 30px auto;
+  line-height: 1.6;
+}
+
+/* How It Works Section */
+.mc-how-it-works {
+  background-color: #f0f4f3; /* Slightly darker sand for contrast */
+  padding: 100px 0;
+  
+  /* border-top-left-radius: 50px;
+  border-top-right-radius: 50px;
+  margin-top: -40px; */
+  position: relative;
+  z-index: 10;
+  box-shadow: 0 -10px 30px rgba(0, 0, 0, 0.02); /* Very subtle shadow for depth */
+}
+
+.mc-step-circle {
+  width: 80px;
+  height: 80px;
+  background-color: white;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.5rem;
+  font-weight: bold;
+  color: var(--mc-primary);
+  margin: 0 auto 20px auto;
+  box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+  border: 4px solid var(--mc-background);
+}
+
+/* Final CTA Section */
+.mc-cta-box {
+  background: var(--mc-card-bg);
+  backdrop-filter: blur(10px);
+  border-radius: 24px;
+  border: 1px solid rgba(34, 98, 93, 0.1);
+  padding: 60px 30px;
+  text-align: center;
+  box-shadow: 0 10px 30px rgba(62, 123, 118, 0.05);
+}
+
+/* Footer */
+.mc-footer {
+  background-color: #f0f4f3;
+  padding: 40px 0;
+  text-align: center;
+  color: var(--mc-text-light);
+}
+
+.mc-footer a {
+  color: var(--mc-text-light);
+  text-decoration: none;
+  margin: 0 10px;
+  transition: color 0.3s;
+}
+
+.mc-footer a:hover {
+  color: var(--mc-primary);
+}
+

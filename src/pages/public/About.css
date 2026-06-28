@@ -1,0 +1,154 @@
+.about-page {
+  min-height: 100vh;
+}
+
+/* Hero Section */
+.about-hero {
+  background: linear-gradient(135deg, var(--mc-primary) 0%, var(--mc-secondary) 100%);
+  padding: 100px 0 80px 0;
+  color: white;
+  margin-bottom: 0;
+}
+
+.about-hero-title {
+  font-size: 3rem;
+  font-weight: 700;
+  margin-bottom: 1rem;
+  color: white;
+}
+
+.about-hero-subtitle {
+  font-size: 1.3rem;
+  opacity: 0.9;
+  max-width: 700px;
+  margin: 0 auto;
+}
+
+/* Section Titles */
+.section-title {
+  color: var(--mc-primary);
+  font-weight: 700;
+  font-size: 2.5rem;
+}
+
+.section-divider {
+  width: 80px;
+  height: 4px;
+  background-color: var(--mc-secondary);
+  border-radius: 2px;
+  margin-top: 1rem;
+}
+
+/* Mission Section */
+.mission-text {
+  font-size: 1.05rem;
+  line-height: 1.8;
+  color: var(--mc-text-light);
+  margin-bottom: 1.5rem;
+}
+
+.mission-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.mission-list li {
+  padding: 0.75rem 0;
+  font-size: 1.05rem;
+  color: var(--mc-text-dark);
+  border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+}
+
+.mission-list li:last-child {
+  border-bottom: none;
+}
+
+.mission-list i {
+  color: var(--mc-secondary);
+}
+
+/* For Clients & Mentors Sections */
+.mentor-content h3 {
+  color: var(--mc-primary);
+  font-weight: 600;
+}
+
+.mentor-benefits h5 {
+  color: var(--mc-primary);
+  font-weight: 600;
+}
+
+.mentor-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.mentor-list li {
+  padding: 0.75rem 0;
+  font-size: 1rem;
+  color: var(--mc-text-light);
+}
+
+.mentor-list i {
+  color: var(--mc-primary);
+}
+
+.requirements-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.requirements-list li {
+  padding: 1rem 0;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+  line-height: 1.6;
+}
+
+.requirements-list li:last-child {
+  border-bottom: none;
+}
+
+.requirements-list strong {
+  color: var(--mc-primary);
+}
+
+/* Core Values Section */
+.value-card {
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.value-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 15px 35px rgba(62, 123, 118, 0.15);
+}
+
+.value-icon {
+  margin-bottom: 1rem;
+}
+
+/* CTA Section */
+.about-cta-section {
+  padding: 80px 0;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .about-hero-title {
+    font-size: 2rem;
+  }
+  
+  .about-hero-subtitle {
+    font-size: 1.1rem;
+  }
+  
+  .section-title {
+    font-size: 2rem;
+  }
+  
+  .about-cta-section h2 {
+    font-size: 1.8rem !important;
+  }
+}
