@@ -18,6 +18,21 @@
   object-fit: contain;
 }
 
+.btn-outline-secondary {
+  color: var(--mc-primary);
+  border: 2px solid var(--mc-primary);
+  padding: 10px 24px;
+  border-radius: 50px;
+  font-weight: 500;
+  transition: all 0.3s ease;
+}
+
+.btn-outline-secondary:hover {
+  background-color: var(--mc-primary);
+  color: white;
+  border-color: var(--mc-primary);
+}
+
 /* Custom Buttons */
 .btn-mc-primary {
   background-color: var(--mc-primary);

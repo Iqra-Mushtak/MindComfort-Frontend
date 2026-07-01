@@ -38,9 +38,14 @@ const LandingPage = () => {
               </li>
             </ul>
           </div>
+          <div className="d-flex gap-2">
+            <button className="btn btn-outline-secondary d-none d-lg-block" onClick={() => navigate('/auth?mode=login')}>
+            Login
+          </button>
           <button className="btn btn-mc-primary d-none d-lg-block" onClick={handleJoinClient}>
             Get Started
           </button>
+          </div>
         </div>
       </nav>
 

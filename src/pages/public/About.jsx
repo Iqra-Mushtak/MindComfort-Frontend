@@ -1,6 +1,7 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import './About.css';
+import logoImg from '../../assets/logo.png';
 
 const About = () => {
   const navigate = useNavigate();
@@ -15,6 +16,40 @@ const About = () => {
 
   return (
     <div className="about-page">
+        {/* --- Navbar --- */}
+      <nav className="navbar navbar-expand-lg fixed-top mc-navbar">
+        <div className="container">
+          <a className="navbar-brand d-flex align-items-center gap-2 mc-logo" href="/">
+            <img src={logoImg} alt="MindComfort Logo" className="mc-logo-img" />
+            MindComfort
+          </a>
+
+          <button className="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+            <span className="navbar-toggler-icon"></span>
+          </button>
+          
+          <div className="collapse navbar-collapse justify-content-center" id="navbarNav">
+            <ul className="navbar-nav gap-4">
+              <li className="nav-item">
+                <a className="nav-link" href="/">Home</a>
+              </li>
+              {/* <li className="nav-item">
+                <a className="nav-link" href="/about">About</a>
+              </li> */}
+            </ul>
+          </div>
+          
+          <div className="d-flex gap-2">
+            <button className="btn btn-outline-secondary d-none d-lg-block" onClick={() => navigate('/auth?mode=login')}>
+              Login
+            </button>
+            <button className="btn btn-mc-primary d-none d-lg-block" onClick={handleGetStarted}>
+              Get Started
+            </button>
+          </div>
+        </div>
+      </nav>
+
       {/* Hero Section */}
       <section className="about-hero">
         <div className="container text-center">
