@@ -7,11 +7,15 @@ const About = () => {
   const navigate = useNavigate();
 
   const handleGetStarted = () => {
-    navigate('/auth?role=client');
+    navigate('/signup?role=client');
   };
 
   const handleJoinMentor = () => {
-    navigate('/auth?role=mentor');
+    navigate('/signup?role=mentor');
+  };
+
+  const handleLogin = () => {
+    navigate('/login');
   };
 
   return (
@@ -40,7 +44,7 @@ const About = () => {
           </div>
           
           <div className="d-flex gap-2">
-            <button className="btn btn-outline-secondary d-none d-lg-block" onClick={() => navigate('/auth?mode=login')}>
+            <button className="btn btn-outline-secondary d-none d-lg-block" onClick={handleLogin}>
               Login
             </button>
             <button className="btn btn-mc-primary d-none d-lg-block" onClick={handleGetStarted}>
