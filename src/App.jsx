@@ -4,6 +4,7 @@ import About from './pages/public/About';
 import Login from './pages/public/Login';
 import Signup from './pages/public/Signup';
 import VerifyOTP from './pages/public/VerifyOTP';
+import MentorApplication from './pages/public/MentorApplication';
 
 function App() {
   return (
@@ -13,6 +14,7 @@ function App() {
       <Route path="/login" element={<Login />} />
       <Route path="/signup" element={<Signup />} />
       <Route path="/verify-otp" element={<VerifyOTP />} />
+      <Route path="/mentor-application" element={<MentorApplication />} />
     </Routes>
   );
 }

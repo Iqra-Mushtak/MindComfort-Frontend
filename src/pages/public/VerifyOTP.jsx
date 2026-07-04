@@ -65,7 +65,19 @@ const VerifyOTP = () => {
       console.log('Verification response:', response.data);
       setSuccessMsg(response.data.message || 'Verified successfully. Redirecting...');
       setTimeout(() => {
+
+        if (response.data.role === 'mentor') {
+      
+          navigate('/mentor-application', {
+            state: {
+              email: email,
+              token: response.data.token,
+              userId: response.data.id
+            }
+          });
+        } else {
         navigate('/login');
+      }
       }, 2000);
     } catch (err) {
       console.error('OTP verification error:', err);
