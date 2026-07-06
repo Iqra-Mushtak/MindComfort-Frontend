@@ -6,6 +6,7 @@ import Signup from './pages/public/Signup';
 import VerifyOTP from './pages/public/VerifyOTP';
 import MentorApplication from './pages/public/MentorApplication';
 import ForgotPassword from './pages/public/ForgotPassword';
+import ClientDashboard from './pages/client/ClientDashboard';
 
 function App() {
   return (
@@ -17,6 +18,7 @@ function App() {
       <Route path="/verify-otp" element={<VerifyOTP />} />
       <Route path="/mentor-application" element={<MentorApplication />} />
       <Route path="/forgot-password" element={<ForgotPassword />} />
+      <Route path="/client/dashboard" element={<ClientDashboard />} />
     </Routes>
   );
 }

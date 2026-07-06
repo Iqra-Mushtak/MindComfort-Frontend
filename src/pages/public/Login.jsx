@@ -24,7 +24,8 @@ const Login = () => {
       localStorage.setItem('token', response.data.token);
       localStorage.setItem('user', JSON.stringify(response.data.user));
       
-      alert('Login Successful! Welcome back.');
+      alert('Login Successful!');
+      navigate('/client/dashboard');
 
     } catch (err) {
       setError(err.response?.data?.message || 'An error occurred during login.');

@@ -1,0 +1,328 @@
+/* Dashboard Layout */
+.dashboard-container {
+  display: flex;
+  min-height: 100vh;
+  background-color: var(--mc-background);
+}
+
+/* Sidebar Styling */
+.mc-sidebar {
+  width: 260px;
+  background: rgba(255, 255, 255, 0.9);
+  backdrop-filter: blur(10px);
+  border-right: 1px solid rgba(201, 232, 203, 0.3);
+  padding: 2rem 1.5rem;
+  display: flex;
+  flex-direction: column;
+  position: fixed;
+  height: 100vh;
+  overflow-y: auto;
+  z-index: 100;
+}
+
+.mc-sidebar-logo {
+  color: var(--mc-primary);
+  font-weight: 700;
+  font-size: 1.5rem;
+  margin-bottom: 3rem;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  text-decoration: none;
+}
+
+.mc-nav-menu {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  flex-grow: 1;
+}
+
+.mc-nav-item {
+  margin-bottom: 0.5rem;
+}
+
+.mc-nav-link {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 16px;
+  border-radius: 12px;
+  color: var(--mc-text-light);
+  text-decoration: none;
+  font-weight: 500;
+  transition: all 0.3s ease;
+}
+
+.mc-nav-link:hover {
+  background-color: rgba(34, 98, 93, 0.05);
+  color: var(--mc-primary);
+}
+
+.mc-nav-link.active {
+  background-color: var(--mc-primary);
+  color: white;
+}
+
+.mc-nav-link i {
+  font-size: 1.2rem;
+}
+
+/* Sidebar Bottom (Profile & Logout) */
+.mc-sidebar-footer {
+  margin-top: auto;
+  border-top: 1px solid rgba(201, 232, 203, 0.3);
+  padding-top: 1.5rem;
+}
+
+.mc-user-info {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 1rem;
+}
+
+.mc-user-avatar {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--mc-primary), var(--mc-secondary));
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-weight: bold;
+  font-size: 1.1rem;
+}
+
+.mc-user-details h6 {
+  margin: 0;
+  font-size: 0.9rem;
+  color: var(--mc-text-dark);
+  font-weight: 600;
+}
+
+.mc-user-details small {
+  color: var(--mc-text-light);
+  font-size: 0.75rem;
+}
+
+.mc-logout-btn {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  padding: 10px 16px;
+  border: none;
+  background: transparent;
+  color: #ba1a1a;
+  font-weight: 500;
+  cursor: pointer;
+  border-radius: 12px;
+  transition: background 0.3s;
+}
+
+.mc-logout-btn:hover {
+  background-color: rgba(186, 26, 26, 0.05);
+}
+
+/* Main Content Area */
+.mc-main-content {
+  margin-left: 260px;
+  flex-grow: 1;
+  padding: 3rem 4rem;
+  width: calc(100% - 260px);
+}
+
+/* Parallel Header Layout (Fixes the stacking issue) */
+.mc-header-row {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: nowrap;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 3rem;
+  width: 100%;
+}
+
+.mc-welcome-header {
+  margin-bottom: 0;
+  flex: 1;
+}
+
+.mc-welcome-header h1 {
+  color: var(--mc-primary);
+  font-weight: 700;
+  font-size: 2.5rem;
+  margin-bottom: 0.5rem;
+}
+
+.mc-welcome-header p {
+  color: var(--mc-text-light);
+  font-size: 1.1rem;
+}
+
+/* Top Right Notification Bell */
+.mc-top-bar {
+  margin-bottom: 0;
+  flex-shrink: 0;
+  margin-left: 20px;
+}
+
+.mc-notification-btn {
+  position: relative;
+  background: white;
+  border: 1px solid rgba(201, 232, 203, 0.3);
+  width: 45px;
+  height: 45px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  color: var(--mc-primary);
+  font-size: 1.2rem;
+  box-shadow: 0 5px 15px rgba(62, 123, 118, 0.05);
+  transition: all 0.3s ease;
+}
+
+.mc-notification-btn:hover {
+  transform: scale(1.05);
+}
+
+.mc-badge {
+  position: absolute;
+  top: -5px;
+  right: -5px;
+  background-color: #ba1a1a;
+  color: white;
+  font-size: 0.7rem;
+  font-weight: bold;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 2px solid white;
+}
+
+/* Dashboard Grid */
+.mc-dashboard-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr); /* Forces exactly 2 columns */
+  gap: 1.5rem;
+  max-width: 900px; /* Prevents cards from stretching too wide */
+}
+
+/* Dashboard Cards */
+.mc-dash-card {
+  background: var(--mc-card-bg);
+  backdrop-filter: blur(10px);
+  border-radius: 24px;
+  border: 1px solid rgba(201, 232, 203, 0.3);
+  box-shadow: 0 10px 30px rgba(62, 123, 118, 0.05);
+  overflow: hidden;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  cursor: pointer;
+  text-decoration: none;
+  color: inherit;
+}
+
+.mc-dash-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 15px 35px rgba(62, 123, 118, 0.1);
+}
+
+.mc-card-visual {
+  height: 120px;
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 2.5rem;
+  color: white;
+}
+
+/* Muted Greenish/Earthy Gradients */
+.visual-plans { background: linear-gradient(135deg, #37a59c, #236b65); }
+.visual-chat { background: linear-gradient(135deg, #22625D, #45ada4); }
+.visual-live { background: linear-gradient(135deg, #205450, #3C928B); }
+.visual-recordings { background: linear-gradient(135deg, #49a69e, #2f6e66); }
+
+.mc-card-body {
+  padding: 1rem;
+}
+
+.mc-card-body h4 {
+  color: var(--mc-text-dark);
+  font-weight: 600;
+  margin-bottom: 0.25rem;
+  font-size: 1.1rem;
+}
+
+.mc-card-body p {
+  color: var(--mc-text-light);
+  font-size: 0.85rem;
+  margin: 0;
+  line-height: 1.4;
+}
+
+/* Responsive */
+@media (max-width: 992px) {
+  .mc-sidebar {
+    transform: translateX(-100%);
+    transition: transform 0.3s ease;
+  }
+  .mc-sidebar.open {
+    transform: translateX(0);
+  }
+  .mc-main-content {
+    margin-left: 0;
+    width: 100%;
+    padding: 2rem;
+  }
+  
+  /* Stack header on very small screens */
+  .mc-header-row {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 15px;
+  }
+  .mc-top-bar {
+    margin-left: 0;
+  }
+}
+
+@media (max-width: 992px) {
+  .mc-sidebar {
+    transform: translateX(-100%);
+    transition: transform 0.3s ease;
+  }
+  .mc-sidebar.open {
+    transform: translateX(0);
+  }
+  .mc-main-content {
+    margin-left: 0;
+    width: 100%;
+    padding: 1.5rem;
+  }
+  
+  .mc-header-row {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 15px;
+  }
+  .mc-top-bar {
+    margin-left: 0;
+  }
+  
+  .mc-dashboard-grid {
+    grid-template-columns: 1fr; /* 1 card per row */
+    max-width: 100%;
+  }
+
+  .mc-welcome-header h1 {
+    font-size: 1.8rem; /* Smaller heading on mobile */
+  }
+}
