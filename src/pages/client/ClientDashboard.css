@@ -1,17 +1,16 @@
-/* Dashboard Layout */
 .dashboard-container {
   display: flex;
   min-height: 100vh;
   background-color: var(--mc-background);
 }
 
-/* Sidebar Styling */
+
 .mc-sidebar {
   width: 260px;
-  background: rgba(255, 255, 255, 0.9);
+  background: var(--mc-primary);
   backdrop-filter: blur(10px);
   border-right: 1px solid rgba(201, 232, 203, 0.3);
-  padding: 2rem 1.5rem;
+  padding: 0.5rem 1.5rem;
   display: flex;
   flex-direction: column;
   position: fixed;
@@ -21,7 +20,7 @@
 }
 
 .mc-sidebar-logo {
-  color: var(--mc-primary);
+  color: white;
   font-weight: 700;
   font-size: 1.5rem;
   margin-bottom: 3rem;
@@ -48,15 +47,15 @@
   gap: 12px;
   padding: 12px 16px;
   border-radius: 12px;
-  color: var(--mc-text-light);
+  color: var(--mc-background);
   text-decoration: none;
   font-weight: 500;
   transition: all 0.3s ease;
 }
 
 .mc-nav-link:hover {
-  background-color: rgba(34, 98, 93, 0.05);
-  color: var(--mc-primary);
+  background-color: rgba(255, 255, 255, 0.1);
+  color: var(--mc-card-bg);
 }
 
 .mc-nav-link.active {
@@ -71,8 +70,8 @@
 /* Sidebar Bottom (Profile & Logout) */
 .mc-sidebar-footer {
   margin-top: auto;
-  border-top: 1px solid rgba(201, 232, 203, 0.3);
-  padding-top: 1.5rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  padding-top: 0.7rem;
 }
 
 .mc-user-info {
@@ -86,11 +85,11 @@
   width: 40px;
   height: 40px;
   border-radius: 50%;
-  background: linear-gradient(135deg, var(--mc-primary), var(--mc-secondary));
+  background: var(--mc-background);
   display: flex;
   align-items: center;
   justify-content: center;
-  color: white;
+  color: var(--mc-primary);
   font-weight: bold;
   font-size: 1.1rem;
 }
@@ -98,12 +97,12 @@
 .mc-user-details h6 {
   margin: 0;
   font-size: 0.9rem;
-  color: var(--mc-text-dark);
+  color: var(--mc-background);
   font-weight: 600;
 }
 
 .mc-user-details small {
-  color: var(--mc-text-light);
+  color: var(--mc-background);
   font-size: 0.75rem;
 }
 
@@ -115,7 +114,7 @@
   padding: 10px 16px;
   border: none;
   background: transparent;
-  color: #ba1a1a;
+  color: var(--mc-background);
   font-weight: 500;
   cursor: pointer;
   border-radius: 12px;
@@ -123,14 +122,14 @@
 }
 
 .mc-logout-btn:hover {
-  background-color: rgba(186, 26, 26, 0.05);
+  color: var(--mc-card-bg)
 }
 
 /* Main Content Area */
 .mc-main-content {
   margin-left: 260px;
   flex-grow: 1;
-  padding: 3rem 4rem;
+  padding: 1.5rem 4rem 4rem 4rem; 
   width: calc(100% - 260px);
 }
 
@@ -171,10 +170,11 @@
 
 .mc-notification-btn {
   position: relative;
-  background: white;
-  border: 1px solid rgba(201, 232, 203, 0.3);
-  width: 45px;
-  height: 45px;
+  background: transparent;
+  border: none;
+  box-shadow: none; 
+  width: 35px;
+  height: 35px;
   border-radius: 50%;
   display: flex;
   align-items: center;
@@ -212,7 +212,6 @@
   display: grid;
   grid-template-columns: repeat(2, 1fr); /* Forces exactly 2 columns */
   gap: 1.5rem;
-  max-width: 900px; /* Prevents cards from stretching too wide */
 }
 
 /* Dashboard Cards */
@@ -251,7 +250,7 @@
 .visual-recordings { background: linear-gradient(135deg, #49a69e, #2f6e66); }
 
 .mc-card-body {
-  padding: 1rem;
+  padding: 1.5rem;
 }
 
 .mc-card-body h4 {
@@ -316,7 +315,7 @@
   .mc-top-bar {
     margin-left: 0;
   }
-  
+
   .mc-dashboard-grid {
     grid-template-columns: 1fr; /* 1 card per row */
     max-width: 100%;
@@ -325,4 +324,44 @@
   .mc-welcome-header h1 {
     font-size: 1.8rem; /* Smaller heading on mobile */
   }
+}
+
+.mc-main-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-bottom: 1.5rem;
+  border-bottom: 1px solid rgba(0, 52, 61, 0.15); 
+  margin-bottom: 2rem;
+}
+
+.mc-main-logo {
+  color: var(--mc-primary);
+  font-weight: 700;
+  font-size: 1.2rem;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  text-decoration: none;
+}
+
+.mc-main-logo img {
+  height: 30px;
+}
+
+/* --- NEW: Sidebar User Info at Top --- */
+.mc-user-info-top {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 1rem;
+  background: transparent;
+  margin-bottom: 2rem;
+  border-bottom: 0.5px solid rgba(201, 232, 203, 0.3);
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.mc-user-info-top:hover{
+  transform: scale(1.02);
 }

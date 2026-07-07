@@ -1,0 +1,108 @@
+/* Chatroom List Layout */
+.chatroom-container {
+  display: flex;
+  min-height: 100vh;
+  background-color: var(--mc-background);
+}
+
+.chatroom-main {
+  margin-left: 260px; 
+  flex-grow: 1;
+  padding: 1.5rem 4rem 4rem 4rem;
+}
+
+/* Header */
+.chatroom-header {
+  margin-bottom: 2.5rem;
+}
+
+.chatroom-header h2 {
+  color: var(--mc-primary);
+  font-weight: 700;
+  font-size: 2rem;
+  margin-bottom: 0.5rem;
+}
+
+.chatroom-header p {
+  color: var(--mc-text-light);
+  font-size: 1.1rem;
+}
+
+/* List Styles */
+.chatroom-list {
+  display: flex;
+  flex-direction: column;
+  gap: 1.2rem;
+  max-width: 800px;
+}
+
+.chatroom-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: var(--mc-card-bg);
+  padding: 1.5rem 2rem;
+  border-radius: 16px;
+  border: 1px solid rgba(201, 232, 203, 0.3);
+  box-shadow: 0 5px 15px rgba(62, 123, 118, 0.05);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.chatroom-item:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 8px 20px rgba(62, 123, 118, 0.1);
+}
+
+.chatroom-info h4 {
+  margin: 0 0 0.4rem 0;
+  color: var(--mc-text-dark);
+  font-weight: 600;
+  font-size: 1.15rem;
+}
+
+.chatroom-info p {
+  margin: 0;
+  color: var(--mc-text-light);
+  font-size: 0.9rem;
+}
+
+/* Join Button */
+.join-btn {
+  background-color: var(--mc-primary);
+  color: white;
+  padding: 0.6rem 1.8rem;
+  border-radius: 25px;
+  font-weight: 600;
+  font-size: 0.9rem;
+  transition: background 0.3s;
+  border: none;
+  cursor: pointer;
+}
+
+.join-btn:hover {
+  background-color: #1a4a46; /* Darker teal */
+}
+
+/* Loading & Error States */
+.loading-text, .error-text {
+  text-align: center;
+  padding: 2rem;
+  font-size: 1.1rem;
+}
+.error-text { color: #ba1a1a; }
+
+/* Responsive */
+@media (max-width: 992px) {
+  .chatroom-main {
+    margin-left: 0;
+    padding: 2rem;
+  }
+  .chatroom-item {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 1rem;
+  }
+  .join-btn {
+    align-self: flex-end;
+  }
+}

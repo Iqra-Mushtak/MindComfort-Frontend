@@ -31,84 +31,92 @@ const ClientDashboard = () => {
   };
 
   if (!user) return null; 
-  
+
   const getInitials = (name) => {
     return name ? name.charAt(0).toUpperCase() : 'U';
   };
 
   return (
     <div className="dashboard-container">
-      {/* Sidebar */}
       <aside className="mc-sidebar">
-        <Link to="/" className="mc-sidebar-logo">
-          <img src={logoImg} alt="MindComfort Logo" className="mc-logo-img" style={{ height: '35px' }} />
-          MindComfort
-        </Link>
+  <Link to="/client/profile" style={{ textDecoration: 'none' }}>
+  <div className="mc-user-info-top">
+    <div className="mc-user-avatar">
+      {user.username.charAt(0).toUpperCase()}
+    </div>
+    <div className="mc-user-details">
+      <h6>{user.username}</h6>
+      <small>{user.role === 'mentor' ? 'Mentor' : 'Client'}</small>
+    </div>
+  </div>
+  </Link>
 
-        <ul className="mc-nav-menu">
-          <li className="mc-nav-item">
-            <Link to="/client/dashboard" className="mc-nav-link active">
-              <i className="bi bi-house-fill"></i> Home
-            </Link>
-          </li>
-          <li className="mc-nav-item">
-            <Link to="/client/plans" className="mc-nav-link">
-              <i className="bi bi-bookmark-star-fill"></i> Subscription Plans
-            </Link>
-          </li>
-          <li className="mc-nav-item">
-            <Link to="/client/chatrooms" className="mc-nav-link">
-              <i className="bi bi-chat-dots-fill"></i> Community Chat
-            </Link>
-          </li>
-          <li className="mc-nav-item">
-            <Link to="/client/podcasts" className="mc-nav-link">
-              <i className="bi bi-broadcast-pin"></i> Podcasts
-            </Link>
-          </li>
-          <li className="mc-nav-item">
-            <Link to="/client/profile" className="mc-nav-link">
-              <i className="bi bi-person-fill"></i> Profile
-            </Link>
-          </li>
-        </ul>
+  {/* 2. Navigation in the MIDDLE */}
+  <ul className="mc-nav-menu">
+    <li className="mc-nav-item">
+      <Link to="/client/dashboard" className="mc-nav-link active">
+        <i className="bi bi-house-fill"></i> Home
+      </Link>
+    </li>
+    <li className="mc-nav-item">
+      <Link to="/client/plans" className="mc-nav-link">
+        <i className="bi bi-bookmark-star-fill"></i> Subscription Plans
+      </Link>
+    </li>
+    <li className="mc-nav-item">
+      <Link to="/chatrooms" className="mc-nav-link">
+        <i className="bi bi-chat-dots-fill"></i> Community Chat
+      </Link>
+    </li>
+    <li className="mc-nav-item">
+      <Link to="/client/podcasts" className="mc-nav-link">
+        <i className="bi bi-broadcast-pin"></i> Podcasts
+      </Link>
+    </li>
+    <li className="mc-nav-item">
+      <Link to="/client/profile" className="mc-nav-link">
+        <i className="bi bi-"></i> Mentors
+      </Link>
+    </li>
+  </ul>
 
-        <div className="mc-sidebar-footer">
-          <div className="mc-user-info">
-            <div className="mc-user-avatar">
-              {getInitials(user.username)}
-            </div>
-            <div className="mc-user-details">
-              <h6>{user.username}</h6>
-              <small>{user.email || 'Client'}</small>
-            </div>
-          </div>
-          <button className="mc-logout-btn" onClick={handleLogout}>
-            <i className="bi bi-box-arrow-right"></i> Logout
-          </button>
-        </div>
-      </aside>
+  {/* 3. Logout at the BOTTOM (No logo here anymore) */}
+  <div className="mc-sidebar-footer">
+    <button className="mc-logout-btn" onClick={handleLogout}>
+      <i className="bi bi-box-arrow-right"></i> Log Out
+    </button>
+  </div>
+</aside>
 
             {/* Main Content */}
       <main className="mc-main-content">
         
-        <div className="mc-header-row">
-          <div className="mc-welcome-header">
-            <h1>Welcome, {user.username}!</h1>
-            <p>We're so glad to see you. What would you like to do today?</p>
-          </div>
-          
-          <div className="mc-top-bar">
-            <button className="mc-notification-btn">
-              <i className="bi bi-bell-fill"></i>
-              <span className="mc-badge">3</span>
-            </button>
-          </div>
-        </div>
+    <div className="mc-main-header">
+    
+    <div style={{ flex: 1 }}></div>
+    <div style={{ display: 'flex', alignItems: 'center', gap: '20px' }}>
+      {/* Notification Bell */}
+      <button className="mc-notification-btn">
+        <i className="bi bi-bell-fill"></i>
+        <span className="mc-badge">3</span>
+      </button>
+      
+      {/* Logo at Top Right Corner */}
+      <Link to="/client/dashboard" className="mc-main-logo">
+        MindComfort
+        <img src={logoImg} alt="MindComfort Logo" />
+      </Link>
+    </div>
+  </div>
+
+  <div className="mc-welcome-header" style={{ marginBottom: 0 }}>
+      <h1>Welcome, {user.username}!</h1>
+      <p>We're so glad to see you. What do you want to do today?</p>
+    </div>
 
         <div className="mc-dashboard-grid">
           {/* Card 1: Chatrooms */}
-          <Link to="/client/chatrooms" className="mc-dash-card">
+          <Link to="/chatrooms" className="mc-dash-card">
             <div className="mc-card-visual visual-chat">
               <i className="bi bi-people-fill"></i>
             </div>

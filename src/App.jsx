@@ -7,6 +7,7 @@ import VerifyOTP from './pages/public/VerifyOTP';
 import MentorApplication from './pages/public/MentorApplication';
 import ForgotPassword from './pages/public/ForgotPassword';
 import ClientDashboard from './pages/client/ClientDashboard';
+import ChatroomList from './pages/shared/ChatroomList';
 
 function App() {
   return (
@@ -19,6 +20,9 @@ function App() {
       <Route path="/mentor-application" element={<MentorApplication />} />
       <Route path="/forgot-password" element={<ForgotPassword />} />
       <Route path="/client/dashboard" element={<ClientDashboard />} />
+      <Route path="/chatrooms" element={<ChatroomList />} /> 
+      <Route path="/chatrooms" element={<ChatroomList />} /> 
+
     </Routes>
   );
 }

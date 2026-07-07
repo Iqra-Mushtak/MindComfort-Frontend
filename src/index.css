@@ -1,10 +1,10 @@
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
 
 :root {
-  --mc-primary: #22625d;       /* Deep Teal */
-  --mc-primary-hover: #1a4d49; 
+  --mc-primary: #00343d;       /* Deep Teal */
+  --mc-primary-hover: #143b38; 
   --mc-secondary: #4a654e;     /* Sage Green */
-  --mc-background: #f6faf8;    /* Warm Sand/Off-white */
+  --mc-background: #d5f1f0;    /* Warm Sand/Off-white */
   --mc-text-dark: #181d1c;     /* Slate Charcoal */
   --mc-text-light: #3f4947;    /* Muted text */
   --mc-card-bg: rgba(255, 255, 255, 0.7);
