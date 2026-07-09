@@ -8,6 +8,7 @@ import MentorApplication from './pages/public/MentorApplication';
 import ForgotPassword from './pages/public/ForgotPassword';
 import ClientDashboard from './pages/client/ClientDashboard';
 import ChatroomList from './pages/shared/ChatroomList';
+import ChatInterface from './pages/shared/ChatInterface';
 
 function App() {
   return (
@@ -22,6 +23,7 @@ function App() {
       <Route path="/client/dashboard" element={<ClientDashboard />} />
       <Route path="/chatrooms" element={<ChatroomList />} /> 
       <Route path="/chatrooms" element={<ChatroomList />} /> 
+      <Route path="/chatroom/:id" element={<ChatInterface />} />
 
     </Routes>
   );

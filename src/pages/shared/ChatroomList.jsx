@@ -13,15 +13,25 @@ const ChatroomList = () => {
   const [error, setError] = useState('');
 
   useEffect(() => {
-    const userData = JSON.parse(localStorage.getItem('user'));
-    const token = localStorage.getItem('token');
-    
-    if (!token || !userData) {
-      navigate('/login');
-    } else {
-      setUser(userData);
-      fetchChatrooms();
+    let userData = null;
+
+    try {
+      userData = JSON.parse(localStorage.getItem('user'));
+    } catch (err) {
+      userData = null;
     }
+
+    const token = localStorage.getItem('token');
+
+    if (!token || !userData) {
+      localStorage.removeItem('token');
+      localStorage.removeItem('user');
+      navigate('/login');
+      return;
+    }
+
+    setUser(userData);
+    fetchChatrooms();
   }, [navigate]);
 
   const fetchChatrooms = async () => {
@@ -29,6 +39,12 @@ const ChatroomList = () => {
       const response = await api.get('/chat');
       setChatrooms(response.data);
     } catch (err) {
+      if (err?.response?.status === 401 || err?.response?.status === 403) {
+        localStorage.removeItem('token');
+        localStorage.removeItem('user');
+        navigate('/login');
+        return;
+      }
       setError('Failed to load chatrooms.');
     } finally {
       setLoading(false);
@@ -68,7 +84,7 @@ const ChatroomList = () => {
       <aside className="mc-sidebar">
         <Link to="/client/profile" style={{ textDecoration: 'none' }}>
         <div className="mc-user-info-top">
-          <div className="mc-user-avatar">{user.username.charAt(0).toUpperCase()}</div>
+          <div className="mc-user-avatar">{(user?.username || 'U').charAt(0).toUpperCase()}</div>
           <div className="mc-user-details">
             <h6>{user.username}</h6>
             <small>{user.role === 'mentor' ? 'Mentor' : 'Client'}</small>
@@ -84,17 +100,15 @@ const ChatroomList = () => {
           <li className="mc-nav-item"><Link to="/client/profile" className="mc-nav-link"><i className="bi bi-person-fill"></i> Profile</Link></li>
         </ul>
 
-        {/* Logout at BOTTOM */}
+  
         <div className="mc-sidebar-footer">
           <button className="mc-logout-btn" onClick={handleLogout}><i className="bi bi-box-arrow-right"></i> Log Out</button>
         </div>
       </aside>
 
       {/* Main Content */}
-            {/* Main Content */}
       <main className="chatroom-main">
         
-        {/* Top Header Row (Bell & Logo) with the Line Beneath */}
         <div className="mc-main-header">
           <div style={{ flex: 1 }}></div> 
           <div style={{ display: 'flex', alignItems: 'center', gap: '20px' }}>
@@ -109,7 +123,6 @@ const ChatroomList = () => {
           </div>
         </div>
 
-        {/* Chatroom Header (Now UNDER the line) */}
         <div className="chatroom-header">
           <h2>Community Chatrooms</h2>
           <p>Find a safe space to connect with others.</p>
@@ -129,7 +142,7 @@ const ChatroomList = () => {
                 </div>
                 <button onClick={() => handleJoin(room._id)} className="join-btn">
                   {user.role === 'mentor' ? 'Join' : 
-                   (user.isSubscribed || user.subscriptionStatus === 'active') ? 'Join' : 'Subscribe to Chat'}
+                   (user.isSubscribed || user.subscriptionStatus === 'active') ? 'Join' : 'Join Room'}
                 </button>
               </div>
             ))}
