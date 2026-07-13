@@ -170,7 +170,7 @@
 
 .mc-notification-btn {
   position: relative;
-  background: transparent;
+  background: none;
   border: none;
   box-shadow: none; 
   width: 35px;

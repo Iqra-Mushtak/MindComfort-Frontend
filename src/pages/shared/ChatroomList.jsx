@@ -11,6 +11,7 @@ const ChatroomList = () => {
   const [chatrooms, setChatrooms] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
+  const [subscriptionStatus, setSubscriptionStatus] = useState(null);
 
   useEffect(() => {
     let userData = null;
@@ -32,7 +33,31 @@ const ChatroomList = () => {
 
     setUser(userData);
     fetchChatrooms();
+    syncSubscriptionState(userData);
   }, [navigate]);
+
+  const syncSubscriptionState = async (currentUser) => {
+    try {
+      const response = await api.get('/subscriptions/status');
+      const hasActiveChat = Boolean(response?.data?.hasActiveChat);
+      const updatedUser = {
+        ...currentUser,
+        isSubscribed: hasActiveChat,
+        subscriptionStatus: hasActiveChat ? 'active' : 'inactive'
+      };
+
+      setUser(updatedUser);
+      setSubscriptionStatus({
+        hasActiveChat,
+        isSubscribed: hasActiveChat,
+        status: hasActiveChat ? 'active' : 'inactive'
+      });
+      localStorage.setItem('user', JSON.stringify(updatedUser));
+    } catch (err) {
+      console.error('Failed to sync subscription state:', err);
+      setSubscriptionStatus({ hasActiveChat: false, isSubscribed: false, status: 'inactive' });
+    }
+  };
 
   const fetchChatrooms = async () => {
     try {
@@ -61,15 +86,20 @@ const ChatroomList = () => {
 
   const handleJoin = (roomId) => {
     if (user.role === 'mentor') {
-      navigate(`/chatroom/${roomId}`);;
+      navigate(`/chatroom/${roomId}`);
     } else if (user.role === 'client') {
-      const isSubscribed = user.isSubscribed || user.subscriptionStatus === 'active';
-      
+      const isSubscribed = Boolean(
+        user?.isSubscribed ||
+        user?.subscriptionStatus === 'active' ||
+        subscriptionStatus?.isSubscribed ||
+        subscriptionStatus?.hasActiveChat
+      );
+
       if (isSubscribed) {
         navigate(`/chatroom/${roomId}`);
       } else {
-        navigate('/client/plans', { 
-          state: { message: 'Subscribe to access community chatrooms' } 
+        navigate('/client/plans', {
+          state: { message: 'Subscribe to access community chatrooms' }
         });
       }
     }
@@ -80,7 +110,6 @@ const ChatroomList = () => {
   return (
     <div className="chatroom-container">
       {/* Sidebar */}
-            {/* Sidebar */}
       <aside className="mc-sidebar">
         <Link to="/client/profile" style={{ textDecoration: 'none' }}>
         <div className="mc-user-info-top">
@@ -142,7 +171,7 @@ const ChatroomList = () => {
                 </div>
                 <button onClick={() => handleJoin(room._id)} className="join-btn">
                   {user.role === 'mentor' ? 'Join' : 
-                   (user.isSubscribed || user.subscriptionStatus === 'active') ? 'Join' : 'Join Room'}
+                   (user?.isSubscribed || user?.subscriptionStatus === 'active' || subscriptionStatus?.isSubscribed || subscriptionStatus?.hasActiveChat) ? 'Join' : 'Join Room'}
                 </button>
               </div>
             ))}
