@@ -25,6 +25,11 @@ const ChatInterface = () => {
   const chatContainerRef = useRef(null);
   const [replyingTo, setReplyingTo] = useState(null);
 
+  const [showReportModal, setShowReportModal] = useState(false);
+  const [reportMessageId, setReportMessageId] = useState(null);
+  const [selectedReason, setSelectedReason] = useState(''); 
+  const [reportReason, setReportReason] = useState('');
+
   const getDateLabel = (createdAt) => {
     if (!createdAt) return '';
     const messageDate = new Date(createdAt);
@@ -299,12 +304,38 @@ const ChatInterface = () => {
     }
   };
 
-  const handleReportMessage = async (messageId) => {
-    const reason = prompt('Why are you reporting this message?');
-    if (!reason) return;
+    const handleReportClick = (messageId) => {
+    setReportMessageId(messageId);
+    setShowReportModal(true);
+    setReportReason('');
+    setSelectedReason('');
+  };
+
+  const closeReportModal = () => {
+    setShowReportModal(false);
+    setReportMessageId(null);
+    setReportReason('');
+    setSelectedReason('');
+  };
+
+  const submitReport = async () => {
+    let finalReason = selectedReason;
+    
+    if (selectedReason === 'other') {
+      if (!reportReason.trim()) {
+        alert('Please provide a reason for reporting this message.');
+        return;
+      }
+      finalReason = `Other: ${reportReason.trim()}`;
+    }
+    
     try {
-      await api.post('/chat/report', { messageId, reason });
+      await api.post('/chat/report', { 
+        messageId: reportMessageId, 
+        reason: finalReason 
+      });
       alert('Message reported successfully.');
+      closeReportModal();
     } catch (err) {
       alert(err?.response?.data?.message || 'Failed to report message.');
     }
@@ -321,6 +352,16 @@ const ChatInterface = () => {
       navigate('/login');
     }
   };
+
+    const reportOptions = [
+    { id: 'harassment', label: 'Harassment or bullying' },
+    { id: 'spam', label: 'Spam or selling things' },
+    { id: 'misleading', label: 'Misleading' },
+    { id: 'hate', label: 'Hate speech' },
+    { id: 'joke', label: 'Joking or Trolling' },
+    { id: 'inappropriate', label: 'Inappropriate content' },
+    { id: 'other', label: 'Other' }
+  ];
 
   if (!user) return null;
 
@@ -452,7 +493,7 @@ const ChatInterface = () => {
                                 className="message-action-btn report-btn"
                                 onClick={(e) => {
                                   e.stopPropagation();
-                                  handleReportMessage(msg._id);
+                                  handleReportClick(msg._id);
                                 }}
                               >
                                 <i className="bi bi-flag"></i>
@@ -488,6 +529,65 @@ const ChatInterface = () => {
               </div>
             )}
             
+            {/* Report Modal */}
+            {showReportModal && (
+              <div className="report-modal-overlay" onClick={closeReportModal}>
+                <div className="report-modal-card" onClick={(e) => e.stopPropagation()}>
+                  <div className="report-modal-header">
+                    <h3>Report Message</h3>
+                    <button className="report-modal-close" onClick={closeReportModal}>
+                      <i className="bi bi-x"></i>
+                    </button>
+                  </div>
+                  
+                  <div className="report-modal-body">
+                    <p className="report-modal-subtitle">Why are you reporting this message?</p>
+                    
+                    <div className="report-options-list">
+                      {reportOptions.map((option) => (
+                        <label 
+                          key={option.id} 
+                          className={`report-option ${selectedReason === option.id ? 'selected' : ''}`}
+                        >
+                          <input
+                            type="radio"
+                            name="reportReason"
+                            value={option.id}
+                            checked={selectedReason === option.id}
+                            onChange={(e) => setSelectedReason(e.target.value)}
+                          />
+                          <span className="report-option-label">{option.label}</span>
+                        </label>
+                      ))}
+                    </div>
+
+                    {selectedReason === 'other' && (
+                      <textarea
+                        className="report-reason-input"
+                        placeholder="Please describe the issue..."
+                        value={reportReason}
+                        onChange={(e) => setReportReason(e.target.value)}
+                        rows="3"
+                      />
+                    )}
+                  </div>
+
+                  <div className="report-modal-footer">
+                    <button className="report-cancel-btn" onClick={closeReportModal}>
+                      Cancel
+                    </button>
+                    <button 
+                      className="report-submit-btn" 
+                      onClick={submitReport}
+                      disabled={!selectedReason}
+                    >
+                      Submit Report
+                    </button>
+                  </div>
+                </div>
+              </div>
+            )}
+
             <form className="chat-input-area" onSubmit={handleSendMessage}>
               <input
                 type="text"
