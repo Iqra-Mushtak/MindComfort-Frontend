@@ -4,7 +4,6 @@
   background-color: var(--mc-background);
 }
 
-
 .mc-sidebar {
   width: 260px;
   background: var(--mc-primary);
@@ -67,7 +66,6 @@
   font-size: 1.2rem;
 }
 
-/* Sidebar Bottom (Profile & Logout) */
 .mc-sidebar-footer {
   margin-top: auto;
   border-top: 1px solid rgba(255, 255, 255, 0.1);
@@ -125,7 +123,6 @@
   color: var(--mc-card-bg)
 }
 
-/* Main Content Area */
 .mc-main-content {
   margin-left: 260px;
   flex-grow: 1;
@@ -133,7 +130,6 @@
   width: calc(100% - 260px);
 }
 
-/* Parallel Header Layout (Fixes the stacking issue) */
 .mc-header-row {
   display: flex;
   flex-direction: row;
@@ -153,7 +149,7 @@
   color: var(--mc-primary);
   font-weight: 700;
   font-size: 1.5rem;
-  margin-bottom: 1rem;
+  margin-bottom: 2rem;
 }
 
 .mc-welcome-header p {
@@ -161,7 +157,6 @@
   font-size: 1.1rem;
 }
 
-/* Top Right Notification Bell */
 .mc-top-bar {
   margin-bottom: 0;
   flex-shrink: 0;
@@ -207,14 +202,12 @@
   border: 2px solid white;
 }
 
-/* Dashboard Grid */
 .mc-dashboard-grid {
   display: grid;
-  grid-template-columns: repeat(2, 1fr); /* Forces exactly 2 columns */
+  grid-template-columns: repeat(2, 1fr);
   gap: 1.5rem;
 }
 
-/* Dashboard Cards */
 .mc-dash-card {
   background: var(--mc-card-bg);
   backdrop-filter: blur(10px);
@@ -243,7 +236,6 @@
   color: white;
 }
 
-/* Muted Greenish/Earthy Gradients */
 .visual-plans { background: linear-gradient(135deg, #37a59c, #236b65); }
 .visual-chat { background: linear-gradient(135deg, #22625D, #45ada4); }
 .visual-live { background: linear-gradient(135deg, #205450, #3C928B); }
@@ -267,7 +259,6 @@
   line-height: 1.4;
 }
 
-/* Responsive */
 @media (max-width: 992px) {
   .mc-sidebar {
     transform: translateX(-100%);
@@ -282,7 +273,6 @@
     padding: 2rem;
   }
   
-  /* Stack header on very small screens */
   .mc-header-row {
     flex-direction: column;
     align-items: flex-start;
@@ -317,12 +307,12 @@
   }
 
   .mc-dashboard-grid {
-    grid-template-columns: 1fr; /* 1 card per row */
+    grid-template-columns: 1fr;
     max-width: 100%;
   }
 
   .mc-welcome-header h1 {
-    font-size: 1.8rem; /* Smaller heading on mobile */
+    font-size: 1.8rem;
   }
 }
 
@@ -349,7 +339,6 @@
   height: 30px;
 }
 
-/* --- NEW: Sidebar User Info at Top --- */
 .mc-user-info-top {
   display: flex;
   align-items: center;

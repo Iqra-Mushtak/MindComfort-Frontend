@@ -121,14 +121,33 @@ const ChatroomList = () => {
         </div>
         </Link>
       
-        <ul className="mc-nav-menu">
-          <li className="mc-nav-item"><Link to="/client/dashboard" className="mc-nav-link"><i className="bi bi-house-fill"></i> Home</Link></li>
-          <li className="mc-nav-item"><Link to="/client/plans" className="mc-nav-link"><i className="bi bi-bookmark-star-fill"></i> Subscription Plans</Link></li>
-          <li className="mc-nav-item"><Link to="/chatrooms" className="mc-nav-link active"><i className="bi bi-chat-dots-fill"></i> Community Chat</Link></li>
-          <li className="mc-nav-item"><Link to="/client/podcasts" className="mc-nav-link"><i className="bi bi-broadcast-pin"></i> Podcasts</Link></li>
-          <li className="mc-nav-item"><Link to="/client/profile" className="mc-nav-link"><i className="bi bi-person-fill"></i> Profile</Link></li>
-        </ul>
+                <ul className="mc-nav-menu">
+          <li className="mc-nav-item">
+            <Link to={user.role === 'mentor' ? '/mentor/dashboard' : '/client/dashboard'} className="mc-nav-link">
+              <i className="bi bi-house-fill"></i> Home
+            </Link>
+          </li>
 
+          {user.role !== 'mentor' && (
+            <li className="mc-nav-item">
+              <Link to="/client/plans" className="mc-nav-link">
+                <i className="bi bi-bookmark-star-fill"></i> Subscription Plans
+              </Link>
+            </li>
+          )}
+
+          <li className="mc-nav-item">
+            <Link to="/chatrooms" className="mc-nav-link active">
+              <i className="bi bi-chat-dots-fill"></i> Community Chat
+            </Link>
+          </li>
+
+          <li className="mc-nav-item">
+            <Link to={user.role === 'mentor' ? '/mentor/podcasts' : '/client/podcasts'} className="mc-nav-link">
+              <i className="bi bi-broadcast-pin"></i> Podcasts
+            </Link>
+          </li>
+        </ul>
   
         <div className="mc-sidebar-footer">
           <button className="mc-logout-btn" onClick={handleLogout}><i className="bi bi-box-arrow-right"></i> Log Out</button>

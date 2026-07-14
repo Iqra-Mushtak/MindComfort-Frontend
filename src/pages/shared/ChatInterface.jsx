@@ -381,7 +381,7 @@ const ChatInterface = () => {
 
         <ul className="mc-nav-menu">
           <li className="mc-nav-item"><Link to="/client/dashboard" className="mc-nav-link"><i className="bi bi-house-fill"></i> Home</Link></li>
-          <li className="mc-nav-item"><Link to="/client/plans" className="mc-nav-link"><i className="bi bi-bookmark-star-fill"></i> Subscription Plans</Link></li>
+          {/* <li className="mc-nav-item"><Link to="/client/plans" className="mc-nav-link"><i className="bi bi-bookmark-star-fill"></i> Subscription Plans</Link></li> */}
           <li className="mc-nav-item"><Link to="/chatrooms" className="mc-nav-link active"><i className="bi bi-chat-dots-fill"></i> Community Chat</Link></li>
           <li className="mc-nav-item"><Link to="/client/podcasts" className="mc-nav-link"><i className="bi bi-broadcast-pin"></i> Podcasts</Link></li>
         </ul>
@@ -516,18 +516,6 @@ const ChatInterface = () => {
                 {rateLimitMsg}
               </div>
             )}
-
-            {replyingTo && (
-              <div className="reply-preview">
-                <div className="reply-preview-content">
-                  <span className="reply-preview-sender">Replying to {replyingTo.anonymousId}</span>
-                  <span className="reply-preview-text">{replyingTo.content}</span>
-                </div>
-                <button className="reply-cancel-btn" onClick={cancelReply}>
-                  <i className="bi bi-x"></i>
-                </button>
-              </div>
-            )}
             
             {/* Report Modal */}
             {showReportModal && (
@@ -589,6 +577,17 @@ const ChatInterface = () => {
             )}
 
             <form className="chat-input-area" onSubmit={handleSendMessage}>
+              {replyingTo && (
+              <div className="reply-preview">
+                <div className="reply-preview-content">
+                  <span className="reply-preview-sender">Replying to {replyingTo.anonymousId}</span>
+                  <span className="reply-preview-text">{replyingTo.content}</span>
+                </div>
+                <button className="reply-cancel-btn" onClick={cancelReply}>
+                  <i className="bi bi-x"></i>
+                </button>
+              </div>
+            )}
               <input
                 type="text"
                 className="chat-input"

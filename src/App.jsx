@@ -9,6 +9,7 @@ import ForgotPassword from './pages/public/ForgotPassword';
 import ClientDashboard from './pages/client/ClientDashboard';
 import ChatroomList from './pages/shared/ChatroomList';
 import ChatInterface from './pages/shared/ChatInterface';
+import MentorDashboard from './pages/mentor/MentorDashboard';
 
 function App() {
   return (
@@ -24,6 +25,7 @@ function App() {
       <Route path="/chatrooms" element={<ChatroomList />} /> 
       <Route path="/chatrooms" element={<ChatroomList />} /> 
       <Route path="/chatroom/:id" element={<ChatInterface />} />
+      <Route path="/mentor/dashboard" element={<MentorDashboard />} />
 
     </Routes>
   );

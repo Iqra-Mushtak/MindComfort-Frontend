@@ -75,7 +75,7 @@ const ClientDashboard = () => {
     </li>
     <li className="mc-nav-item">
       <Link to="/client/profile" className="mc-nav-link">
-        <i className="bi bi-"></i> Mentors
+        <i className="bi bi-person-heart"></i> Mentors
       </Link>
     </li>
   </ul>
@@ -109,8 +109,8 @@ const ClientDashboard = () => {
     </div>
   </div>
 
-  <div className="mc-welcome-header" style={{ marginBottom: 0 }}>
-      <h1>Welcome, {user.username}!</h1>
+  <div className="mc-welcome-header">
+      <h3>Welcome, {user.username}!</h3>
       <p>We're so glad to see you. What do you want to do today?</p>
     </div>
 

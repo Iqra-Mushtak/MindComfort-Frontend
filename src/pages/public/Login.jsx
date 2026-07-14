@@ -7,6 +7,22 @@ const Login = () => {
   const [formData, setFormData] = useState({ email: '', password: '' });
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
+
+  // React.useEffect(() => {
+  //   const user = JSON.parse(localStorage.getItem('user'));
+  //   const token = localStorage.getItem('token');
+
+  //   if (token && user) {
+  //     if (user.role === 'mentor') {
+  //       navigate('/mentor/dashboard');
+  //     } else if (user.role === 'admin' || user.role === 'moderator') {
+  //       navigate('/admin/dashboard');
+  //     } else {
+  //       navigate('/client/dashboard');
+  //     }
+  //   }
+  // }, [navigate]);
+
   const navigate = useNavigate();
 
   const handleChange = (e) => {
@@ -24,8 +40,14 @@ const Login = () => {
       localStorage.setItem('token', response.data.token);
       localStorage.setItem('user', JSON.stringify(response.data.user));
       
-      alert('Login Successful!');
-      navigate('/client/dashboard');
+      const userRole = response.data.user.role;
+      if (userRole === 'mentor') {
+        navigate('/mentor/dashboard');
+      } else if (userRole === 'admin' || userRole === 'moderator') {
+        navigate('/admin/dashboard'); 
+      } else {
+        navigate('/client/dashboard');
+      }
 
     } catch (err) {
       setError(err.response?.data?.message || 'An error occurred during login.');

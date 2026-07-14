@@ -11,6 +11,7 @@
   display: flex;
   flex-direction: column;
   height: 100vh;
+  overflow-x: hidden;
 }
 
 .chat-header {
@@ -191,6 +192,7 @@
 
 .chat-input-area {
   display: flex;
+  flex-wrap: wrap;
   gap: 1rem;
   padding: 1rem;
   background: transparent;
@@ -200,6 +202,7 @@
 
 .chat-input {
   flex-grow: 1;
+  flex-basis: auto;
   padding: 0.8rem 1.2rem;
   border: 2px solid #d4e8e6;
   border-radius: 12px;
@@ -360,14 +363,18 @@
   background: rgba(0, 0, 0, 0.05);
   border-left: 3px solid var(--mc-primary);
   border-radius: 4px;
-  display: flex;
+  /* display: flex; */
+  display: block;
   align-items: center;
   gap: 4px;
-  overflow: visible; 
+  overflow: hidden; 
   white-space: normal; 
-  text-overflow: clip; 
+  text-overflow: ellipsis; 
   max-width: 100%;
-  line-height: 1.4;
+  min-width: 0;
+  width: 100%;
+  box-sizing: border-box;
+
 }
 
 .own-message .message-reply-preview {
@@ -390,64 +397,71 @@
 }
 
 .message-reply-preview span {
-  overflow: visible;
-  text-overflow: clip;
-  word-break: break-word;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  /* word-break: break-word; */
+  min-width: 0;
 }
 
 .reply-preview {
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  padding: 0.6rem 1rem;
-  background: #f8fbfa;
-  border-left: 4px solid var(--mc-primary);
-  margin: 0 1rem 0.5rem 1rem;
-  border-radius: 8px;
-  animation: slideDown 0.3s ease;
+  padding: 8px 12px;
+  background: rgba(0, 132, 118, 0.05);
+  border-left: 3px solid var(--mc-primary);
+  border-radius: 6px;
+  margin-bottom: 10px;
+  width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
+  overflow: hidden;
+  flex-basis: 100%;
+  order: -1;
 }
 
 .reply-preview-content {
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
-  overflow: hidden;
   flex: 1;
+  min-width: 0; 
+  overflow: hidden;
+  margin-right: 10px;
 }
 
 .reply-preview-sender {
+  display: block;
   font-size: 0.8rem;
-  font-weight: 600;
+  font-weight: 700;
   color: var(--mc-primary);
-}
-
-.reply-preview-text {
-  font-size: 0.85rem;
-  color: var(--mc-text-dark);
+  margin-bottom: 2px;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
 }
 
+.reply-preview-text {
+  display: block;
+  font-size: 0.85rem;
+  color: #666;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  width: 100%;
+}
+
 .reply-cancel-btn {
   background: none;
   border: none;
-  color: var(--mc-text-light);
+  color: #999;
   cursor: pointer;
-  font-size: 1.2rem;
-  padding: 0.2rem;
+  font-size: 1rem;
+  padding: 4px;
+  flex-shrink: 0; 
   display: flex;
   align-items: center;
   justify-content: center;
-  border-radius: 4px;
-  transition: all 0.2s ease;
-  flex-shrink: 0;
-  margin-left: 0.5rem;
 }
 
 .reply-cancel-btn:hover {
-  background: rgba(0, 0, 0, 0.1);
-  color: var(--mc-text-dark);
+  color: #333;
 }
 
 @keyframes slideDown {
