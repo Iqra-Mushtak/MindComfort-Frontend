@@ -51,7 +51,6 @@ const ClientDashboard = () => {
   </div>
   </Link>
 
-  {/* 2. Navigation in the MIDDLE */}
   <ul className="mc-nav-menu">
     <li className="mc-nav-item">
       <Link to="/client/dashboard" className="mc-nav-link active">
@@ -74,13 +73,12 @@ const ClientDashboard = () => {
       </Link>
     </li>
     <li className="mc-nav-item">
-      <Link to="/client/profile" className="mc-nav-link">
+      <Link to="/client/mentors" className="mc-nav-link">
         <i className="bi bi-person-heart"></i> Mentors
       </Link>
     </li>
   </ul>
 
-  {/* 3. Logout at the BOTTOM (No logo here anymore) */}
   <div className="mc-sidebar-footer">
     <button className="mc-logout-btn" onClick={handleLogout}>
       <i className="bi bi-box-arrow-right"></i> Log Out
@@ -101,7 +99,6 @@ const ClientDashboard = () => {
         <span className="mc-badge">3</span>
       </button>
       
-      {/* Logo at Top Right Corner */}
       <Link to="/client/dashboard" className="mc-main-logo">
         MindComfort
         <img src={logoImg} alt="MindComfort Logo" />

@@ -10,6 +10,8 @@ import ClientDashboard from './pages/client/ClientDashboard';
 import ChatroomList from './pages/shared/ChatroomList';
 import ChatInterface from './pages/shared/ChatInterface';
 import MentorDashboard from './pages/mentor/MentorDashboard';
+import Profile from './pages/shared/Profile';
+import EditProfile from './pages/shared/EditProfile';
 
 function App() {
   return (
@@ -26,7 +28,10 @@ function App() {
       <Route path="/chatrooms" element={<ChatroomList />} /> 
       <Route path="/chatroom/:id" element={<ChatInterface />} />
       <Route path="/mentor/dashboard" element={<MentorDashboard />} />
-
+      <Route path="/client/profile" element={<Profile />} />
+      <Route path="/mentor/profile" element={<Profile />} />
+      <Route path="/client/profile/edit" element={<EditProfile />} />
+      <Route path="/mentor/profile/edit" element={<EditProfile />} />
     </Routes>
   );
 }

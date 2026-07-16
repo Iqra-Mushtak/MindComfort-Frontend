@@ -153,12 +153,15 @@
   color: var(--mc-primary);
   font-weight: 700;
   font-size: 1.5rem;
-  margin-bottom: 1rem;
+  margin-bottom: 0.2rem !important;
+  margin-top: 0 !important;
 }
 
 .mc-welcome-header p {
   color: var(--mc-text-light);
   font-size: 1.1rem;
+  margin-top: 0 !important;
+  margin-bottom: 1rem !important;
 }
 
 /* Top Right Notification Bell */
