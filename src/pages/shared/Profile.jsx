@@ -51,7 +51,6 @@ const Profile = () => {
   if (loading) return <div className="loading">Loading profile...</div>;
   if (error) return <div className="loading" style={{color: 'red', textAlign: 'center', marginTop: '50px'}}>{error}</div>;
   
-  // Prevent completely blank screen if user data is missing
   if (!user) return <div className="loading" style={{textAlign: 'center', marginTop: '50px'}}>No user data found. Please check browser console (F12) for errors.</div>;
 
   // Fallback in case role is somehow missing
@@ -155,6 +154,41 @@ const Profile = () => {
               <div className="info-row"><span className="info-label">Qualification:</span> <span className="info-value">{mentorProfile?.qualification || 'Not provided'}</span></div>
               <div className="info-row"><span className="info-label">Expertise:</span> <span className="info-value">{mentorProfile?.expertise || 'Not provided'}</span></div>
               <div className="info-row"><span className="info-label">Experience:</span> <span className="info-value">{mentorProfile?.experience || 'Not provided'}</span></div>
+
+              <div className="info-row">
+                <span className="info-label">Availability:</span>
+                <div className="info-value">
+                  {mentorProfile?.availabilitySchedule && mentorProfile.availabilitySchedule.length > 0 ? (
+                    <div className="slots-list-view">
+                      {mentorProfile.availabilitySchedule.map((slot) => {
+                        let dayDisplay = '';
+                        if (slot.day && slot.endDay) {
+                          dayDisplay = `${slot.day} to ${slot.endDay}`;
+                        } else if (slot.day) {
+                          dayDisplay = slot.day;
+                        } else if (slot.date) {
+                          const startDate = new Date(slot.date).toLocaleDateString();
+                          if (slot.endDate) {
+                            const endDate = new Date(slot.endDate).toLocaleDateString();
+                            dayDisplay = `${startDate} to ${endDate}`;
+                          } else {
+                            dayDisplay = startDate;
+                          }
+                        }
+                        
+                        return (
+                          <div key={slot._id} className="slot-item-view">
+                            <span className="slot-day-view">{dayDisplay}</span>
+                            <span className="slot-time-view">{slot.startTime} - {slot.endTime}</span>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  ) : (
+                    <span style={{color: '#888'}}>No availability set</span>
+                  )}
+                </div>
+              </div>
             </>
           )}
         </div>
@@ -163,7 +197,7 @@ const Profile = () => {
           <h3>Security</h3>
           <div className="security-options">
             <Link to={`/${role}/profile/edit?tab=email`} className="security-link">
-              <i className="bi bi-envelope"></i> Update Email (Requires OTP Verification)
+              <i className="bi bi-envelope"></i> Update Email
             </Link>
             <Link to={`/${role}/profile/edit?tab=password`} className="security-link">
               <i className="bi bi-lock"></i> Update Password

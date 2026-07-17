@@ -221,7 +221,8 @@
 }
 
 .form-group input,
-.form-group textarea {
+.form-group textarea,
+.form-group select {
   width: 100%;
   padding: 0.8rem 1rem;
   border: 2px solid #d4e8e6;
@@ -377,3 +378,106 @@
   flex: none;
   width: auto;
 }
+
+.slots-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.8rem;
+  margin-bottom: 1.5rem;
+}
+
+.slot-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.8rem 1rem;
+  background: #f8fbfa;
+  border: 1px solid rgba(201, 232, 203, 0.3);
+  border-radius: 8px;
+}
+
+.slot-info {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.slot-day {
+  font-weight: 600;
+  color: var(--mc-text-dark);
+  min-width: 100px;
+}
+
+.slot-time {
+  color: var(--mc-text-light);
+  font-size: 0.9rem;
+}
+
+.slot-actions {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.icon-btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0.4rem;
+  border-radius: 4px;
+  transition: all 0.2s ease;
+  font-size: 1rem;
+}
+
+.icon-btn.edit { color: var(--mc-primary); }
+.icon-btn.edit:hover { background: rgba(0, 132, 118, 0.1); }
+
+.icon-btn.delete { color: #dc3545; }
+.icon-btn.delete:hover { background: rgba(220, 53, 69, 0.1); }
+
+.slot-form {
+  background: #f8fbfa;
+  padding: 1.2rem;
+  border-radius: 8px;
+  border: 1px solid rgba(201, 232, 203, 0.3);
+  margin-top: 1rem;
+}
+
+.slot-type-toggle {
+  display: flex;
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+}
+
+.toggle-btn {
+  flex: 1;
+  padding: 0.6rem;
+  border: 1px solid #d4e8e6;
+  background: white;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: 500;
+  color: var(--mc-text-light);
+  transition: all 0.2s;
+}
+
+.toggle-btn.active {
+  background: var(--mc-primary);
+  color: white;
+  border-color: var(--mc-primary);
+}
+
+.time-inputs {
+  display: flex;
+  gap: 1rem;
+}
+
+.time-inputs .form-group {
+  flex: 1;
+}
+
+.slot-form-actions {
+  display: flex;
+  gap: 1rem;
+  margin-top: 1rem;
+}
+

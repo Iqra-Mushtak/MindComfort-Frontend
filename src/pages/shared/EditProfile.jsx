@@ -21,6 +21,11 @@ const EditProfile = () => {
   const [emailData, setEmailData] = useState({ currentEmail: '', newEmail: '', otp: '' });
   const [emailLoading, setEmailLoading] = useState(false);
 
+  const [slots, setSlots] = useState([]);
+  const [isAddingSlot, setIsAddingSlot] = useState(false);
+  const [editingSlotId, setEditingSlotId] = useState(null);
+  const [slotData, setSlotData] = useState({ day: '', endDay: '', date: '', endDate: '', startTime: '09:00', endTime: '12:00' });
+
   useEffect(() => {
     const token = localStorage.getItem('token');
     const userData = JSON.parse(localStorage.getItem('user'));
@@ -40,6 +45,8 @@ const EditProfile = () => {
           expertise: response.data.mentorProfile.expertise || '',
           experience: response.data.mentorProfile.experience || ''
         });
+        setSlots(response.data.mentorProfile.availabilitySchedule || []);
+
       }
       setLoading(false);
     } catch (err) {
@@ -131,6 +138,67 @@ const EditProfile = () => {
     }
   };
 
+  const handleSlotChange = (e) => {
+    setSlotData({ ...slotData, [e.target.name]: e.target.value });
+  };
+
+  const handleSlotSubmit = async (e) => {
+    e.preventDefault();
+    
+    if (!slotData.day && !slotData.date) {
+      return alert('Please select at least a Day or a specific Date.');
+    }
+
+    try {
+      const payload = {
+        startTime: slotData.startTime,
+        endTime: slotData.endTime,
+      };
+
+      if (slotData.day) payload.day = slotData.day;
+      if (slotData.endDay) payload.endDay = slotData.endDay;
+      if (slotData.date) payload.date = slotData.date;
+      if (slotData.endDate) payload.endDate = slotData.endDate;
+
+      if (editingSlotId) {
+        await api.put(`/profile/mentor/${user.id}/availability/${editingSlotId}`, payload);
+        setSlots(slots.map(s => s._id === editingSlotId ? { ...s, ...payload } : s));
+        setEditingSlotId(null);
+      } else {
+        const res = await api.post(`/profile/mentor/${user.id}/availability`, payload);
+        setSlots([...slots, res.data.slot]);
+      }
+      
+      setSlotData({ day: '', endDay: '', date: '', endDate: '', startTime: '09:00', endTime: '12:00' });
+      setIsAddingSlot(false);
+    } catch (err) {
+      alert(err.response?.data?.message || 'Failed to save slot');
+    }
+  };
+
+  const handleEditSlot = (slot) => {
+    setSlotData({
+      day: slot.day || '',
+      endDay: slot.endDay || '',
+      date: slot.date ? slot.date.split('T')[0] : '',
+      endDate: slot.endDate ? slot.endDate.split('T')[0] : '',
+      startTime: slot.startTime,
+      endTime: slot.endTime
+    });
+    setEditingSlotId(slot._id);
+    setIsAddingSlot(true);
+  };
+
+  const handleDeleteSlot = async (slotId) => {
+    if (!window.confirm('Are you sure you want to delete this availability slot?')) return;
+    try {
+      await api.delete(`/profile/mentor/${user.id}/availability/${slotId}`);
+      setSlots(slots.filter(s => s._id !== slotId));
+    } catch (err) {
+      alert(err.response?.data?.message || 'Failed to delete slot');
+    }
+  };
+  
   if (loading) return <div className="loading">Loading...</div>;
   if (!user) return null;
 
@@ -181,7 +249,89 @@ const EditProfile = () => {
               <div className="form-group"><label>Expertise</label><textarea value={mentorData.expertise} onChange={(e) => setMentorData({...mentorData, expertise: e.target.value})} rows="3" required /></div>
               <div className="form-group"><label>Experience</label><input type="text" value={mentorData.experience} onChange={(e) => setMentorData({...mentorData, experience: e.target.value})} required /></div>
             </div>
-            <div className="form-actions"><button type="submit" className="save-btn">Save Changes</button></div>
+
+            <div className="profile-section">
+              <div style={{display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem'}}>
+                <h3 style={{margin: 0, border: 'none'}}>Availability Schedule</h3>
+                {!isAddingSlot && (
+                  <button type="button" className="save-btn" style={{padding: '0.5rem 1rem', fontSize: '0.9rem'}} onClick={() => setIsAddingSlot(true)}>
+                    <i className="bi bi-plus-lg"></i> Add Slot
+                  </button>
+                )}
+              </div>
+
+              {slots.length > 0 ? (
+                <div className="slots-list">
+                  {slots.map((slot) => (
+                    <div key={slot._id} className="slot-item">
+                      <div className="slot-info">
+                        <span className="slot-day">{slot.date ? new Date(slot.date).toLocaleDateString() : slot.day}</span>
+                        <span className="slot-time">{slot.startTime} - {slot.endTime}</span>
+                      </div>
+                      <div className="slot-actions">
+                        <button type="button" className="icon-btn edit" onClick={() => handleEditSlot(slot)}><i className="bi bi-pencil"></i></button>
+                        <button type="button" className="icon-btn delete" onClick={() => handleDeleteSlot(slot._id)}><i className="bi bi-trash"></i></button>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <p style={{color: '#888', fontSize: '0.9rem', marginBottom: '1rem'}}>No availability slots added yet.</p>
+              )}
+
+              {isAddingSlot && (
+              <div className="slot-form">
+                <div className="form-group">
+                  <label>Day of Week <span style={{fontWeight: 'normal', color: '#888'}}></span></label>
+                  <small style={{display: 'block', marginBottom: '0.5rem', fontSize: '0.85rem', color: '#666'}}>
+                    Set your regular weekly availability. Optional if you are adding a specific date below.
+                  </small>
+                  <div style={{display: 'flex', gap: '1rem', alignItems: 'center'}}>
+                    <select name="day" value={slotData.day} onChange={handleSlotChange} style={{flex: 1}}>
+                      <option value="">From...</option>
+                      {['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'].map(d => (
+                        <option key={d} value={d}>{d}</option>
+                      ))}
+                    </select>
+                    <span style={{color: '#888'}}>to</span>
+                    <select name="endDay" value={slotData.endDay} onChange={handleSlotChange} style={{flex: 1}}>
+                      <option value="">To... (optional)</option>
+                      {['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'].map(d => (
+                        <option key={d} value={d}>{d}</option>
+                      ))}
+                    </select>
+                  </div>
+                </div>
+
+                <div className="form-group">
+                  <label>Date <span style={{fontWeight: 'normal', color: '#888'}}></span></label>
+                  <div style={{display: 'flex', gap: '1rem', alignItems: 'center'}}>
+                    <input type="date" name="date" value={slotData.date} onChange={handleSlotChange} style={{flex: 1}} />
+                    <span style={{color: '#888'}}>to</span>
+                    <input type="date" name="endDate" value={slotData.endDate} onChange={handleSlotChange} style={{flex: 1}} placeholder="Optional" />
+                  </div>
+                </div>
+
+                <div className="time-inputs">
+                  <div className="form-group">
+                    <label>Start Time</label>
+                    <input type="time" name="startTime" value={slotData.startTime} onChange={handleSlotChange} required />
+                  </div>
+                  <div className="form-group">
+                    <label>End Time</label>
+                    <input type="time" name="endTime" value={slotData.endTime} onChange={handleSlotChange} required />
+                  </div>
+                </div>
+
+                <div className="slot-form-actions">
+                  <button type="button" onClick={handleSlotSubmit} className="save-btn">{editingSlotId ? 'Update Slot' : 'Save Slot'}</button>
+                  <button type="button" className="cancel-btn" onClick={() => { setIsAddingSlot(false); setEditingSlotId(null); }}>Cancel</button>
+                </div>
+              </div>
+            )}
+            </div>
+
+            <div className="form-actions"><button type="submit" className="save-btn">Save Mentor Details</button></div>
           </form>
         )}
 
