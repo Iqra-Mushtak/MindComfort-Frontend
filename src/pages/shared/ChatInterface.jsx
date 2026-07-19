@@ -583,7 +583,7 @@ const ChatInterface = () => {
                   <span className="reply-preview-sender">Replying to {replyingTo.anonymousId}</span>
                   <span className="reply-preview-text">{replyingTo.content}</span>
                 </div>
-                <button className="reply-cancel-btn" onClick={cancelReply}>
+                <button type="button" className="reply-cancel-btn" onClick={cancelReply}>
                   <i className="bi bi-x"></i>
                 </button>
               </div>
