@@ -135,7 +135,7 @@ const ClientDashboard = () => {
           </Link>
 
           {/* Card 3: Upcoming Podcasts */}
-          <Link to="/client/upcoming-podcasts" className="mc-dash-card">
+          <Link to="/client/podcasts?tab=discover" className="mc-dash-card">
             <div className="mc-card-visual visual-live">
               <i className="bi bi-calendar-event-fill"></i>
             </div>
@@ -146,7 +146,7 @@ const ClientDashboard = () => {
           </Link>
 
           {/* Card 4: Purchased Podcasts */}
-          <Link to="/client/my-podcasts" className="mc-dash-card">
+          <Link to="/client/podcasts?tab=library&view=upcoming" className="mc-dash-card">
             <div className="mc-card-visual visual-recordings">
               <i className="bi bi-play-circle-fill"></i>
             </div>

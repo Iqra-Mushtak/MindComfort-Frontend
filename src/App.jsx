@@ -12,6 +12,9 @@ import ChatInterface from './pages/shared/ChatInterface';
 import MentorDashboard from './pages/mentor/MentorDashboard';
 import Profile from './pages/shared/Profile';
 import EditProfile from './pages/shared/EditProfile';
+import MentorMyPodcasts from './pages/mentor/podcast/MentorMyPodcasts';
+import CreatePodcast from './pages/mentor/podcast/CreatePodcast';
+import ClientPodcast from './pages/client/ClientPodcast';
 
 function App() {
   return (
@@ -25,13 +28,18 @@ function App() {
       <Route path="/forgot-password" element={<ForgotPassword />} />
       <Route path="/client/dashboard" element={<ClientDashboard />} />
       <Route path="/chatrooms" element={<ChatroomList />} /> 
-      <Route path="/chatrooms" element={<ChatroomList />} /> 
       <Route path="/chatroom/:id" element={<ChatInterface />} />
       <Route path="/mentor/dashboard" element={<MentorDashboard />} />
       <Route path="/client/profile" element={<Profile />} />
       <Route path="/mentor/profile" element={<Profile />} />
       <Route path="/client/profile/edit" element={<EditProfile />} />
       <Route path="/mentor/profile/edit" element={<EditProfile />} />
+      <Route path="/mentor/my-podcasts" element={<MentorMyPodcasts />} />
+      <Route path="/mentor/podcasts" element={<MentorMyPodcasts />} />
+      <Route path="/mentor/create-podcast" element={<CreatePodcast />} />    
+      <Route path="/client/podcasts" element={<ClientPodcast />} />
+      <Route path="/client/upcoming-podcasts" element={<ClientPodcast />} />
+      <Route path="/client/my-podcasts" element={<ClientPodcast />} />
     </Routes>
   );
 }
