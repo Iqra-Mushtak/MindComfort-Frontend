@@ -3,6 +3,7 @@ import { useNavigate, Link, useLocation } from 'react-router-dom';
 import api from '../../utils/api';
 import './ClientPodcast.css';
 import logoImg from '../../assets/logo.png';
+import PurchaseModal from './PurchaseModal';
 
 const ClientPodcasts = () => {
   const navigate = useNavigate();
@@ -14,6 +15,11 @@ const ClientPodcasts = () => {
   const [library, setLibrary] = useState({ upcoming: [], past: [] });
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
+  const [loadError, setLoadError] = useState(false);
+  const [isPurchaseModalOpen, setIsPurchaseModalOpen] = useState(false);
+  const [selectedPodcast, setSelectedPodcast] = useState(null);
+  const [purchaseError, setPurchaseError] = useState('');
+  const [isPurchasing, setIsPurchasing] = useState(false);
 
   useEffect(() => {
     const userData = JSON.parse(localStorage.getItem('user'));
@@ -54,6 +60,7 @@ const ClientPodcasts = () => {
   const fetchData = async () => {
     setLoading(true);
     setError('');
+    setLoadError(false);
     try {
       const [upcomingRes, libraryRes] = await Promise.all([
         api.get('/podcasts/client/upcoming'),
@@ -62,24 +69,69 @@ const ClientPodcasts = () => {
       setUpcomingPodcasts(upcomingRes.data.data || []);
       setLibrary(libraryRes.data);
     } catch (err) {
-      setError('Failed to load podcasts.');
+      setLoadError(true);
       console.error(err);
     } finally {
       setLoading(false);
     }
   };
 
-  const handlePurchase = async (podcastId, title) => {
-    if (!window.confirm(`Purchase "${title}" to attend the live session and access the recording?`)) {
-      return;
-    }
-    try {
-      await api.post(`/subscriptions/podcast/${podcastId}`);
-      alert('Podcast purchased successfully!');
-      fetchData();
-    } catch (err) {
-      alert(err.response?.data?.message || 'Failed to purchase podcast');
-    }
+  const handlePurchase = (podcast) => {
+    setSelectedPodcast(podcast);
+    setPurchaseError('');
+    setIsPurchaseModalOpen(true);
+  };
+
+  const handleConfirmPurchase = async () => {
+      if (!selectedPodcast) return;
+      setIsPurchasing(true);
+      setPurchaseError('');
+      try {
+          const token = localStorage.getItem('token');
+          const response = await fetch(`http://localhost:5000/api/subscriptions/podcast/${selectedPodcast._id}`, {
+              method: 'POST',
+              headers: {
+                  'Authorization': `Bearer ${token}`,
+                  'Content-Type': 'application/json'
+              }
+          });
+          if (!response.ok) {
+              const errorData = await response.json();
+              throw new Error(errorData.message || 'Failed to create purchase');
+          }
+          const data = await response.json();
+          
+          // Build and auto-submit PayFast form
+          if (data.payfastData && data.payfastUrl) {
+              const form = document.createElement('form');
+              form.method = 'POST';
+              form.action = data.payfastUrl;
+              
+              Object.keys(data.payfastData).forEach(key => {
+                  const input = document.createElement('input');
+                  input.type = 'hidden';
+                  input.name = key;
+                  input.value = data.payfastData[key];
+                  form.appendChild(input);
+              });
+              
+              document.body.appendChild(form);
+              form.submit();
+          } else {
+              throw new Error('No PayFast payment data received');
+          }
+      } catch (err) {
+          console.error('Purchase error:', err);
+          setPurchaseError(err.message || 'Failed to process purchase. Please try again.');
+      } finally {
+          setIsPurchasing(false);
+      }
+  };
+
+  const handleCancelPurchase = () => {
+    setIsPurchaseModalOpen(false);
+    setSelectedPodcast(null);
+    setPurchaseError('');
   };
 
   const handlePlayRecording = async (podcastId) => {
@@ -87,16 +139,18 @@ const ClientPodcasts = () => {
       const res = await api.get(`/podcasts/${podcastId}/recording`);
       window.open(res.data.recordingUrl, '_blank');
     } catch (err) {
-      alert(err.response?.data?.message || 'Failed to load recording');
+      console.error('Error loading recording:', err);
+      setError(err.response?.data?.message || 'Failed to load recording');
     }
   };
 
   const handleJoinLive = async (podcastId) => {
     try {
       await api.get(`/podcasts/${podcastId}/join-stream`);
-      alert('Connected to live session. Live player UI is not available yet, but your access was verified.');
+      setError('Connected to live session. Live player UI is not available yet, but your access was verified.');
     } catch (err) {
-      alert(err.response?.data?.message || 'Unable to join live session');
+      console.error('Error joining live session:', err);
+      setError(err.response?.data?.message || 'Unable to join live session');
     }
   };
 
@@ -210,7 +264,8 @@ const ClientPodcasts = () => {
           </button>
         </div>
 
-        {error && <div className="alert alert-danger">{error}</div>}
+        {loadError && <p className="error-text">Failed to load podcasts. Please try again.</p>}
+        {error && <p className="error-text">{error}</p>}
 
         {loading ? (
           <div className="loading-text">Loading podcasts...</div>
@@ -256,7 +311,7 @@ const ClientPodcasts = () => {
                           ) : (
                             <button 
                               className="btn-purchase"
-                              onClick={() => handlePurchase(podcast._id, podcast.title)}
+                              onClick={() => handlePurchase(podcast)}
                             >
                               <i className="bi bi-bag-plus"></i> Purchase
                             </button>
@@ -394,6 +449,16 @@ const ClientPodcasts = () => {
           </>
         )}
       </main>
+
+      <PurchaseModal
+        isOpen={isPurchaseModalOpen}
+        item={selectedPodcast}
+        itemType="podcast"
+        onConfirm={handleConfirmPurchase}
+        onCancel={handleCancelPurchase}
+        isLoading={isPurchasing}
+        error={purchaseError}
+      />
     </div>
   );
 };
