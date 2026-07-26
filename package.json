@@ -11,6 +11,7 @@
   },
   "dependencies": {
     "@stripe/stripe-js": "^9.10.0",
+    "agora-rtc-sdk-ng": "^4.24.6",
     "axios": "^1.18.1",
     "bootstrap": "^5.3.8",
     "bootstrap-icons": "^1.13.1",

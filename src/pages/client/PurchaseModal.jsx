@@ -59,7 +59,9 @@ const PurchaseModal = ({
   const getDate = () => {
     if (isPlan) return null;
     if (isPodcast) {
-      return new Date(item.scheduledDate).toLocaleDateString('en-US', {
+      const dateStr = item.startTime || item.scheduledDate;
+      if (!dateStr) return null;
+      return new Date(dateStr).toLocaleDateString('en-US', {
         weekday: 'long',
         year: 'numeric',
         month: 'long',

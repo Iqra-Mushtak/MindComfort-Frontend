@@ -49,21 +49,22 @@ const PodcastSummaryModal = ({ podcast, onClose }) => {
               </p>
             </div>
 
-            {/* Stats - Only for Past Podcasts */}
-            {podcast.status === 'ended' && (
+            {(podcast.status === 'upcoming' || podcast.status === 'ended') && (
               <div className="row g-3 mb-4">
                 <div className="col-md-6">
                   <div className="stats-card purchased">
                     <h3>{podcast.purchased || 0}</h3>
-                    <small>Tickets Purchased</small>
+                    <small>Tickets Sold</small>
                   </div>
                 </div>
-                <div className="col-md-6">
-                  <div className="stats-card attended">
-                    <h3>{podcast.attended || 0}</h3>
-                    <small>Actually Attended</small>
+                {podcast.status === 'ended' && (
+                  <div className="col-md-6">
+                    <div className="stats-card attended">
+                      <h3>{podcast.attended || 0}</h3>
+                      <small>Actually Attended</small>
+                    </div>
                   </div>
-                </div>
+                )}
               </div>
             )}
 

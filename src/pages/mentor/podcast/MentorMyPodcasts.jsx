@@ -45,32 +45,53 @@ const MentorMyPodcasts = () => {
   };
 
   const renderSection = (sectionTitle, sectionKey, items) => {
-    const count = items.length;
-    
-    return (
-      <div className="mb-5">
-        <h4>{sectionTitle}</h4>
-        
-        {count > 0 ? (
-          <p className="section-count">{count} {sectionKey} podcast{count !== 1 ? 's' : ''}</p>
-        ) : (
-          <p className="section-count">No {sectionKey} podcasts available</p>
-        )}
+  const count = items.length;
+  const now = new Date();
 
-        {count > 0 && (
-          <div>
-            {items.map((item) => (
-              <MentorPodcastItem 
-                key={item._id || item.id} 
-                {...item} 
-                onClick={() => setSelectedPodcast(item)}
-              />
-            ))}
-          </div>
-        )}
-      </div>
-    );
-  };
+  return (
+    <div className="mb-5">
+      <h4>{sectionTitle}</h4>
+      {count > 0 ? (
+        <p className="section-count">{count} {sectionKey} podcast{count !== 1 ? 's' : ''}</p>
+      ) : (
+        <p className="section-count">No {sectionKey} podcasts available</p>
+      )}
+      {count > 0 && (
+        <div>
+          {items.map((item) => {
+            const startTime = new Date(item.startTime || item.date);
+            
+            const isLiveTime = now >= new Date(startTime.getTime() - 5 * 60000); 
+            
+            return (
+              <div key={item._id || item.id} className="podcast-item-wrapper" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                <div style={{ flex: 1 }} onClick={() => setSelectedPodcast(item)}>
+                  <MentorPodcastItem 
+                    {...item} 
+                    onClick={() => setSelectedPodcast(item)}
+                  />
+                </div>
+                
+                {sectionKey === 'upcoming' && isLiveTime && item.status === 'upcoming' && (
+                  <button 
+                    className="btn-go-live"
+                    onClick={() => navigate(`/mentor/podcast/${item._id}/live`)}
+                    style={{
+                      background: '#dc3545', color: 'white', border: 'none', 
+                      padding: '8px 16px', borderRadius: '20px', fontWeight: 'bold', cursor: 'pointer'
+                    }}
+                  >
+                    <i className="bi bi-broadcast"></i> Go Live
+                  </button>
+                )}
+              </div>
+            );
+          })}
+        </div>
+      )}
+    </div>
+  );
+};
 
   if (!user) return null;
 

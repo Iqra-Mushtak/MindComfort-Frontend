@@ -17,9 +17,13 @@ import CreatePodcast from './pages/mentor/podcast/CreatePodcast';
 import ClientPodcast from './pages/client/ClientPodcast';
 import PlansList from './pages/client/PlansList';
 import PaymentSuccess from './pages/client/PaymentSuccess';
+import MentorLiveDashboard from './pages/mentor/podcast/MentorLiveDashboard';
+import ClientLivePlayer from './pages/client/ClientLivePlayer';
+import GlobalLiveBadge from './components/GlobalLiveBadge';
 
 function App() {
   return (
+    <>
     <Routes>
       <Route path="/" element={<LandingPage />} />
       <Route path="/about" element={<About />} />
@@ -44,7 +48,11 @@ function App() {
       <Route path="/client/podcasts" element={<ClientPodcast />} />
       <Route path="/client/upcoming-podcasts" element={<ClientPodcast />} />
       <Route path="/client/my-podcasts" element={<ClientPodcast />} />
+      <Route path="/mentor/podcast/:id/live" element={<MentorLiveDashboard />} />
+      <Route path="/client/podcast/:id/live" element={<ClientLivePlayer />} />
     </Routes>
+          <GlobalLiveBadge />
+    </>
   );
 }
 

@@ -147,7 +147,7 @@ const ClientPodcasts = () => {
   const handleJoinLive = async (podcastId) => {
     try {
       await api.get(`/podcasts/${podcastId}/join-stream`);
-      setError('Connected to live session. Live player UI is not available yet, but your access was verified.');
+      navigate(`/client/podcast/${podcastId}/live`);
     } catch (err) {
       console.error('Error joining live session:', err);
       setError(err.response?.data?.message || 'Unable to join live session');
@@ -300,10 +300,10 @@ const ClientPodcasts = () => {
                           <span><i className="bi bi-calendar3"></i> {formatDate(podcast.startTime)}</span>
                           <span><i className="bi bi-clock"></i> {formatTime(podcast.startTime)}</span>
                         </div>
-                        <div className="podcast-card-footer">
-                          <span className="podcast-price">
-                            {podcast.price === 0 ? 'Free' : `PKR ${podcast.price}`}
-                          </span>
+                        <div className="podcast-card-footer">   
+                            <span className="podcast-price">
+                              {podcast.price === 0 ? 'Free' : `PKR ${podcast.price}`}
+                            </span>                          
                           {podcast.isPurchased ? (
                             <button className="btn-purchased" disabled>
                               <i className="bi bi-check-lg"></i> In Library
