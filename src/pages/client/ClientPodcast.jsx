@@ -101,7 +101,6 @@ const ClientPodcasts = () => {
           }
           const data = await response.json();
           
-          // Build and auto-submit PayFast form
           if (data.payfastData && data.payfastUrl) {
               const form = document.createElement('form');
               form.method = 'POST';
@@ -276,7 +275,6 @@ const ClientPodcasts = () => {
               <div className="podcasts-grid">
                 {upcomingPodcasts.length === 0 ? (
                   <div className="empty-state">
-                    <i className="bi bi-broadcast-pin"></i>
                     <p>No upcoming podcasts at the moment. Check back soon!</p>
                   </div>
                 ) : (
@@ -345,7 +343,6 @@ const ClientPodcasts = () => {
                   <div className="podcasts-grid">
                     {library.upcoming.length === 0 ? (
                       <div className="empty-state">
-                        <i className="bi bi-calendar-event"></i>
                         <p>You haven't purchased any upcoming podcasts yet.</p>
                         <button className="btn-browse" onClick={() => setActiveTab('discover')}>
                           Browse Podcasts
@@ -397,7 +394,6 @@ const ClientPodcasts = () => {
                   <div className="podcasts-grid">
                     {library.past.length === 0 ? (
                       <div className="empty-state">
-                        <i className="bi bi-play-circle"></i>
                         <p>No past podcasts in your library yet.</p>
                       </div>
                     ) : (

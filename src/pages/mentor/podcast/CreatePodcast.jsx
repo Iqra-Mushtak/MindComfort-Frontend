@@ -110,10 +110,12 @@ const CreatePodcast = () => {
     setLoading(true);
 
     try {
+      const parsedPrice = formData.price === '' ? 0 : parseFloat(formData.price);
+      
       let payload = {
         title: formData.title,
         description: formData.description,
-        price: parseFloat(formData.price) || 0,
+        price: parsedPrice, 
       };
 
       if (formData.endDate) {
@@ -127,11 +129,17 @@ const CreatePodcast = () => {
         if (hasInvalidTime) {
           throw new Error('Use a valid time format like 3:00 PM or 15:00.');
         }
-        payload.sessions = schedule.map(s => ({
+        
+        const sessions = schedule.map(s => ({
           date: s.date,
           startTime: new Date(`${s.date}T${normalizeTimeInput(s.startTime)}`).toISOString(),
           endTime: new Date(`${s.date}T${normalizeTimeInput(s.endTime)}`).toISOString()
         }));
+
+        payload.sessions = sessions;
+        payload.startTime = sessions[0].startTime;
+        payload.endTime = sessions[sessions.length - 1].endTime;
+
       } else {
         if (!schedule[0]?.startTime || !schedule[0]?.endTime) {
            throw new Error('Please provide start and end times.');
@@ -235,19 +243,19 @@ const CreatePodcast = () => {
               />
             </div>
 
-               <div className="form-group">
-                  <label>Ticket Price (PKR) *</label>
-                  <input
-                    type="number"
-                    name="price"
-                    value={formData.price}
-                    onChange={handleChange}
-                    placeholder="e.g., 500 (Enter 0 for Free)"
-                    min="0"
-                    step="0.01"
-                    required
-                  />
-                </div>
+            <div className="form-group">
+              <label>Ticket Price (PKR) *</label>
+              <input
+                type="number"
+                name="price"
+                value={formData.price}
+                onChange={handleChange}
+                placeholder="e.g., 500 (Enter 0 for Free)"
+                min="0"
+                step="0.01"
+                required
+              />
+            </div>
           </div>
 
           <div className="form-section">
@@ -265,36 +273,43 @@ const CreatePodcast = () => {
             </div>
 
             {!isSeries && (
-              <div className="single-time-row">
-                <div className="form-group">
-                  <label>Start Time *</label>
-                  <input
-                    type="text"
-                    value={schedule[0]?.startTime || ''}
-                    onChange={(e) => handleScheduleChange(0, 'startTime', e.target.value)}
-                    placeholder="e.g., 3:00 PM"
-                    required
-                  />
+              <>
+                <div className="single-time-row">
+                  <div className="form-group">
+                    <label>Start Time *</label>
+                    <input
+                      type="text"
+                      value={schedule[0]?.startTime || ''}
+                      onChange={(e) => handleScheduleChange(0, 'startTime', e.target.value)}
+                      placeholder="e.g., 3:00 PM"
+                      required
+                    />
+                  </div>
+                  <div className="form-group">
+                    <label>End Time *</label>
+                    <input
+                      type="text"
+                      value={schedule[0]?.endTime || ''}
+                      onChange={(e) => handleScheduleChange(0, 'endTime', e.target.value)}
+                      placeholder="e.g., 4:30 PM"
+                      required
+                    />
+                  </div>
                 </div>
-                <div className="form-group">
-                  <label>End Time *</label>
-                  <input
-                    type="text"
-                    value={schedule[0]?.endTime || ''}
-                    onChange={(e) => handleScheduleChange(0, 'endTime', e.target.value)}
-                    placeholder="e.g., 4:30 PM"
-                    required
-                  />
-                </div>
-              </div>
+                <p className="section-subtitle">Time format: 3:00 PM or 15:00</p>
+              </>
             )}
-            <p className="section-subtitle">Time format: 3:00 PM or 15:00</p>
           </div>
 
           {isSeries && (
             <div className="form-section">
               <h3>Daily Timetable</h3>
               <p className="section-subtitle">Set the specific timings for each day of your series.</p>
+              
+              <p className="section-subtitle" style={{ marginTop: '-10px', marginBottom: '20px', fontSize: '0.85rem', color: '#6c757d' }}>
+                Time format: 3:00 PM or 15:00
+              </p>
+              
               <div className="timetable-list">
                 {schedule.map((slot, index) => (
                   <div key={slot.date} className="timetable-row">

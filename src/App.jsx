@@ -20,6 +20,7 @@ import PaymentSuccess from './pages/client/PaymentSuccess';
 import MentorLiveDashboard from './pages/mentor/podcast/MentorLiveDashboard';
 import ClientLivePlayer from './pages/client/ClientLivePlayer';
 import GlobalLiveBadge from './components/GlobalLiveBadge';
+import AdminDashboard from './pages/admin/AdminDashboard';
 
 function App() {
   return (
@@ -50,6 +51,7 @@ function App() {
       <Route path="/client/my-podcasts" element={<ClientPodcast />} />
       <Route path="/mentor/podcast/:id/live" element={<MentorLiveDashboard />} />
       <Route path="/client/podcast/:id/live" element={<ClientLivePlayer />} />
+      <Route path="/admin/dashboard" element={<AdminDashboard />} />
     </Routes>
           <GlobalLiveBadge />
     </>
