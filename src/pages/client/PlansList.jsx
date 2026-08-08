@@ -84,23 +84,15 @@ const PlansList = () => {
             }
             const data = await response.json();
             
-            if (data.payfastData && data.payfastUrl) {
-                const form = document.createElement('form');
-                form.method = 'POST';
-                form.action = data.payfastUrl;
-                
-                Object.keys(data.payfastData).forEach(key => {
-                    const input = document.createElement('input');
-                    input.type = 'hidden';
-                    input.name = key;
-                    input.value = data.payfastData[key];
-                    form.appendChild(input);
-                });
-                
-                document.body.appendChild(form);
-                form.submit();
+            if (data.checkoutUrl) {
+                localStorage.setItem('paymentId', data.paymentId);
+                if (data.sessionId) {
+                    localStorage.setItem('stripeSessionId', data.sessionId);
+                }
+                console.log('Redirecting to Stripe Checkout:', data.checkoutUrl);
+                window.location.href = data.checkoutUrl;
             } else {
-                throw new Error('No PayFast payment data received');
+                throw new Error('No checkout URL received');
             }
         } catch (err) {
             console.error('Purchase error:', err);

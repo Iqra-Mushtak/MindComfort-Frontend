@@ -17,6 +17,7 @@ import CreatePodcast from './pages/mentor/podcast/CreatePodcast';
 import ClientPodcast from './pages/client/ClientPodcast';
 import PlansList from './pages/client/PlansList';
 import PaymentSuccess from './pages/client/PaymentSuccess';
+import PaymentProcess from './pages/client/PaymentProcess';
 import MentorLiveDashboard from './pages/mentor/podcast/MentorLiveDashboard';
 import ClientLivePlayer from './pages/client/ClientLivePlayer';
 import GlobalLiveBadge from './components/GlobalLiveBadge';
@@ -35,6 +36,7 @@ function App() {
       <Route path="/forgot-password" element={<ForgotPassword />} />
       <Route path="/client/dashboard" element={<ClientDashboard />} />
       <Route path="/client/plans" element={<PlansList />} />
+      <Route path="/payment/process" element={<PaymentProcess />} />
       <Route path="/payment-success" element={<PaymentSuccess />} />
       <Route path="/chatrooms" element={<ChatroomList />} /> 
       <Route path="/chatroom/:id" element={<ChatInterface />} />

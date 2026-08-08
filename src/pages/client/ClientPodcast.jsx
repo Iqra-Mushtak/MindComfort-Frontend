@@ -101,23 +101,14 @@ const ClientPodcasts = () => {
           }
           const data = await response.json();
           
-          if (data.payfastData && data.payfastUrl) {
-              const form = document.createElement('form');
-              form.method = 'POST';
-              form.action = data.payfastUrl;
-              
-              Object.keys(data.payfastData).forEach(key => {
-                  const input = document.createElement('input');
-                  input.type = 'hidden';
-                  input.name = key;
-                  input.value = data.payfastData[key];
-                  form.appendChild(input);
-              });
-              
-              document.body.appendChild(form);
-              form.submit();
+          if (data.clientSecret && data.stripePaymentIntentId) {
+              console.log('Stripe payment intent created:', data.stripePaymentIntentId);
+              localStorage.setItem('stripePaymentIntentId', data.stripePaymentIntentId);
+              localStorage.setItem('stripeClientSecret', data.clientSecret);
+              localStorage.setItem('paymentId', data.paymentId);
+              navigate('/payment/process', { state: { clientSecret: data.clientSecret, paymentIntentId: data.stripePaymentIntentId } });
           } else {
-              throw new Error('No PayFast payment data received');
+              throw new Error('No Stripe payment data received');
           }
       } catch (err) {
           console.error('Purchase error:', err);

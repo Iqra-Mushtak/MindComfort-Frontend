@@ -11,7 +11,8 @@ const PaymentSuccess = () => {
     const [error, setError] = useState(null);
 
     const token = localStorage.getItem('token');
-    const paymentId = searchParams.get('payment_id');
+    const sessionId = searchParams.get('session_id');
+    const paymentId = localStorage.getItem('paymentId'); 
 
     useEffect(() => {
         if (!token) {
@@ -19,44 +20,85 @@ const PaymentSuccess = () => {
             return;
         }
 
-        if (!paymentId) {
+        if (!sessionId && !paymentId) {
             setError('Invalid payment session');
             setPaymentStatus('error');
             return;
         }
 
         fetchPaymentStatus();
-    }, [token,  paymentId, navigate]);
+    }, [token, sessionId, paymentId, navigate]);
 
     const fetchPaymentStatus = async () => {
         try {
-            const params = new URLSearchParams();
-            params.append('payment_id', paymentId);
+            console.log('fetchPaymentStatus CALLED');
+            console.log('paymentId from localStorage:', paymentId);
+            console.log('sessionId from URL:', sessionId);
 
-            const response = await fetch(`http://localhost:5000/api/webhooks/payment-status?${params}`, {
-                method: 'GET',
-                headers: {
-                    'Authorization': `Bearer ${token}`,
-                    'Content-Type': 'application/json'
+            if (paymentId) {
+                console.log('paymentId found, calling complete-payment...');
+                const completeResponse = await fetch('http://localhost:5000/api/webhooks/complete-payment', {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ paymentId })
+                });
+
+                console.log('complete-payment response status:', completeResponse.status);
+                console.log('complete-payment response ok:', completeResponse.ok);
+
+                if (completeResponse.ok) {
+                    const completeData = await completeResponse.json();
+                    console.log('complete-payment SUCCESS:', completeData);
+                    setPaymentStatus('success');
+                    setSubscriptionDetails(completeData);
+                    localStorage.removeItem('paymentId');
+                    localStorage.removeItem('stripePaymentIntentId');
+                    localStorage.removeItem('stripeClientSecret');
+                    return;
+                } else {
+                    console.log('complete-payment NOT ok, trying fallback...');
                 }
-            });
-
-            if (!response.ok) {
-                throw new Error('Failed to fetch payment status');
+            } else {
+                console.log('NO paymentId in localStorage!');
             }
 
-            const data = await response.json();
+            if (sessionId) {
+                console.log('sessionId found, calling session-status...');
+                const response = await fetch(`http://localhost:5000/api/subscriptions/session-status?sessionId=${encodeURIComponent(sessionId)}`, {
+                    method: 'GET',
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    }
+                });
 
-            if (data.payment.status === 'completed' && data.subscription) {
-                setPaymentStatus('success');
-                setSubscriptionDetails(data);
-            } else if (data.payment.status === 'pending') {
-                setPaymentStatus('pending');
-                setSubscriptionDetails(data);
-                setTimeout(fetchPaymentStatus, 3000);
-            } else {
-                setPaymentStatus('failed');
-                setError('Payment could not be verified');
+                console.log('session-status response status:', response.status);
+
+                if (!response.ok) {
+                    throw new Error('Failed to fetch payment status');
+                }
+
+                const data = await response.json();
+                console.log('session-status data:', data);
+
+                if (data.payment && data.payment.status === 'completed') {
+                    
+                    console.log('Payment completed from session-status');
+                    setPaymentStatus('success');
+                    setSubscriptionDetails(data);
+                } else if (data.status === 'pending' || (data.payment && data.payment.status === 'pending')) {
+                   
+                    console.log('Payment pending, retrying in 2 seconds...');
+                    setPaymentStatus('pending');
+                    setSubscriptionDetails(data);
+                    setTimeout(fetchPaymentStatus, 2000);
+                } else {
+                    setPaymentStatus('failed');
+                    setError('Payment could not be verified');
+                }
             }
         } catch (err) {
             console.error('Error fetching payment status:', err);
