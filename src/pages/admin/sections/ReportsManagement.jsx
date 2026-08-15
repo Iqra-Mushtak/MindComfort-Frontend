@@ -3,8 +3,11 @@ import api from '../../../utils/api';
 import '../AdminDashboard.css';
 import { useLocation } from 'react-router-dom';
 
-const ReportsManagement = () => {
+const ReportsManagement = ({ isModerator = false }) => {
   const location = useLocation();
+  const user = JSON.parse(localStorage.getItem('user'));
+  const apiPrefix = isModerator || user?.role === 'moderator' ? '/moderator' : '/admin';
+  
   const [reports, setReports] = useState([]);
   const [loading, setLoading] = useState(false);
   const [search, setSearch] = useState('');
@@ -30,7 +33,7 @@ const ReportsManagement = () => {
       query.append('page', page);
       query.append('limit', 20);
 
-      const res = await api.get(`/admin/reports/pending?${query}`);
+      const res = await api.get(`${apiPrefix}/reports/pending?${query}`);
       setReports(res.data.reports);
       setTotal(res.data.total);
     } catch (err) {
@@ -43,7 +46,7 @@ const ReportsManagement = () => {
   const handleDeleteMessage = async (reportId) => {
     if (window.confirm('Delete this message?')) {
       try {
-        await api.patch(`/admin/reports/${reportId}/delete-message`);
+        await api.patch(`${apiPrefix}/reports/${reportId}/delete-message`);
         alert('Message deleted');
         fetchReports();
       } catch (err) {
@@ -55,7 +58,7 @@ const ReportsManagement = () => {
   const handleWarnUser = async (reportId) => {
     if (window.confirm('Warn this user?')) {
       try {
-        await api.patch(`/admin/reports/${reportId}/warn-user`);
+        await api.patch(`${apiPrefix}/reports/${reportId}/warn-user`);
         alert('User warned');
         fetchReports();
       } catch (err) {
@@ -67,7 +70,7 @@ const ReportsManagement = () => {
   const handleSuspendUser = async (reportId) => {
     if (window.confirm('Suspend this user?')) {
       try {
-        await api.patch(`/admin/reports/${reportId}/suspend-user`);
+        await api.patch(`${apiPrefix}/reports/${reportId}/suspend-user`);
         alert('User suspended');
         fetchReports();
       } catch (err) {
@@ -79,7 +82,7 @@ const ReportsManagement = () => {
   const handleRejectReport = async (reportId) => {
     if (window.confirm('Reject this report?')) {
       try {
-        await api.patch(`/admin/reports/${reportId}/reject`);
+        await api.patch(`${apiPrefix}/reports/${reportId}/reject`);
         alert('Report rejected');
         fetchReports();
       } catch (err) {

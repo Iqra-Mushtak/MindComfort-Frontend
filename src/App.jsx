@@ -22,6 +22,7 @@ import MentorLiveDashboard from './pages/mentor/podcast/MentorLiveDashboard';
 import ClientLivePlayer from './pages/client/ClientLivePlayer';
 import GlobalLiveBadge from './components/GlobalLiveBadge';
 import AdminDashboard from './pages/admin/AdminDashboard';
+import ModeratorDashboard from './pages/moderator/ModeratorDashboard';
 
 function App() {
   return (
@@ -54,6 +55,7 @@ function App() {
       <Route path="/mentor/podcast/:id/live" element={<MentorLiveDashboard />} />
       <Route path="/client/podcast/:id/live" element={<ClientLivePlayer />} />
       <Route path="/admin/dashboard" element={<AdminDashboard />} />
+      <Route path="/moderator/dashboard" element={<ModeratorDashboard />} />
     </Routes>
           <GlobalLiveBadge />
     </>

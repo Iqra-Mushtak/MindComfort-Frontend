@@ -10,6 +10,9 @@ const LiveChatFeed = () => {
   const [loading, setLoading] = useState(false);
   const [socket, setSocket] = useState(null);
   const [openMenuId, setOpenMenuId] = useState(null);
+  const [activeForm, setActiveForm] = useState(null); // 'delete', 'warn', 'suspend', or null
+  const [formData, setFormData] = useState({ messageId: null, userId: null });
+  const [formInput, setFormInput] = useState('');
   const messagesEndRef = useRef(null);
   const socketRef = useRef(null);
 
@@ -81,7 +84,9 @@ const LiveChatFeed = () => {
 
   const fetchChatrooms = async () => {
     try {
-      const res = await api.get('/admin/chatrooms');
+      const user = JSON.parse(localStorage.getItem('user'));
+      const apiPrefix = user?.role === 'moderator' ? '/moderator' : '/admin';
+      const res = await api.get(`${apiPrefix}/chatrooms`);
       setChatrooms(res.data.chatrooms || []);
     } catch (err) {
       console.error('Error fetching chatrooms:', err);
@@ -94,7 +99,9 @@ const LiveChatFeed = () => {
     setLoading(true);
     
     try {
-      const res = await api.get(`/admin/chatrooms/${chatroomId}/messages`);
+      const user = JSON.parse(localStorage.getItem('user'));
+      const apiPrefix = user?.role === 'moderator' ? '/moderator' : '/admin';
+      const res = await api.get(`${apiPrefix}/chatrooms/${chatroomId}/messages`);
       setMessages(res.data.messages || []);
     } catch (err) {
       console.error('Error fetching previous messages:', err);
@@ -104,47 +111,126 @@ const LiveChatFeed = () => {
   };
 
   const handleDeleteMessage = (messageId, userId) => {
-    if (window.confirm('Delete this message?')) {
-      if (socketRef.current) {
-        socketRef.current.emit('adminDeleteMessage', {
-          messageId,
-          chatroomId: selectedChatroom,
-          userId
-        });
-      }
-    }
+    setFormData({ messageId, userId });
+    setActiveForm('delete');
+    setFormInput('');
   };
 
   const handleWarnUser = (userId, messageId) => {
-    const reason = window.prompt('Enter reason for warning:');
-    if (reason) {
-      if (socketRef.current) {
-        socketRef.current.emit('adminWarnUser', {
-          userId,
-          messageId,
-          chatroomId: selectedChatroom,
-          reason
-        });
-      }
-    }
+    setFormData({ messageId, userId });
+    setActiveForm('warn');
+    setFormInput('');
   };
 
   const handleSuspendUser = (userId, messageId) => {
-    const reason = window.prompt('Enter reason for suspension:');
-    if (reason) {
+    setFormData({ messageId, userId });
+    setActiveForm('suspend');
+    setFormInput('');
+  };
+
+  const closeForm = () => {
+    setActiveForm(null);
+    setFormData({ messageId: null, userId: null });
+    setFormInput('');
+  };
+
+  const submitForm = () => {
+    if (activeForm === 'delete') {
       if (socketRef.current) {
-        socketRef.current.emit('adminSuspendUser', {
-          userId,
-          messageId,
+        socketRef.current.emit('adminDeleteMessage', {
+          messageId: formData.messageId,
           chatroomId: selectedChatroom,
-          reason
+          userId: formData.userId
         });
       }
+      closeForm();
+      setOpenMenuId(null);
+    } else if (activeForm === 'warn') {
+      if (!formInput.trim()) {
+        alert('Please enter a reason for warning');
+        return;
+      }
+      if (socketRef.current) {
+        socketRef.current.emit('adminWarnUser', {
+          userId: formData.userId,
+          messageId: formData.messageId,
+          chatroomId: selectedChatroom,
+          reason: formInput
+        });
+      }
+      closeForm();
+      setOpenMenuId(null);
+    } else if (activeForm === 'suspend') {
+      if (!formInput.trim()) {
+        alert('Please enter a reason for suspension');
+        return;
+      }
+      if (socketRef.current) {
+        socketRef.current.emit('adminSuspendUser', {
+          userId: formData.userId,
+          messageId: formData.messageId,
+          chatroomId: selectedChatroom,
+          reason: formInput
+        });
+      }
+      closeForm();
+      setOpenMenuId(null);
     }
   };
 
+  const getFormTitle = () => {
+    if (activeForm === 'delete') return 'Delete Message';
+    if (activeForm === 'warn') return 'Warn User';
+    if (activeForm === 'suspend') return 'Suspend User';
+    return '';
+  };
+
+  const getFormLabel = () => {
+    if (activeForm === 'delete') return 'Are you sure you want to delete this message?';
+    if (activeForm === 'warn') return 'Enter reason for warning:';
+    if (activeForm === 'suspend') return 'Enter reason for suspension:';
+    return '';
+  };
+
+  const renderForm = () => {
+    if (!activeForm) return null;
+
+    return (
+      <div className="admin-modal-overlay" onClick={closeForm}>
+        <div className="admin-modal" onClick={(e) => e.stopPropagation()}>
+          <div className="admin-modal-header">
+            <h3>{getFormTitle()}</h3>
+            <button className="admin-modal-close" onClick={closeForm}>×</button>
+          </div>
+          <div className="admin-modal-body">
+            <label>{getFormLabel()}</label>
+            {activeForm !== 'delete' && (
+              <textarea
+                className="admin-form-textarea"
+                value={formInput}
+                onChange={(e) => setFormInput(e.target.value)}
+                placeholder={activeForm === 'warn' ? 'Enter warning reason...' : 'Enter suspension reason...'}
+                rows="4"
+              />
+            )}
+            {activeForm === 'delete' && (
+              <p style={{ color: '#6c757d', marginTop: '10px' }}>This action cannot be undone.</p>
+            )}
+          </div>
+          <div className="admin-modal-footer">
+            <button className="admin-btn-cancel" onClick={closeForm}>Cancel</button>
+            <button className="admin-btn-confirm" onClick={submitForm}>
+              {activeForm === 'delete' ? 'Delete' : activeForm === 'warn' ? 'Warn' : 'Suspend'}
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  };
+
   return (
-    <div className="admin-section">
+    <div className="admin-section" onClick={() => openMenuId && setOpenMenuId(null)}>
+      {renderForm()}
       <div className="section-header">
         <h2>Live Chat Feed</h2>
         <small>Real-time chat monitoring</small>
@@ -160,7 +246,6 @@ const LiveChatFeed = () => {
                 className={`chatroom-btn ${selectedChatroom === room._id ? 'active' : ''}`}
                 onClick={() => handleSelectChatroom(room._id)}
               >
-                <span className={`online-indicator ${room.isActive ? 'online' : 'offline'}`}></span>
                 {room.name}
               </button>
             ))}
@@ -172,7 +257,7 @@ const LiveChatFeed = () => {
             <>
               <div className="messages-header">
                 <h3>Messages</h3>
-                {!socket ? <small>Connecting...</small> : <small className="online-status">●  Live</small>}
+                {!socket && <small>Connecting...</small>}
               </div>
 
               {loading ? (
@@ -182,52 +267,67 @@ const LiveChatFeed = () => {
                   {messages.length === 0 ? (
                     <div className="empty-state">Waiting for messages...</div>
                   ) : (
-                    messages.map(msg => (
-                      <div key={msg._id} className="message-item">
-                        <div className="message-header">
-                          <strong>{msg.anonymousId || 'Anonymous'}</strong>
-                          <span className="message-time">
-                            {new Date(msg.createdAt).toLocaleTimeString()}
-                          </span>
-                        </div>
-                        <div className="message-content">
-                          {msg.content}
-                        </div>
-                        <div className="message-actions">
-                          <div className="action-menu-container">
-                            <button
-                              className="btn-dots"
-                              onClick={() => setOpenMenuId(openMenuId === msg._id ? null : msg._id)}
-                              title="Message actions"
-                            >
-                              ⋮
-                            </button>
-                            {openMenuId === msg._id && (
-                              <div className="action-menu">
-                                <button
-                                  className="menu-item delete"
-                                  onClick={() => handleDeleteMessage(msg._id, msg.senderId?._id)}
-                                >
-                                  🗑️ Delete Message
-                                </button>
-                                <button
-                                  className="menu-item warn"
-                                  onClick={() => handleWarnUser(msg.senderId?._id, msg._id)}
-                                >
-                                  ⚠️ Warn User
-                                </button>
-                                <button
-                                  className="menu-item suspend"
-                                  onClick={() => handleSuspendUser(msg.senderId?._id, msg._id)}
-                                >
-                                  🚫 Suspend User
-                                </button>
+                    messages.map((msg, index) => {
+                      const prevMsg = index > 0 ? messages[index - 1] : null;
+                      const isSameSender = prevMsg && prevMsg.anonymousId === msg.anonymousId;
+                      const showSenderId = !isSameSender;
+
+                      return (
+                        <div key={msg._id} className={`admin-message-item ${isSameSender ? 'same-sender' : ''}`}>
+                          {showSenderId && (
+                            <div className="admin-message-sender-name">
+                              {msg.anonymousId || 'Anonymous'}
+                            </div>
+                          )}
+                          <div style={{ display: 'flex', gap: '4px', alignItems: 'flex-start' }}>
+                            <div className="admin-message-bubble">
+                              <div style={{ display: 'flex', gap: '8px', alignItems: 'flex-start', justifyContent: 'space-between' }}>
+                                <div className="admin-message-content">
+                                  {msg.content}
+                                </div>
+                                <span className="admin-message-timestamp">
+                                  {new Date(msg.createdAt).toLocaleTimeString()}
+                                </span>
                               </div>
-                            )}
+                            </div>
+                            <div className="admin-action-menu-container">
+                              <button
+                                className="admin-btn-dots"
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  setOpenMenuId(openMenuId === msg._id ? null : msg._id);
+                                }}
+                                title="Message actions"
+                              >
+                                ⋮
+                              </button>
+                              {openMenuId === msg._id && (
+                                <div className="admin-action-menu" onClick={(e) => e.stopPropagation()}>
+                                  <button
+                                    className="admin-menu-item delete"
+                                    onClick={() => handleDeleteMessage(msg._id, msg.senderId?._id)}
+                                  >
+                                  Delete Message
+                                  </button>
+                                  <button
+                                    className="admin-menu-item warn"
+                                    onClick={() => handleWarnUser(msg.senderId?._id, msg._id)}
+                                  >
+                                  Warn User
+                                  </button>
+                                  <button
+                                    className="admin-menu-item suspend"
+                                    onClick={() => handleSuspendUser(msg.senderId?._id, msg._id)}
+                                  >
+                                  Suspend User
+                                  </button>
+                                </div>
+                              )}
+                            </div>
                           </div>
                         </div>
-                      </div>
-                    ))
+                      );
+                    })
                   )}
                   <div ref={messagesEndRef} />
                 </div>

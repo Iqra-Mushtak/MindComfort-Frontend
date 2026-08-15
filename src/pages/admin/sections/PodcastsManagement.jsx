@@ -3,8 +3,11 @@ import api from '../../../utils/api';
 import '../AdminDashboard.css';
 import { useLocation } from 'react-router-dom';
 
-const PodcastsManagement = () => {
+const PodcastsManagement = ({ isModerator = false }) => {
   const location = useLocation();
+  const user = JSON.parse(localStorage.getItem('user'));
+  const apiPrefix = isModerator || user?.role === 'moderator' ? '/moderator' : '/admin';
+  
   const [tab, setTab] = useState(() => {
     return location.state?.defaultTab === 'pending' ? 'pending' : 'all';
   });
@@ -41,7 +44,7 @@ const PodcastsManagement = () => {
       query.append('page', page);
       query.append('limit', 20);
 
-      const res = await api.get(`/admin/podcasts?${query}`);
+      const res = await api.get(`${apiPrefix}/podcasts?${query}`);
       setPodcasts(res.data.podcasts);
       setTotal(res.data.total);
     } catch (err) {
@@ -58,7 +61,7 @@ const PodcastsManagement = () => {
       query.append('page', page);
       query.append('limit', 20);
 
-      const res = await api.get(`/admin/podcasts/pending/list?${query}`);
+      const res = await api.get(`${apiPrefix}/podcasts/pending/list?${query}`);
       setPendingPodcasts(res.data.podcasts);
       setTotal(res.data.total);
     } catch (err) {
@@ -75,7 +78,7 @@ const PodcastsManagement = () => {
 
   const handleApproveConfirm = async () => {
     try {
-      await api.patch(`/admin/podcasts/${pendingActionId}/approve`, {});
+      await api.patch(`${apiPrefix}/podcasts/${pendingActionId}/approve`, {});
       setShowApproveConfirm(false);
       setPendingActionId(null);
       fetchPendingPodcasts();
@@ -96,7 +99,7 @@ const PodcastsManagement = () => {
     const reason = window.prompt('Enter rejection reason:');
     if (reason) {
       try {
-        await api.patch(`/admin/podcasts/${pendingActionId}/reject`, { reason });
+        await api.patch(`${apiPrefix}/podcasts/${pendingActionId}/reject`, { reason });
         setPendingActionId(null);
         fetchPendingPodcasts();
         alert('Podcast rejected');
@@ -114,7 +117,7 @@ const PodcastsManagement = () => {
 
   const handleDeleteConfirm = async () => {
     try {
-      await api.delete(`/admin/podcasts/${selectedPodcast._id}`);
+      await api.delete(`${apiPrefix}/podcasts/${selectedPodcast._id}`);
       setSelectedPodcast(null);
       setShowDeleteConfirm(false);
       fetchPodcasts();

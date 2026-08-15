@@ -43,8 +43,10 @@ const Login = () => {
       const userRole = response.data.user.role;
       if (userRole === 'mentor') {
         navigate('/mentor/dashboard');
-      } else if (userRole === 'admin' || userRole === 'moderator') {
-        navigate('/admin/dashboard'); 
+      } else if (userRole === 'admin') {
+        navigate('/admin/dashboard');
+      } else if (userRole === 'moderator') {
+        navigate('/moderator/dashboard');
       } else {
         navigate('/client/dashboard');
       }

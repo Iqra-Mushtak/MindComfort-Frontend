@@ -105,10 +105,13 @@ const LivePodcast = () => {
       setAgoraClient(client);
       setIsListening(true);
 
-      const podcastRes = await api.get(`/admin/podcasts/${selectedPodcast}`);
+      const user = JSON.parse(localStorage.getItem('user'));
+      const apiPrefix = user?.role === 'moderator' ? '/moderator' : '/admin';
+      
+      const podcastRes = await api.get(`${apiPrefix}/podcasts/${selectedPodcast}`);
       setPodcastDetails(podcastRes.data.podcast);
 
-      const commentsRes = await api.get(`/admin/podcasts/${selectedPodcast}/comments`);
+      const commentsRes = await api.get(`${apiPrefix}/podcasts/${selectedPodcast}/comments`);
       setComments(commentsRes.data.comments || []);
     } catch (err) {
       console.error('Error joining podcast stream:', err);
@@ -127,7 +130,9 @@ const LivePodcast = () => {
   const fetchLivePodcasts = async () => {
     try {
       setLoading(true);
-      const res = await api.get('/admin/podcasts?type=live');
+      const user = JSON.parse(localStorage.getItem('user'));
+      const apiPrefix = user?.role === 'moderator' ? '/moderator' : '/admin';
+      const res = await api.get(`${apiPrefix}/podcasts?type=live`);
       const livePodcasts = res.data.podcasts.filter(p => p.streamStatus === 'live');
       setPodcasts(livePodcasts);
     } catch (err) {
@@ -294,19 +299,19 @@ const LivePodcast = () => {
                                       className="menu-item delete"
                                       onClick={() => handleDeleteComment(comment._id, comment.user?._id)}
                                     >
-                                      🗑️ Delete Comment
+                                    Delete Comment
                                     </button>
                                     <button
                                       className="menu-item warn"
                                       onClick={() => handleWarnCommentUser(comment.user?._id, comment._id)}
                                     >
-                                      ⚠️ Warn User
+                                     Warn User
                                     </button>
                                     <button
                                       className="menu-item suspend"
                                       onClick={() => handleSuspendCommentUser(comment.user?._id, comment._id)}
                                     >
-                                      🚫 Suspend User
+                                    Suspend User
                                     </button>
                                   </div>
                                 )}

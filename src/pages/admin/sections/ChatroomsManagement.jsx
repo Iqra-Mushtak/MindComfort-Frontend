@@ -2,7 +2,10 @@ import React, { useState, useEffect } from 'react';
 import api from '../../../utils/api';
 import '../AdminDashboard.css';
 
-const ChatroomsManagement = () => {
+const ChatroomsManagement = ({ isModerator = false }) => {
+  const user = JSON.parse(localStorage.getItem('user'));
+  const apiPrefix = isModerator || user?.role === 'moderator' ? '/moderator' : '/admin';
+  
   const [chatrooms, setChatrooms] = useState([]);
   const [loading, setLoading] = useState(false);
   const [search, setSearch] = useState('');
@@ -29,7 +32,7 @@ const ChatroomsManagement = () => {
       query.append('page', page);
       query.append('limit', 20);
 
-      const res = await api.get(`/admin/chatrooms?${query}`);
+      const res = await api.get(`${apiPrefix}/chatrooms?${query}`);
       setChatrooms(res.data.chatrooms);
       setTotal(res.data.total);
     } catch (err) {
@@ -50,7 +53,7 @@ const ChatroomsManagement = () => {
   const handleEditSubmit = async (e) => {
     e.preventDefault();
     try {
-      await api.put(`/admin/chatrooms/${editChatroomId}`, editFormData);
+      await api.put(`${apiPrefix}/chatrooms/${editChatroomId}`, editFormData);
       alert('Chatroom updated successfully!');
       setEditChatroomId(null);
       fetchChatrooms();
@@ -71,7 +74,7 @@ const ChatroomsManagement = () => {
   const handleToggleSubmit = async (e) => {
     e.preventDefault();
     try {
-      await api.patch(`/admin/chatrooms/${toggleChatroomId}/toggle-status`);
+      await api.patch(`${apiPrefix}/chatrooms/${toggleChatroomId}/toggle-status`);
       setToggleChatroomId(null);
       fetchChatrooms();
     } catch (err) {
