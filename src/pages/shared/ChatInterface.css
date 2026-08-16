@@ -96,6 +96,8 @@
   width: fit-content;
   max-width: 65%;
   clear: both;
+  position: relative;
+  align-items: flex-start;
 }
 
 .message-item:first-child {
@@ -286,87 +288,75 @@
   border: 1px solid #f5c6cb;
 }
 
-.message-actions {
-  position: absolute;
-  bottom: 22px; 
-  right: 8px;
+.message-menu-container {
+  position: relative;
   display: flex;
-  gap: 4px;
-  opacity: 0.9;
-  transition: opacity 0.2s ease;
-  z-index: 10;
+  align-items: flex-start;
+  flex-shrink: 0;
 }
 
-.message-action-btn {
+.message-menu-btn {
   background: none;
   border: none;
   color: var(--mc-text-light);
   cursor: pointer;
-  font-size: 0.85rem;
-  padding: 6px;
+  font-size: 1rem;
+  padding: 0;
   display: flex;
   align-items: center;
   justify-content: center;
-  position: relative;
-  width: 28px;
-  height: 28px;
-  border-radius: 6px;
+  border-radius: 0;
+  transition: none;
+  width: auto;
+  height: auto;
+  flex-shrink: 0;
+}
+
+.message-dropdown-menu {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  background: white;
+  border: 1px solid #e0e0e0;
+  border-radius: 8px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+  min-width: 140px;
+  z-index: 1000;
+  overflow: hidden;
+  margin-top: 4px;
+}
+
+.message-dropdown-menu .menu-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: none;
+  border: none;
+  padding: 10px 12px;
+  width: 100%;
+  text-align: left;
+  cursor: pointer;
+  color: var(--mc-text-dark);
+  font-size: 0.9rem;
   transition: all 0.2s ease;
 }
 
-.message-action-btn:hover {
-  opacity: 1;
-  background: rgba(0, 0, 0, 0.08);
-  border-radius: 6px;
+.message-dropdown-menu .menu-item:hover {
+  background: #f5f5f5;
 }
 
-.message-action-btn:hover .action-text {
-  display: inline-block;
+.message-dropdown-menu .menu-item i {
+  font-size: 0.9rem;
 }
 
-.reply-btn{
+.message-dropdown-menu .reply-item:hover {
+  background: rgba(0, 132, 118, 0.08);
   color: var(--mc-primary);
 }
 
-.report-btn{
+.message-dropdown-menu .report-item:hover {
+  background: rgba(220, 53, 69, 0.08);
   color: #dc3545;
-}
-
-.reply-btn:hover {
-  background-color: rgba(0, 132, 118, 0.15);
-}
-
-.report-btn:hover {
-  background-color: rgba(220, 53, 69, 0.15);
-}
-
-.own-message .message-action-btn {
-  background: rgba(255, 255, 255, 0.95);
-}
-
-.own-message .message-action-btn:hover {
-  background: rgba(255, 255, 255, 0.1);
-}
-
-.action-text {
-  display: none;
-  position: absolute;
-  top: 100%;
-  left: 50%;
-  transform: translateX(-50%);
-  margin-top: 8px;
-  background: rgba(0, 0, 0, 0.8);
-  color: white;
-  padding: 4px 8px;
-  border-radius: 4px;
-  font-size: 0.7rem;
-  white-space: nowrap;
-  z-index: 100;
-  pointer-events: none;
-}
-
-.message-action-btn:hover .action-text {
-  display: block;
 }
 
 .message-reply-preview {

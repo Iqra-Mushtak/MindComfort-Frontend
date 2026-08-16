@@ -154,6 +154,11 @@ const PlansList = () => {
                             <i className="bi bi-broadcast-pin"></i> Podcasts
                         </Link>
                     </li>
+                    <li className="mc-nav-item active">
+                        <Link to="/client/mentors" className="mc-nav-link active">
+                            <i className="bi bi-person-heart"></i> Mentors
+                        </Link>
+                    </li>
                 </ul>
 
                 <div className="mc-sidebar-footer">

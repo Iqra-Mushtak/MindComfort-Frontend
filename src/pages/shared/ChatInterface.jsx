@@ -29,6 +29,7 @@ const ChatInterface = () => {
   const [reportMessageId, setReportMessageId] = useState(null);
   const [selectedReason, setSelectedReason] = useState(''); 
   const [reportReason, setReportReason] = useState('');
+  const [openMessageMenuId, setOpenMessageMenuId] = useState(null);
 
   const getDateLabel = (createdAt) => {
     if (!createdAt) return '';
@@ -425,7 +426,7 @@ const ChatInterface = () => {
           <p className="error-text">{error}</p>
         ) : (
           <>
-              <div className="chat-messages" ref={chatContainerRef}>
+              <div className="chat-messages" ref={chatContainerRef} onClick={() => setOpenMessageMenuId(null)}>
               {messages.length === 0 ? (
                 <p style={{ textAlign: 'center', color: 'var(--mc-text-light)' }}>No messages yet. Start the conversation!</p>
               ) : (
@@ -460,47 +461,63 @@ const ChatInterface = () => {
                             {msg.anonymousId}
                           </div>
                         )}
-                        <div 
-                          className="message-bubble"
-                          onDoubleClick={() => !msg.isOwn && handleDoubleClick(msg)}
-                        >
-                          {msg.replyTo && (
-                            <div 
-                              className="message-reply-preview"
-                              onClick={() => jumpToMessage(msg.replyTo._id)}
-                              style={{ cursor: 'pointer' }}
-                            >
-                              <span>{msg.replyTo.content}</span>
+                        <div style={{ display: 'flex', gap: '4px', alignItems: 'flex-start' }}>
+                          <div 
+                            className="message-bubble"
+                            onDoubleClick={() => !msg.isOwn && handleDoubleClick(msg)}
+                          >
+                            {msg.replyTo && (
+                              <div 
+                                className="message-reply-preview"
+                                onClick={() => jumpToMessage(msg.replyTo._id)}
+                                style={{ cursor: 'pointer' }}
+                              >
+                                <span>{msg.replyTo.content}</span>
+                              </div>
+                            )}
+                            <div className="message-content">{msg.content}</div>
+                            <div className="message-timestamp">
+                              {getTimeString(msg.createdAt)}
                             </div>
-                          )}
-                          <div className="message-content">{msg.content}</div>
-                          <div className="message-timestamp">
-                            {getTimeString(msg.createdAt)}
                           </div>
                           {!msg.isOwn && (
-                            <div className="message-actions">
+                            <div className="message-menu-container">
                               <button 
-                                className="message-action-btn reply-btn"
+                                className="message-menu-btn"
                                 onClick={(e) => {
                                   e.stopPropagation();
-                                  handleReplyClick(msg);
+                                  setOpenMessageMenuId(openMessageMenuId === msg._id ? null : msg._id);
                                 }}
+                                title="Message options"
                               >
-                                <i className="bi bi-reply"></i>
-                                <span className="action-text">Reply</span>
+                                <i className="bi bi-three-dots-vertical"></i>
                               </button>
-                              <button 
-                                className="message-action-btn report-btn"
-                                onClick={(e) => {
-                                  e.stopPropagation();
-                                  handleReportClick(msg._id);
-                                }}
-                              >
-                                <i className="bi bi-flag"></i>
-                                <span className="action-text">Report</span>
-                              </button>
-                            </div>
-                          )}
+                              {openMessageMenuId === msg._id && (
+                                <div className="message-dropdown-menu" onClick={(e) => e.stopPropagation()}>
+                                  <button
+                                    className="menu-item reply-item"
+                                    onClick={() => {
+                                      handleReplyClick(msg);
+                                      setOpenMessageMenuId(null);
+                                    }}
+                                  >
+                                    <i className="bi bi-reply"></i>
+                                    <span>Reply</span>
+                                  </button>
+                                  <button
+                                    className="menu-item report-item"
+                                    onClick={() => {
+                                      handleReportClick(msg._id);
+                                      setOpenMessageMenuId(null);
+                                  }}
+                                >
+                                  <i className="bi bi-flag"></i>
+                                  <span>Report</span>
+                                </button>
+                              </div>
+                            )}
+                          </div>
+                        )}
                         </div>
                       </div>
                     
