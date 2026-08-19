@@ -12,9 +12,10 @@ const EditProfile = () => {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState(initialTab);
+  const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [showLogoutModal, setShowLogoutModal] = useState(false);
 
   const [mentorData, setMentorData] = useState({ fullName: '', qualification: '', expertise: '', experience: '' });
-  
   const [passwordData, setPasswordData] = useState({ currentPassword: '', newPassword: '', confirmPassword: '' });
 
   const [emailStep, setEmailStep] = useState(1);
@@ -31,7 +32,7 @@ const EditProfile = () => {
     const userData = JSON.parse(localStorage.getItem('user'));
     if (!token || !userData) { navigate('/login'); return; }
     
-    fetchProfile(userData.id);
+    fetchProfile(userData.id || userData._id);
   }, [navigate]);
 
   const fetchProfile = async (userId) => {
@@ -46,12 +47,24 @@ const EditProfile = () => {
           experience: response.data.mentorProfile.experience || ''
         });
         setSlots(response.data.mentorProfile.availabilitySchedule || []);
-
       }
       setLoading(false);
     } catch (err) {
       setLoading(false);
     }
+  };
+
+  const handleLogoutClick = () => {
+    setShowLogoutModal(true);
+  };
+
+  const confirmLogout = () => {
+    localStorage.clear();
+    navigate('/login');
+  };
+
+  const cancelLogout = () => {
+    setShowLogoutModal(false);
   };
 
   const handleMentorSubmit = async (e) => {
@@ -202,20 +215,63 @@ const EditProfile = () => {
   if (loading) return <div className="loading">Loading...</div>;
   if (!user) return null;
 
+  const role = user.role || 'client';
+
   return (
     <div className="profile-container">
-      <aside className="mc-sidebar">
-        <Link to={`/${user.role}/profile`} style={{ textDecoration: 'none' }}>
+      {sidebarOpen && (
+        <div className="mc-sidebar-overlay" onClick={() => setSidebarOpen(false)}></div>
+      )}
+
+      <aside className={`mc-sidebar ${sidebarOpen ? 'open' : ''}`}>
+        <Link to={`/${role}/profile`} style={{ textDecoration: 'none' }}>
           <div className="mc-user-info-top">
             <div className="mc-user-avatar">{(user?.username || 'U').charAt(0).toUpperCase()}</div>
             <div className="mc-user-details">
               <h6>{user.username}</h6>
-              <small>{user.role === 'mentor' ? 'Mentor' : 'Client'}</small>
+              <small>{role === 'mentor' ? 'Mentor' : 'Client'}</small>
             </div>
           </div>
         </Link>
+
+        <ul className="mc-nav-menu">
+          <li className="mc-nav-item">
+            <Link to={role === 'mentor' ? '/mentor/dashboard' : '/client/dashboard'} className="mc-nav-link">
+              <i className="bi bi-house-fill"></i> Home
+            </Link>
+          </li>
+
+          {role === 'client' && (
+            <li className="mc-nav-item">
+              <Link to="/client/plans" className="mc-nav-link">
+                <i className="bi bi-bookmark-star-fill"></i> Subscription Plans
+              </Link>
+            </li>
+          )}
+
+          <li className="mc-nav-item">
+            <Link to="/chatrooms" className="mc-nav-link">
+              <i className="bi bi-chat-dots-fill"></i> Community Chat
+            </Link>
+          </li>
+
+          <li className="mc-nav-item">
+            <Link to={role === 'mentor' ? '/mentor/podcasts' : '/client/podcasts'} className="mc-nav-link">
+              <i className="bi bi-broadcast-pin"></i> Podcasts
+            </Link>
+          </li>
+
+          {role === 'client' && (
+            <li className="mc-nav-item">
+              <Link to="/client/mentors" className="mc-nav-link">
+                <i className="bi bi-person-heart"></i> Mentors
+              </Link>
+            </li>
+          )}
+        </ul>
+
         <div className="mc-sidebar-footer">
-          <button className="mc-logout-btn" onClick={() => { localStorage.clear(); navigate('/login'); }}>
+          <button className="mc-logout-btn" onClick={handleLogoutClick}>
             <i className="bi bi-box-arrow-right"></i> Log Out
           </button>
         </div>
@@ -223,24 +279,37 @@ const EditProfile = () => {
 
       <main className="profile-main">
         <div className="mc-main-header">
+          <button 
+            className="mc-sidebar-toggle-btn" 
+            onClick={() => setSidebarOpen(!sidebarOpen)}
+            aria-label="Toggle Sidebar"
+          >
+            <i className={`bi ${sidebarOpen ? 'bi-x-lg' : 'bi-list'}`}></i>
+          </button>
           <div style={{ flex: 1 }}></div>
-          <Link to="/" className="mc-main-logo">MindComfort <img src={logoImg} alt="Logo" /></Link>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '20px' }}>
+            <button className="mc-notification-btn">
+              <i className="bi bi-bell-fill"></i>
+              <span className="mc-badge">3</span>
+            </button>
+            <Link to="/" className="mc-main-logo">MindComfort <img src={logoImg} alt="Logo" /></Link>
+          </div>
         </div>
 
         <div className="profile-header">
           <h2>Edit Profile</h2>
-          <Link to={`/${user.role}/profile`} className="cancel-edit-btn">Cancel</Link>
+          <Link to={`/${role}/profile`} className="cancel-edit-btn">Cancel</Link>
         </div>
 
         <div className="edit-tabs">
-          {user.role === 'mentor' && (
+          {role === 'mentor' && (
             <button className={`tab-btn ${activeTab === 'mentor' ? 'active' : ''}`} onClick={() => setActiveTab('mentor')}>Mentor Details</button>
           )}
           <button className={`tab-btn ${activeTab === 'password' ? 'active' : ''}`} onClick={() => setActiveTab('password')}>Password</button>
           <button className={`tab-btn ${activeTab === 'email' ? 'active' : ''}`} onClick={() => { setActiveTab('email'); setEmailStep(1); }}>Email</button>
         </div>
 
-        {activeTab === 'mentor' && user.role === 'mentor' && (
+        {activeTab === 'mentor' && role === 'mentor' && (
           <form onSubmit={handleMentorSubmit} className="profile-form">
             <div className="profile-section">
               <h3>Mentor Information</h3>
@@ -280,55 +349,55 @@ const EditProfile = () => {
               )}
 
               {isAddingSlot && (
-              <div className="slot-form">
-                <div className="form-group">
-                  <label>Day of Week <span style={{fontWeight: 'normal', color: '#888'}}></span></label>
-                  <small style={{display: 'block', marginBottom: '0.5rem', fontSize: '0.85rem', color: '#666'}}>
-                    Set your regular weekly availability. Optional if you are adding a specific date below.
-                  </small>
-                  <div style={{display: 'flex', gap: '1rem', alignItems: 'center'}}>
-                    <select name="day" value={slotData.day} onChange={handleSlotChange} style={{flex: 1}}>
-                      <option value="">From...</option>
-                      {['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'].map(d => (
-                        <option key={d} value={d}>{d}</option>
-                      ))}
-                    </select>
-                    <span style={{color: '#888'}}>to</span>
-                    <select name="endDay" value={slotData.endDay} onChange={handleSlotChange} style={{flex: 1}}>
-                      <option value="">To... (optional)</option>
-                      {['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'].map(d => (
-                        <option key={d} value={d}>{d}</option>
-                      ))}
-                    </select>
-                  </div>
-                </div>
-
-                <div className="form-group">
-                  <label>Date <span style={{fontWeight: 'normal', color: '#888'}}></span></label>
-                  <div style={{display: 'flex', gap: '1rem', alignItems: 'center'}}>
-                    <input type="date" name="date" value={slotData.date} onChange={handleSlotChange} style={{flex: 1}} />
-                    <span style={{color: '#888'}}>to</span>
-                    <input type="date" name="endDate" value={slotData.endDate} onChange={handleSlotChange} style={{flex: 1}} placeholder="Optional" />
-                  </div>
-                </div>
-
-                <div className="time-inputs">
+                <div className="slot-form">
                   <div className="form-group">
-                    <label>Start Time</label>
-                    <input type="time" name="startTime" value={slotData.startTime} onChange={handleSlotChange} required />
+                    <label>Day of Week</label>
+                    <small style={{display: 'block', marginBottom: '0.5rem', fontSize: '0.85rem', color: '#666'}}>
+                      Set your regular weekly availability. Optional if you are adding a specific date below.
+                    </small>
+                    <div style={{display: 'flex', gap: '1rem', alignItems: 'center'}}>
+                      <select name="day" value={slotData.day} onChange={handleSlotChange} style={{flex: 1}}>
+                        <option value="">From...</option>
+                        {['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'].map(d => (
+                          <option key={d} value={d}>{d}</option>
+                        ))}
+                      </select>
+                      <span style={{color: '#888'}}>to</span>
+                      <select name="endDay" value={slotData.endDay} onChange={handleSlotChange} style={{flex: 1}}>
+                        <option value="">To... (optional)</option>
+                        {['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'].map(d => (
+                          <option key={d} value={d}>{d}</option>
+                        ))}
+                      </select>
+                    </div>
                   </div>
-                  <div className="form-group">
-                    <label>End Time</label>
-                    <input type="time" name="endTime" value={slotData.endTime} onChange={handleSlotChange} required />
-                  </div>
-                </div>
 
-                <div className="slot-form-actions">
-                  <button type="button" onClick={handleSlotSubmit} className="save-btn">{editingSlotId ? 'Update Slot' : 'Save Slot'}</button>
-                  <button type="button" className="cancel-btn" onClick={() => { setIsAddingSlot(false); setEditingSlotId(null); }}>Cancel</button>
+                  <div className="form-group">
+                    <label>Date</label>
+                    <div style={{display: 'flex', gap: '1rem', alignItems: 'center'}}>
+                      <input type="date" name="date" value={slotData.date} onChange={handleSlotChange} style={{flex: 1}} />
+                      <span style={{color: '#888'}}>to</span>
+                      <input type="date" name="endDate" value={slotData.endDate} onChange={handleSlotChange} style={{flex: 1}} placeholder="Optional" />
+                    </div>
+                  </div>
+
+                  <div className="time-inputs">
+                    <div className="form-group">
+                      <label>Start Time</label>
+                      <input type="time" name="startTime" value={slotData.startTime} onChange={handleSlotChange} required />
+                    </div>
+                    <div className="form-group">
+                      <label>End Time</label>
+                      <input type="time" name="endTime" value={slotData.endTime} onChange={handleSlotChange} required />
+                    </div>
+                  </div>
+
+                  <div className="slot-form-actions">
+                    <button type="button" onClick={handleSlotSubmit} className="save-btn">{editingSlotId ? 'Update Slot' : 'Save Slot'}</button>
+                    <button type="button" className="cancel-btn" onClick={() => { setIsAddingSlot(false); setEditingSlotId(null); }}>Cancel</button>
+                  </div>
                 </div>
-              </div>
-            )}
+              )}
             </div>
 
             <div className="form-actions"><button type="submit" className="save-btn">Save Mentor Details</button></div>
@@ -383,6 +452,21 @@ const EditProfile = () => {
           </div>
         )}
       </main>
+
+      {showLogoutModal && (
+        <div className="mc-modal-overlay">
+          <div className="mc-logout-modal-card">
+            <div className="mc-logout-modal-header">
+              <h4>Confirm Logout</h4>
+            </div>
+            <p>Are you sure you want to logout from MindComfort?</p>
+            <div className="mc-logout-modal-actions">
+              <button className="btn-cancel-logout" onClick={cancelLogout}>Cancel</button>
+              <button className="btn-confirm-logout" onClick={confirmLogout}>Logout</button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

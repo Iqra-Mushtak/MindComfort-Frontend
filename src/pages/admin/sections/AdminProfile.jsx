@@ -171,14 +171,14 @@ const AdminProfile = ({ user }) => {
           ) : (
             <div className="inline-edit-form">
               {emailStep === 'initiate' && (
-                <div className="inline-edit-form">
+                <>
                   <button className="btn-save" onClick={handleInitiateEmailChange}>
                     Send Verification Code to Current Email
                   </button>
                   <div className="inline-form-buttons">
                     <button type="button" className="btn-cancel" onClick={cancelEmailEdit}>Cancel</button>
                   </div>
-                </div>
+                </>
               )}
 
               {emailStep === 'verify_current' && (

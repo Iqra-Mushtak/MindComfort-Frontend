@@ -200,3 +200,49 @@
     transform: rotate(360deg);
   }
 }
+
+@media (max-width: 768px) {
+  .payment-content,
+  .payment-error,
+  .payment-loading {
+    padding: 20px 15px;
+    width: 100%;
+  }
+
+  .payment-details {
+    padding: 15px;
+    margin-top: 20px;
+  }
+}
+
+@media (max-width: 576px) {
+  .payment-details-grid {
+    grid-template-columns: 1fr; 
+    gap: 12px;
+  }
+
+  .payment-action-buttons,
+  .payment-error-buttons {
+    flex-direction: column; 
+    gap: 10px;
+    width: 100%;
+  }
+
+  .payment-btn-primary,
+  .payment-btn-secondary,
+  .payment-btn-error,
+  .payment-btn-secondary-error {
+    width: 100%; 
+  }
+
+  .payment-success-icon,
+  .payment-error-icon {
+    font-size: 48px;
+    margin-bottom: 12px;
+  }
+
+  .payment-success h2,
+  .payment-error h2 {
+    font-size: 1.4rem;
+  }
+}

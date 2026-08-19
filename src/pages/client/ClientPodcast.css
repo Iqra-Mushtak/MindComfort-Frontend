@@ -14,7 +14,7 @@
 .client-podcasts-main {
   margin-left: 260px;
   flex-grow: 1;
-  padding: 1.5rem 4rem 4rem 4rem;
+  padding: 0 4rem 4rem 4rem;
 }
 
 .podcasts-header {
@@ -341,10 +341,70 @@
 
 @media (max-width: 992px) {
   .client-podcasts-main {
-    margin-left: 0;
-    padding: 1.5rem;
+    margin-left: 0 !important;
+    width: 100% !important;
+    padding: 0 1rem 1.5rem 1rem !important;
   }
   .podcasts-grid {
     grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 991px) {
+  .client-podcasts-main {
+    margin-left: 0 !important;
+    width: 100% !important;
+    padding: 0 1rem 1.5rem 1rem !important; 
+  }
+
+  .podcasts-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+    gap: 1.2rem !important;
+  }
+
+  .podcasts-header h2 {
+    font-size: 1.6rem;
+  }
+
+  .podcasts-header p {
+    font-size: 0.95rem;
+  }
+}
+
+@media (max-width: 600px) {
+  .podcasts-grid {
+    grid-template-columns: 1fr !important;
+    gap: 1.2rem !important;
+  }
+
+  .podcasts-tabs {
+    gap: 0.25rem;
+  }
+
+  .podcast-tab {
+    padding: 0.6rem 1rem;
+    font-size: 0.88rem;
+  }
+
+  .library-subtabs {
+    gap: 0.4rem;
+  }
+
+  .subtab {
+    padding: 0.4rem 0.9rem;
+    font-size: 0.8rem;
+  }
+
+  .podcast-card-body {
+    padding: 1rem;
+  }
+
+  .podcast-card-body h4 {
+    font-size: 1rem;
+  }
+
+  .podcast-card-footer {
+    flex-direction: row;
+    gap: 8px;
   }
 }

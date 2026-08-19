@@ -21,6 +21,7 @@ const AdminDashboard = () => {
   const [loading, setLoading] = useState(true);
   const [activeSection, setActiveSection] = useState('dashboard');
   const [showLogoutModal, setShowLogoutModal] = useState(false); 
+  const [sidebarOpen, setSidebarOpen] = useState(false);
   
   const [stats, setStats] = useState({
     totalClients: 0,
@@ -119,8 +120,11 @@ const AdminDashboard = () => {
 
   return (
     <div className="admin-dashboard-container">
-      {/* Sidebar */}
-      <aside className="mc-sidebar">
+      {sidebarOpen && (
+        <div className="mc-sidebar-overlay" onClick={() => setSidebarOpen(false)}></div>
+      )}
+
+      <aside className={`mc-sidebar ${sidebarOpen ? 'open' : ''}`}>
         <div 
           className="mc-user-info-top clickable-profile"
           onClick={() => setActiveSection('profile')}
@@ -135,52 +139,52 @@ const AdminDashboard = () => {
 
         <ul className="mc-nav-menu">
           <li className={`mc-nav-item ${activeSection === 'dashboard' ? 'active' : ''}`}>
-            <button className="mc-nav-link" onClick={() => setActiveSection('dashboard')}>
-              <i className="bi bi-grid-fill"></i> Dashboard
+            <button className="mc-nav-link" onClick={() => { setActiveSection('dashboard'); setSidebarOpen(false); }}>
+              <i className="bi bi-grid-fill"></i> Home
             </button>
           </li>
           <li className={`mc-nav-item ${activeSection === 'clients' ? 'active' : ''}`}>
-            <button className="mc-nav-link" onClick={() => setActiveSection('clients')}>
+            <button className="mc-nav-link" onClick={() => { setActiveSection('clients'); setSidebarOpen(false); }}>
               <i className="bi bi-people-fill"></i> Clients
             </button>
           </li>
           <li className={`mc-nav-item ${activeSection === 'mentors' ? 'active' : ''}`}>
-            <button className="mc-nav-link" onClick={() => setActiveSection('mentors')}>
+            <button className="mc-nav-link" onClick={() => { setActiveSection('mentors'); setSidebarOpen(false); }}>
               <i className="bi bi-person-badge-fill"></i> Mentors
             </button>
           </li>
           <li className={`mc-nav-item ${activeSection === 'moderators' ? 'active' : ''}`}>
-            <button className="mc-nav-link" onClick={() => setActiveSection('moderators')}>
+            <button className="mc-nav-link" onClick={() => { setActiveSection('moderators'); setSidebarOpen(false); }}>
               <i className="bi bi-shield-lock-fill"></i> Moderators
             </button>
           </li>
           <li className={`mc-nav-item ${activeSection === 'chatrooms' ? 'active' : ''}`}>
-            <button className="mc-nav-link" onClick={() => setActiveSection('chatrooms')}>
+            <button className="mc-nav-link" onClick={() => { setActiveSection('chatrooms'); setSidebarOpen(false); }}>
               <i className="bi bi-chat-dots-fill"></i> Chatrooms
             </button>
           </li>
           <li className={`mc-nav-item ${activeSection === 'podcasts' ? 'active' : ''}`}>
-            <button className="mc-nav-link" onClick={() => setActiveSection('podcasts')}>
+            <button className="mc-nav-link" onClick={() => { setActiveSection('podcasts'); setSidebarOpen(false); }}>
               <i className="bi bi-broadcast-pin"></i> Podcasts
             </button>
           </li>
           <li className={`mc-nav-item ${activeSection === 'live-chat' ? 'active' : ''}`}>
-            <button className="mc-nav-link" onClick={() => setActiveSection('live-chat')}>
+            <button className="mc-nav-link" onClick={() => { setActiveSection('live-chat'); setSidebarOpen(false); }}>
               <i className="bi bi-chat-left-dots"></i> Live Chat
             </button>
           </li>
           <li className={`mc-nav-item ${activeSection === 'live-podcast' ? 'active' : ''}`}>
-            <button className="mc-nav-link" onClick={() => setActiveSection('live-podcast')}>
+            <button className="mc-nav-link" onClick={() => { setActiveSection('live-podcast'); setSidebarOpen(false); }}>
               <i className="bi bi-broadcast"></i> Live Podcast
             </button>
           </li>
           <li className={`mc-nav-item ${activeSection === 'reports' ? 'active' : ''}`}>
-            <button className="mc-nav-link" onClick={() => setActiveSection('reports')}>
+            <button className="mc-nav-link" onClick={() => { setActiveSection('reports'); setSidebarOpen(false); }}>
               <i className="bi bi-flag-fill"></i> Reports
             </button>
           </li>
           <li className={`mc-nav-item ${activeSection === 'subscriptions' ? 'active' : ''}`}>
-            <button className="mc-nav-link" onClick={() => setActiveSection('subscriptions')}>
+            <button className="mc-nav-link" onClick={() => { setActiveSection('subscriptions'); setSidebarOpen(false); }}>
               <i className="bi bi-credit-card-fill"></i> Subscriptions
             </button>
           </li>
@@ -193,8 +197,16 @@ const AdminDashboard = () => {
         </div>
       </aside>
 
-      <main className="admin-main-content">
+      <main className={`admin-main-content ${activeSection === 'live-chat' ? 'live-chat-active' : ''}`}>
         <div className="mc-main-header">
+          <button 
+            className="mc-sidebar-toggle-btn" 
+            onClick={() => setSidebarOpen(!sidebarOpen)}
+            aria-label="Toggle Sidebar"
+          >
+            <i className={`bi ${sidebarOpen ? 'bi-x-lg' : 'bi-list'}`}></i>
+          </button>
+
           <div style={{ flex: 1 }}></div>
           <div style={{ display: 'flex', alignItems: 'center', gap: '20px' }}>
             <button className="mc-notification-btn">

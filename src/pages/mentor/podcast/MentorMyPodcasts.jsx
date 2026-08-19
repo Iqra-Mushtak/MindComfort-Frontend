@@ -16,6 +16,8 @@ const MentorMyPodcasts = () => {
     past: []
   });
   const [loading, setLoading] = useState(true);
+  const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [showLogoutModal, setShowLogoutModal] = useState(false);
 
   useEffect(() => {
     const userData = JSON.parse(localStorage.getItem('user'));
@@ -25,7 +27,6 @@ const MentorMyPodcasts = () => {
       setUser(userData);
     }
     
-    // Fetch podcasts from API
     fetchPodcasts();
   }, [navigate]);
 
@@ -44,61 +45,77 @@ const MentorMyPodcasts = () => {
     }
   };
 
-  const renderSection = (sectionTitle, sectionKey, items) => {
-  const count = items.length;
-  const now = new Date();
+  const handleLogoutClick = () => {
+    setShowLogoutModal(true);
+  };
 
-  return (
-    <div className="mb-5">
-      <h4>{sectionTitle}</h4>
-      {count > 0 ? (
-        <p className="section-count">{count} {sectionKey} podcast{count !== 1 ? 's' : ''}</p>
-      ) : (
-        <p className="section-count">No {sectionKey} podcasts available</p>
-      )}
-      {count > 0 && (
-        <div>
-          {items.map((item) => {
-            const startTime = new Date(item.startTime || item.date);
-            
-            const isLiveTime = now >= new Date(startTime.getTime() - 5 * 60000); 
-            
-            return (
-              <div key={item._id || item.id} className="podcast-item-wrapper" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                <div style={{ flex: 1 }} onClick={() => setSelectedPodcast(item)}>
-                  <MentorPodcastItem 
-                    {...item} 
-                    onClick={() => setSelectedPodcast(item)}
-                  />
+  const confirmLogout = () => {
+    localStorage.clear();
+    navigate('/login');
+  };
+
+  const cancelLogout = () => {
+    setShowLogoutModal(false);
+  };
+
+  const renderSection = (sectionTitle, sectionKey, items) => {
+    const count = items.length;
+    const now = new Date();
+
+    return (
+      <div className="mb-5">
+        <h4>{sectionTitle}</h4>
+        {count > 0 ? (
+          <p className="section-count">{count} {sectionKey} podcast{count !== 1 ? 's' : ''}</p>
+        ) : (
+          <p className="section-count">No {sectionKey} podcasts available</p>
+        )}
+        {count > 0 && (
+          <div>
+            {items.map((item) => {
+              const startTime = new Date(item.startTime || item.date);
+              const isLiveTime = now >= new Date(startTime.getTime() - 5 * 60000); 
+              
+              return (
+                <div key={item._id || item.id} className="podcast-item-wrapper" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: '10px' }}>
+                  <div style={{ flex: 1 }} onClick={() => setSelectedPodcast(item)}>
+                    <MentorPodcastItem 
+                      {...item} 
+                      onClick={() => setSelectedPodcast(item)}
+                    />
+                  </div>
+                  
+                  {sectionKey === 'upcoming' && isLiveTime && item.status === 'upcoming' && (
+                    <button 
+                      className="btn-go-live"
+                      onClick={() => navigate(`/mentor/podcast/${item._id}/live`)}
+                      style={{
+                        background: '#dc3545', color: 'white', border: 'none', 
+                        padding: '8px 16px', borderRadius: '20px', fontWeight: 'bold', cursor: 'pointer',
+                        whiteSpace: 'nowrap'
+                      }}
+                    >
+                      <i className="bi bi-broadcast"></i> Go Live
+                    </button>
+                  )}
                 </div>
-                
-                {sectionKey === 'upcoming' && isLiveTime && item.status === 'upcoming' && (
-                  <button 
-                    className="btn-go-live"
-                    onClick={() => navigate(`/mentor/podcast/${item._id}/live`)}
-                    style={{
-                      background: '#dc3545', color: 'white', border: 'none', 
-                      padding: '8px 16px', borderRadius: '20px', fontWeight: 'bold', cursor: 'pointer'
-                    }}
-                  >
-                    <i className="bi bi-broadcast"></i> Go Live
-                  </button>
-                )}
-              </div>
-            );
-          })}
-        </div>
-      )}
-    </div>
-  );
-};
+              );
+            })}
+          </div>
+        )}
+      </div>
+    );
+  };
 
   if (!user) return null;
 
   return (
     <div className="mentor-podcasts-container">
-      {/* Sidebar */}
-      <aside className="mc-sidebar">
+      {sidebarOpen && (
+        <div className="mc-sidebar-overlay" onClick={() => setSidebarOpen(false)}></div>
+      )}
+
+      <aside className={`mc-sidebar ${sidebarOpen ? 'open' : ''}`}>
         <Link to="/mentor/profile" style={{ textDecoration: 'none' }}>
           <div className="mc-user-info-top">
             <div className="mc-user-avatar">{(user?.username || 'U').charAt(0).toUpperCase()}</div>
@@ -120,7 +137,7 @@ const MentorMyPodcasts = () => {
           </li>
         </ul>
         <div className="mc-sidebar-footer">
-          <button className="mc-logout-btn" onClick={() => { localStorage.clear(); navigate('/login'); }}>
+          <button className="mc-logout-btn" onClick={handleLogoutClick}>
             <i className="bi bi-box-arrow-right"></i> Log Out
           </button>
         </div>
@@ -129,6 +146,14 @@ const MentorMyPodcasts = () => {
       {/* Main Content */}
       <main className="mentor-podcasts-main">
         <div className="mc-main-header">
+          <button 
+            className="mc-sidebar-toggle-btn" 
+            onClick={() => setSidebarOpen(!sidebarOpen)}
+            aria-label="Toggle Sidebar"
+          >
+            <i className={`bi ${sidebarOpen ? 'bi-x-lg' : 'bi-list'}`}></i>
+          </button>
+
           <div style={{ flex: 1 }}></div>
           <Link to="/" className="mc-main-logo">MindComfort <img src={logoImg} alt="Logo" /></Link>
         </div>
@@ -157,6 +182,25 @@ const MentorMyPodcasts = () => {
           />
         )}
       </main>
+
+      {showLogoutModal && (
+        <div className="mc-modal-overlay">
+          <div className="mc-logout-modal-card">
+            <div className="mc-logout-modal-header">
+              <h4>Confirm Logout</h4>
+            </div>
+            <p>Are you sure you want to logout from MindComfort?</p>
+            <div className="mc-logout-modal-actions">
+              <button className="btn-cancel-logout" onClick={cancelLogout}>
+                Cancel
+              </button>
+              <button className="btn-confirm-logout" onClick={confirmLogout}>
+                Logout
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

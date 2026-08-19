@@ -12,6 +12,8 @@ const ChatroomList = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [subscriptionStatus, setSubscriptionStatus] = useState(null);
+  const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [showLogoutModal, setShowLogoutModal] = useState(false);
 
   useEffect(() => {
     let userData = null;
@@ -76,12 +78,18 @@ const ChatroomList = () => {
     }
   };
 
-  const handleLogout = () => {
-    if (window.confirm("Are you sure you want to logout?")) {
-      localStorage.removeItem('token');
-      localStorage.removeItem('user');
-      navigate('/login');
-    }
+  const handleLogoutClick = () => {
+    setShowLogoutModal(true);
+  };
+
+  const confirmLogout = () => {
+    localStorage.removeItem('token');
+    localStorage.removeItem('user');
+    navigate('/login');
+  };
+
+  const cancelLogout = () => {
+    setShowLogoutModal(false);
   };
 
   const handleJoin = (roomId) => {
@@ -109,8 +117,11 @@ const ChatroomList = () => {
 
   return (
     <div className="chatroom-container">
-      {/* Sidebar */}
-      <aside className="mc-sidebar">
+      {sidebarOpen && (
+        <div className="mc-sidebar-overlay" onClick={() => setSidebarOpen(false)}></div>
+      )}
+
+      <aside className={`mc-sidebar ${sidebarOpen ? 'open' : ''}`}>
         <Link to="/client/profile" style={{ textDecoration: 'none' }}>
         <div className="mc-user-info-top">
           <div className="mc-user-avatar">{(user?.username || 'U').charAt(0).toUpperCase()}</div>
@@ -147,23 +158,31 @@ const ChatroomList = () => {
               <i className="bi bi-broadcast-pin"></i> Podcasts
             </Link>
           </li>
-          <li className="mc-nav-item active">
-            <Link to="/client/mentors" className="mc-nav-link active">
-              <i className="bi bi-person-heart"></i> Mentors
-            </Link>
-          </li>
+          {user.role === 'client' && (
+            <li className="mc-nav-item">
+              <Link to="/client/mentors" className="mc-nav-link">
+                <i className="bi bi-person-heart"></i> Mentors
+              </Link>
+            </li>
+          )}
         </ul>
   
         <div className="mc-sidebar-footer">
-          <button className="mc-logout-btn" onClick={handleLogout}><i className="bi bi-box-arrow-right"></i> Log Out</button>
+          <button className="mc-logout-btn" onClick={handleLogoutClick}><i className="bi bi-box-arrow-right"></i> Log Out</button>
         </div>
       </aside>
 
-      {/* Main Content */}
       <main className="chatroom-main">
         
         <div className="mc-main-header">
-          <div style={{ flex: 1 }}></div> 
+          <button 
+            className="mc-sidebar-toggle-btn" 
+            onClick={() => setSidebarOpen(!sidebarOpen)}
+            aria-label="Toggle Sidebar"
+          >
+            <i className={`bi ${sidebarOpen ? 'bi-x-lg' : 'bi-list'}`}></i>
+          </button>
+          <div style={{ flex: 1 }}></div>
           <div style={{ display: 'flex', alignItems: 'center', gap: '20px' }}>
             <button className="mc-notification-btn">
               <i className="bi bi-bell-fill"></i>
@@ -202,6 +221,20 @@ const ChatroomList = () => {
           </div>
         )}
       </main>
+      {showLogoutModal && (
+        <div className="mc-modal-overlay">
+          <div className="mc-logout-modal-card">
+            <div className="mc-logout-modal-header">
+              <h4>Confirm Logout</h4>
+            </div>
+            <p>Are you sure you want to logout from MindComfort?</p>
+            <div className="mc-logout-modal-actions">
+              <button className="btn-cancel-logout" onClick={cancelLogout}>Cancel</button>
+              <button className="btn-confirm-logout" onClick={confirmLogout}>Logout</button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

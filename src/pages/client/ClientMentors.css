@@ -300,3 +300,65 @@
   font-weight: 600;
   color: var(--mc-primary, #00343d);
 }
+
+@media (max-width: 991px) {
+  .client-mentors-content-wrapper {
+    padding: 15px 0;
+  }
+
+  .mentors-grid {
+    grid-template-columns: repeat(2, 1fr) !important; 
+    gap: 16px !important;
+  }
+
+  .mentor-header-banner {
+    padding: 24px 20px;
+    flex-direction: column;
+    text-align: center;
+  }
+
+  .mentor-avatar-large {
+    margin: 0 auto;
+  }
+
+  .mentor-body-content {
+    padding: 20px;
+    gap: 20px;
+  }
+}
+
+@media (max-width: 600px) {
+  .mentors-header h2 {
+    font-size: 1.4rem;
+  }
+
+  .mentors-header p {
+    font-size: 0.88rem;
+    margin-bottom: 18px;
+  }
+
+  .mentors-search-bar {
+    max-width: 100%;
+    margin-bottom: 20px;
+  }
+
+  .mentors-search-bar input {
+    font-size: 0.88rem;
+    padding: 10px 14px 10px 38px;
+  }
+
+  .mentors-grid {
+    grid-template-columns: 1fr !important; 
+    gap: 14px !important;
+  }
+
+  .mentor-card-item {
+    padding: 16px;
+  }
+
+  .schedule-item {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 6px;
+  }
+}

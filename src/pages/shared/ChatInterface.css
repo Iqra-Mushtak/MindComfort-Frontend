@@ -5,13 +5,29 @@
 }
 
 .chat-interface-main {
-  margin-left: 260px;
-  flex-grow: 1;
-  padding: 1.5rem 4rem;
-  display: flex;
-  flex-direction: column;
-  height: 100vh;
-  overflow-x: hidden;
+  margin-left: 260px !important;
+  flex-grow: 1 !important;
+  padding: 0 4rem 1.5rem 4rem !important; 
+  display: flex !important;
+  flex-direction: column !important;
+  height: 100vh !important;
+  overflow-x: hidden !important;
+  width: calc(100% - 260px) !important;
+}
+
+.chat-interface-main .mc-main-header {
+  display: flex !important;
+  justify-content: space-between !important;
+  align-items: center !important;
+  padding: 1rem 0 !important;
+  margin-top: 0 !important;
+  margin-bottom: 1rem !important;
+  border-bottom: 1px solid rgba(0, 52, 61, 0.15) !important;
+  position: sticky !important;
+  top: 0 !important;
+  z-index: 900 !important;
+  background-color: var(--mc-background, #f6faf8) !important;
+  backdrop-filter: blur(10px) !important;
 }
 
 .chat-header {
@@ -406,6 +422,10 @@
   min-width: 0;
 }
 
+.own-message .message-reply-preview span {
+  color: rgba(255, 255, 255, 0.95);
+}
+
 .reply-preview {
   display: flex;
   align-items: center;
@@ -699,4 +719,47 @@
 @keyframes slideUp {
   from { transform: translateY(20px); opacity: 0; }
   to { transform: translateY(0); opacity: 1; }
+}
+
+@media (max-width: 991px) {
+  .mc-sidebar-toggle-btn {
+    display: block !important;
+  }
+
+  .chat-interface-container .mc-sidebar {
+    position: fixed !important;
+    top: 0 !important;
+    left: -280px !important;
+    width: 260px !important;
+    height: 100vh !important;
+    z-index: 1100 !important;
+    background: var(--mc-primary) !important;
+    box-shadow: 4px 0 20px rgba(0, 0, 0, 0.15) !important;
+    transition: left 0.3s ease-in-out !important;
+    transform: none !important;
+  }
+
+  .chat-interface-container .mc-sidebar.open {
+    left: 0 !important;
+  }
+
+  .chat-interface-main {
+    margin-left: 0 !important;
+    width: 100% !important;
+    padding: 0 1rem 1rem 1rem !important;
+  }
+
+  .message-item {
+    max-width: 85% !important;
+  }
+}
+
+.own-message .message-bubble {
+  background: var(--mc-primary);
+  color: white;
+  box-shadow: 0 2px 8px rgba(0, 132, 118, 0.15);
+}
+
+.own-message .message-content {
+  color: white !important;
 }

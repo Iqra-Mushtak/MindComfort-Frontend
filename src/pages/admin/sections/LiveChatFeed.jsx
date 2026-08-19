@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useLayoutEffect, useRef } from 'react';
 import api from '../../../utils/api';
 import '../AdminDashboard.css';
 import io from 'socket.io-client';
@@ -10,10 +10,12 @@ const LiveChatFeed = () => {
   const [loading, setLoading] = useState(false);
   const [socket, setSocket] = useState(null);
   const [openMenuId, setOpenMenuId] = useState(null);
-  const [activeForm, setActiveForm] = useState(null); // 'delete', 'warn', 'suspend', or null
+  const [isFeedScrolled, setIsFeedScrolled] = useState(false);
+  const [activeForm, setActiveForm] = useState(null); 
   const [formData, setFormData] = useState({ messageId: null, userId: null });
   const [formInput, setFormInput] = useState('');
-  const messagesEndRef = useRef(null);
+  
+  const messagesFeedRef = useRef(null);
   const socketRef = useRef(null);
 
   useEffect(() => {
@@ -69,17 +71,40 @@ const LiveChatFeed = () => {
       socketRef.current = newSocket;
       setSocket(newSocket);
     }
-
-    return () => {
-    };
   }, [selectedChatroom]);
 
-  useEffect(() => {
-    scrollToBottom();
-  }, [messages]);
+  useLayoutEffect(() => {
+    if (loading || !selectedChatroom || messages.length === 0) return undefined;
+
+    let secondFrame;
+    const firstFrame = requestAnimationFrame(() => {
+      scrollToBottom();
+      secondFrame = requestAnimationFrame(scrollToBottom);
+    });
+
+    return () => {
+      cancelAnimationFrame(firstFrame);
+      if (secondFrame) cancelAnimationFrame(secondFrame);
+    };
+  }, [loading, selectedChatroom, messages]);
 
   const scrollToBottom = () => {
-    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+    const feed = messagesFeedRef.current;
+    if (feed) {
+      feed.scrollTop = feed.scrollHeight;
+    }
+  };
+
+  const handleMessagesFeedScroll = (event) => {
+    setIsFeedScrolled(event.currentTarget.scrollTop > 2);
+  };
+
+  const handleReturnToChatrooms = () => {
+    const feed = messagesFeedRef.current;
+    if (!feed) return;
+
+    feed.scrollTop = 0;
+    setIsFeedScrolled(false);
   };
 
   const fetchChatrooms = async () => {
@@ -135,21 +160,16 @@ const LiveChatFeed = () => {
   };
 
   const submitForm = () => {
-    if (activeForm === 'delete') {
-      if (socketRef.current) {
-        socketRef.current.emit('adminDeleteMessage', {
-          messageId: formData.messageId,
-          chatroomId: selectedChatroom,
-          userId: formData.userId
-        });
-      }
+    if (activeForm === 'delete' && socketRef.current) {
+      socketRef.current.emit('adminDeleteMessage', {
+        messageId: formData.messageId,
+        chatroomId: selectedChatroom,
+        userId: formData.userId
+      });
       closeForm();
       setOpenMenuId(null);
     } else if (activeForm === 'warn') {
-      if (!formInput.trim()) {
-        alert('Please enter a reason for warning');
-        return;
-      }
+      if (!formInput.trim()) return alert('Please enter a reason for warning');
       if (socketRef.current) {
         socketRef.current.emit('adminWarnUser', {
           userId: formData.userId,
@@ -161,10 +181,7 @@ const LiveChatFeed = () => {
       closeForm();
       setOpenMenuId(null);
     } else if (activeForm === 'suspend') {
-      if (!formInput.trim()) {
-        alert('Please enter a reason for suspension');
-        return;
-      }
+      if (!formInput.trim()) return alert('Please enter a reason for suspension');
       if (socketRef.current) {
         socketRef.current.emit('adminSuspendUser', {
           userId: formData.userId,
@@ -178,59 +195,42 @@ const LiveChatFeed = () => {
     }
   };
 
-  const getFormTitle = () => {
-    if (activeForm === 'delete') return 'Delete Message';
-    if (activeForm === 'warn') return 'Warn User';
-    if (activeForm === 'suspend') return 'Suspend User';
-    return '';
-  };
-
-  const getFormLabel = () => {
-    if (activeForm === 'delete') return 'Are you sure you want to delete this message?';
-    if (activeForm === 'warn') return 'Enter reason for warning:';
-    if (activeForm === 'suspend') return 'Enter reason for suspension:';
-    return '';
-  };
-
-  const renderForm = () => {
-    if (!activeForm) return null;
-
-    return (
-      <div className="admin-modal-overlay" onClick={closeForm}>
-        <div className="admin-modal" onClick={(e) => e.stopPropagation()}>
-          <div className="admin-modal-header">
-            <h3>{getFormTitle()}</h3>
-            <button className="admin-modal-close" onClick={closeForm}>×</button>
-          </div>
-          <div className="admin-modal-body">
-            <label>{getFormLabel()}</label>
-            {activeForm !== 'delete' && (
-              <textarea
-                className="admin-form-textarea"
-                value={formInput}
-                onChange={(e) => setFormInput(e.target.value)}
-                placeholder={activeForm === 'warn' ? 'Enter warning reason...' : 'Enter suspension reason...'}
-                rows="4"
-              />
-            )}
-            {activeForm === 'delete' && (
-              <p style={{ color: '#6c757d', marginTop: '10px' }}>This action cannot be undone.</p>
-            )}
-          </div>
-          <div className="admin-modal-footer">
-            <button className="admin-btn-cancel" onClick={closeForm}>Cancel</button>
-            <button className="admin-btn-confirm" onClick={submitForm}>
-              {activeForm === 'delete' ? 'Delete' : activeForm === 'warn' ? 'Warn' : 'Suspend'}
-            </button>
+  return (
+    <div
+      className={`admin-section live-chat-section ${isFeedScrolled ? 'feed-scrolled' : ''}`}
+      onClick={() => openMenuId && setOpenMenuId(null)}
+    >
+      {activeForm && (
+        <div className="admin-modal-overlay" onClick={closeForm}>
+          <div className="admin-modal" onClick={(e) => e.stopPropagation()}>
+            <div className="admin-modal-header">
+              <h3>{activeForm === 'delete' ? 'Delete Message' : activeForm === 'warn' ? 'Warn User' : 'Suspend User'}</h3>
+              <button className="admin-modal-close" onClick={closeForm}>×</button>
+            </div>
+            <div className="admin-modal-body">
+              <label>
+                {activeForm === 'delete' ? 'Are you sure you want to delete this message?' : activeForm === 'warn' ? 'Enter reason for warning:' : 'Enter reason for suspension:'}
+              </label>
+              {activeForm !== 'delete' && (
+                <textarea
+                  className="admin-form-textarea"
+                  value={formInput}
+                  onChange={(e) => setFormInput(e.target.value)}
+                  placeholder={activeForm === 'warn' ? 'Enter warning reason...' : 'Enter suspension reason...'}
+                  rows="4"
+                />
+              )}
+            </div>
+            <div className="admin-modal-footer">
+              <button className="admin-btn-cancel" onClick={closeForm}>Cancel</button>
+              <button className="admin-btn-confirm" onClick={submitForm}>
+                {activeForm === 'delete' ? 'Delete' : activeForm === 'warn' ? 'Warn' : 'Suspend'}
+              </button>
+            </div>
           </div>
         </div>
-      </div>
-    );
-  };
+      )}
 
-  return (
-    <div className="admin-section" onClick={() => openMenuId && setOpenMenuId(null)}>
-      {renderForm()}
       <div className="section-header">
         <h2>Live Chat Feed</h2>
         <small>Real-time chat monitoring</small>
@@ -260,10 +260,25 @@ const LiveChatFeed = () => {
                 {!socket && <small>Connecting...</small>}
               </div>
 
+              {isFeedScrolled && (
+                <button
+                  className="live-chat-return-btn"
+                  onClick={handleReturnToChatrooms}
+                  aria-label="Return to chatrooms"
+                  title="Return to chatrooms"
+                >
+                  &#8593;
+                </button>
+              )}
+
               {loading ? (
                 <div className="empty-state">Loading previous messages...</div>
               ) : (
-                <div className="messages-feed">
+                <div
+                  className="messages-feed"
+                  ref={messagesFeedRef}
+                  onScroll={handleMessagesFeedScroll}
+                >
                   {messages.length === 0 ? (
                     <div className="empty-state">Waiting for messages...</div>
                   ) : (
@@ -297,30 +312,14 @@ const LiveChatFeed = () => {
                                   e.stopPropagation();
                                   setOpenMenuId(openMenuId === msg._id ? null : msg._id);
                                 }}
-                                title="Message actions"
                               >
                                 ⋮
                               </button>
                               {openMenuId === msg._id && (
                                 <div className="admin-action-menu" onClick={(e) => e.stopPropagation()}>
-                                  <button
-                                    className="admin-menu-item delete"
-                                    onClick={() => handleDeleteMessage(msg._id, msg.senderId?._id)}
-                                  >
-                                  Delete Message
-                                  </button>
-                                  <button
-                                    className="admin-menu-item warn"
-                                    onClick={() => handleWarnUser(msg.senderId?._id, msg._id)}
-                                  >
-                                  Warn User
-                                  </button>
-                                  <button
-                                    className="admin-menu-item suspend"
-                                    onClick={() => handleSuspendUser(msg.senderId?._id, msg._id)}
-                                  >
-                                  Suspend User
-                                  </button>
+                                  <button className="admin-menu-item delete" onClick={() => handleDeleteMessage(msg._id, msg.senderId?._id)}>Delete Message</button>
+                                  <button className="admin-menu-item warn" onClick={() => handleWarnUser(msg.senderId?._id, msg._id)}>Warn User</button>
+                                  <button className="admin-menu-item suspend" onClick={() => handleSuspendUser(msg.senderId?._id, msg._id)}>Suspend User</button>
                                 </div>
                               )}
                             </div>
@@ -329,7 +328,6 @@ const LiveChatFeed = () => {
                       );
                     })
                   )}
-                  <div ref={messagesEndRef} />
                 </div>
               )}
             </>

@@ -1,0 +1,125 @@
+.client-live-container {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 20px;
+}
+
+.live-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 24px;
+  padding-bottom: 16px;
+  border-bottom: 1px solid rgba(0, 52, 61, 0.12);
+}
+
+.live-header h2 {
+  font-size: 1.5rem;
+  font-weight: 700;
+  margin: 0;
+  color: var(--mc-primary, #00343d);
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.btn-leave {
+  background: #dc3545;
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 50px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s ease;
+}
+
+.btn-leave:hover {
+  background: #b02a37;
+}
+
+.live-content-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 24px;
+}
+
+.client-audio-card,
+.comment-input-area {
+  background: #ffffff;
+  border-radius: 20px;
+  padding: 28px;
+  border: 1px solid rgba(0, 52, 61, 0.08);
+  box-shadow: 0 8px 24px rgba(0, 52, 61, 0.05);
+}
+
+.client-audio-card {
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.audio-icon {
+  font-size: 3.5rem;
+  color: var(--mc-primary, #00343d);
+  margin-bottom: 16px;
+}
+
+.comment-input-area textarea {
+  width: 100%;
+  min-height: 120px;
+  padding: 14px;
+  border: 1px solid #cbd5e1;
+  border-radius: 12px;
+  font-size: 0.95rem;
+  resize: vertical;
+  margin-bottom: 14px;
+  outline: none;
+}
+
+.comment-input-area textarea:focus {
+  border-color: var(--mc-primary, #00343d);
+}
+
+.comment-input-area button {
+  width: 100%;
+  padding: 12px;
+  background: var(--mc-primary, #00343d);
+  color: white;
+  border: none;
+  border-radius: 50px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.comment-input-area button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+@media (max-width: 768px) {
+  .client-live-container {
+    padding: 15px;
+  }
+
+  .live-header h2 {
+    font-size: 1.2rem;
+  }
+
+  .btn-leave {
+    padding: 8px 16px;
+    font-size: 0.85rem;
+  }
+
+  .live-content-grid {
+    grid-template-columns: 1fr !important; 
+    gap: 16px !important;
+  }
+
+  .client-audio-card,
+  .comment-input-area {
+    padding: 20px;
+  }
+}

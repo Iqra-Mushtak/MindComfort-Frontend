@@ -3,6 +3,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { io } from 'socket.io-client';
 import AgoraRTC from 'agora-rtc-sdk-ng';
 import api from '../../utils/api';
+import './ClientLivePlayer.css';
 
 const ClientLivePlayer = () => {
   const { id } = useParams();

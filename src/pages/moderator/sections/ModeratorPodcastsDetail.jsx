@@ -61,7 +61,7 @@ const ModeratorPodcastsDetail = () => {
   return (
     <div className="admin-section">
       <div className="section-header">
-        <h2>Podcasts Management</h2>
+        <h2>Podcasts</h2>
       </div>
 
       <div className="search-filter">

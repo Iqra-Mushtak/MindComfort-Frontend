@@ -23,19 +23,21 @@ const MentorPodcastItem = ({ title, date, time, status, onClick }) => {
 
   return (
     <div 
-      className="podcast-item-row"
+      className="podcast-item-row d-flex align-items-center justify-content-between"
       onClick={onClick}
     >
-      <div className="podcast-icon-circle">
+      <div className="podcast-icon-circle flex-shrink-0">
         <i className="bi bi-mic-fill"></i>
       </div>
 
-      <div className="flex-grow-1 overflow-hidden">
-        <h6>{title}</h6>
-        <small>{readableDate} at {readableTime}</small>
+      <div className="flex-grow-1 overflow-hidden me-2">
+        <h6 className="text-truncate mb-0">{title}</h6>
+        <small className="text-muted text-truncate d-block">
+          {readableDate} at {readableTime}
+        </small>
       </div>
 
-      <div className={`status-dot ${status}`}></div>
+      <div className={`status-dot ${status} flex-shrink-0`}></div>
     </div>
   );
 };

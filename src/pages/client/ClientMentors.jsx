@@ -11,6 +11,8 @@ const ClientMentors = () => {
   const [loading, setLoading] = useState(true);
   const [selectedMentor, setSelectedMentor] = useState(null);
   const [search, setSearch] = useState('');
+  const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [showLogoutModal, setShowLogoutModal] = useState(false);
 
   useEffect(() => {
     const userData = JSON.parse(localStorage.getItem('user'));
@@ -37,12 +39,18 @@ const ClientMentors = () => {
     }
   };
 
-  const handleLogout = () => {
-    if (window.confirm('Are you sure you want to logout?')) {
-      localStorage.removeItem('token');
-      localStorage.removeItem('user');
-      navigate('/login');
-    }
+  const handleLogoutClick = () => {
+    setShowLogoutModal(true);
+  };
+
+  const confirmLogout = () => {
+    localStorage.removeItem('token');
+    localStorage.removeItem('user');
+    navigate('/login');
+  };
+
+  const cancelLogout = () => {
+    setShowLogoutModal(false);
   };
 
   const filteredMentors = mentors.filter(m => {
@@ -54,7 +62,11 @@ const ClientMentors = () => {
 
   return (
     <div className="dashboard-container">
-      <aside className="mc-sidebar">
+      {sidebarOpen && (
+        <div className="mc-sidebar-overlay" onClick={() => setSidebarOpen(false)}></div>
+      )}
+
+      <aside className={`mc-sidebar ${sidebarOpen ? 'open' : ''}`}>
         <Link to="/client/profile" style={{ textDecoration: 'none' }}>
           <div className="mc-user-info-top">
             <div className="mc-user-avatar">
@@ -96,7 +108,7 @@ const ClientMentors = () => {
         </ul>
 
         <div className="mc-sidebar-footer">
-          <button className="mc-logout-btn" onClick={handleLogout}>
+          <button className="mc-logout-btn" onClick={handleLogoutClick}>
             <i className="bi bi-box-arrow-right"></i> Log Out
           </button>
         </div>
@@ -104,6 +116,14 @@ const ClientMentors = () => {
 
       <main className="mc-main-content">
         <div className="mc-main-header">
+          <button 
+            className="mc-sidebar-toggle-btn" 
+            onClick={() => setSidebarOpen(!sidebarOpen)}
+            aria-label="Toggle Sidebar"
+          >
+            <i className={`bi ${sidebarOpen ? 'bi-x-lg' : 'bi-list'}`}></i>
+          </button>
+
           <div style={{ flex: 1 }}></div>
           <div style={{ display: 'flex', alignItems: 'center', gap: '20px' }}>
             <button className="mc-notification-btn">
@@ -243,6 +263,25 @@ const ClientMentors = () => {
           )}
         </div>
       </main>
+
+      {showLogoutModal && (
+        <div className="mc-modal-overlay">
+          <div className="mc-logout-modal-card">
+            <div className="mc-logout-modal-header">
+              <h4>Confirm Logout</h4>
+            </div>
+            <p>Are you sure you want to logout from MindComfort?</p>
+            <div className="mc-logout-modal-actions">
+              <button className="btn-cancel-logout" onClick={cancelLogout}>
+                Cancel
+              </button>
+              <button className="btn-confirm-logout" onClick={confirmLogout}>
+                Logout
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

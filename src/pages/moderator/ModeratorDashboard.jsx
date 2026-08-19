@@ -8,7 +8,6 @@ import ReportsManagement from '../admin/sections/ReportsManagement';
 import AdminProfile from '../admin/sections/AdminProfile';
 import LiveChatFeed from '../admin/sections/LiveChatFeed';
 import LivePodcast from '../admin/sections/LivePodcast';
-// import ModeratorChatroomsDetail from './sections/ModeratorChatroomsDetail';
 import ModeratorPodcastsDetail from './sections/ModeratorPodcastsDetail';
 
 const ModeratorDashboard = () => {
@@ -17,6 +16,7 @@ const ModeratorDashboard = () => {
   const [loading, setLoading] = useState(true);
   const [activeSection, setActiveSection] = useState('dashboard');
   const [showLogoutModal, setShowLogoutModal] = useState(false);
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [liveStreams, setLiveStreams] = useState([]);
   
   const [stats, setStats] = useState({
@@ -83,17 +83,28 @@ const ModeratorDashboard = () => {
     navigate('/login');
   };
 
+  const handleNavClick = (section) => {
+    setActiveSection(section);
+    setIsSidebarOpen(false); 
+  };
+
   if (loading) {
     return <div className="mod-loading-container">Loading...</div>;
   }
 
   return (
     <div className="mod-dashboard-container">
-      {/* Sidebar */}
-      <div className="mod-sidebar">
+      {isSidebarOpen && (
+        <div 
+          className="mc-sidebar-overlay" 
+          onClick={() => setIsSidebarOpen(false)}
+        />
+      )}
+
+      <div className={`mod-sidebar ${isSidebarOpen ? 'open' : ''}`}>
         <div 
           className="mod-user-info-top clickable-profile"
-          onClick={() => { setActiveSection('profile'); }}
+          onClick={() => handleNavClick('profile')}
           title="View My Profile"
         >
           <div className="mod-user-avatar">
@@ -108,42 +119,35 @@ const ModeratorDashboard = () => {
         <nav className="mod-nav-menu">
           <button
             className={`mod-nav-item ${activeSection === 'dashboard' ? 'active' : ''}`}
-            onClick={() => { setActiveSection('dashboard'); }}
+            onClick={() => handleNavClick('dashboard')}
           >
             <i className="bi bi-speedometer2"></i> Home
           </button>
 
-          {/* <button
-            className={`mod-nav-item ${activeSection === 'chatrooms' ? 'active' : ''}`}
-            onClick={() => { setActiveSection('chatrooms'); }}
-          >
-            <i className="bi bi-chat-dots"></i> Chatrooms
-          </button> */}
-
           <button
             className={`mod-nav-item ${activeSection === 'podcasts' ? 'active' : ''}`}
-            onClick={() => { setActiveSection('podcasts'); }}
+            onClick={() => handleNavClick('podcasts')}
           >
             <i className="bi bi-broadcast"></i> Podcasts
           </button>
 
           <button
             className={`mod-nav-item ${activeSection === 'live-chat' ? 'active' : ''}`}
-            onClick={() => setActiveSection('live-chat')}
+            onClick={() => handleNavClick('live-chat')}
           >
             <i className="bi bi-chat-left-dots"></i> Live Chat Feed
           </button>
 
           <button
             className={`mod-nav-item ${activeSection === 'live-podcast' ? 'active' : ''}`}
-            onClick={() => setActiveSection('live-podcast')}
+            onClick={() => handleNavClick('live-podcast')}
           >
             <i className="bi bi-broadcast"></i> Live Podcasts
           </button>
 
           <button
             className={`mod-nav-item ${activeSection === 'reports' ? 'active' : ''}`}
-            onClick={() => setActiveSection('reports')}
+            onClick={() => handleNavClick('reports')}
           >
             <i className="bi bi-flag"></i> Reports
             {stats.pendingReports > 0 && (
@@ -161,18 +165,27 @@ const ModeratorDashboard = () => {
 
       <div className="mod-main-content">
         <div className="mod-navbar">
+          <button 
+            className="mc-sidebar-toggle-btn"
+            onClick={() => setIsSidebarOpen(!isSidebarOpen)}
+            title="Toggle Menu"
+          >
+            <i className="bi bi-list"></i>
+          </button>
+
           <div style={{ flex: 1 }}></div>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '20px' }}>
+
+          <div style={{ display: 'flex', alignItems: 'center', gap: '15px' }}>
             {liveStreams.length > 0 && (
               <button 
                 className="mod-live-btn"
-                onClick={() => setActiveSection('live-podcast')}
+                onClick={() => handleNavClick('live-podcast')}
               >
                 <span className="mod-live-dot"></span>
                 LIVE ({liveStreams.length})
               </button>
             )}
-            <button className="mod-notification-btn">
+            <button className="mod-notification-btn" onClick={() => handleNavClick('reports')}>
               <i className="bi bi-bell-fill"></i>
               {stats.pendingReports > 0 && <span className="mod-badge">{stats.pendingReports}</span>}
             </button>
@@ -195,7 +208,7 @@ const ModeratorDashboard = () => {
                   </div>
                   <button 
                     className="mod-card-action-btn"
-                    onClick={() => setActiveSection('live-chat')}
+                    onClick={() => handleNavClick('live-chat')}
                   >
                     View Chatrooms
                   </button>
@@ -208,7 +221,7 @@ const ModeratorDashboard = () => {
                   </div>
                   <button 
                     className="mod-card-action-btn"
-                    onClick={() => setActiveSection('podcasts')}
+                    onClick={() => handleNavClick('podcasts')}
                   >
                     View Podcasts
                   </button>
@@ -217,9 +230,7 @@ const ModeratorDashboard = () => {
             </div>
           )}
 
-          {activeSection === 'podcasts' && (
-            <ModeratorPodcastsDetail />
-          )}
+          {activeSection === 'podcasts' && <ModeratorPodcastsDetail />}
 
           {activeSection === 'live-chat' && <LiveChatFeed />}
 

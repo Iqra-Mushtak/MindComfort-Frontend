@@ -6,6 +6,8 @@ import logoImg from '../../assets/logo.png';
 const ClientDashboard = () => {
   const navigate = useNavigate();
   const [user, setUser] = useState(null);
+  const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [showLogoutModal, setShowLogoutModal] = useState(false);
 
   useEffect(() => {
     const token = localStorage.getItem('token');
@@ -18,16 +20,18 @@ const ClientDashboard = () => {
     }
   }, [navigate]);
 
-  const handleLogout = async () => {
-    try {
-        if (window.confirm("Are you sure you want to logout?")) {
-        localStorage.removeItem('token');
-        localStorage.removeItem('user');
-        navigate('/login');
-      }
-    } catch (error) {
-      console.error('Logout error:', error);
-    }
+ const handleLogoutClick = () => {
+    setShowLogoutModal(true);
+  };
+
+  const confirmLogout = () => {
+    localStorage.removeItem('token');
+    localStorage.removeItem('user');
+    navigate('/login');
+  };
+
+  const cancelLogout = () => {
+    setShowLogoutModal(false);
   };
 
   if (!user) return null; 
@@ -38,7 +42,11 @@ const ClientDashboard = () => {
 
   return (
     <div className="dashboard-container">
-      <aside className="mc-sidebar">
+      {sidebarOpen && (
+        <div className="mc-sidebar-overlay" onClick={() => setSidebarOpen(false)}></div>
+      )}
+
+      <aside className={`mc-sidebar ${sidebarOpen ? 'open' : ''}`}>
   <Link to="/client/profile" style={{ textDecoration: 'none' }}>
   <div className="mc-user-info-top">
     <div className="mc-user-avatar">
@@ -80,16 +88,22 @@ const ClientDashboard = () => {
   </ul>
 
   <div className="mc-sidebar-footer">
-    <button className="mc-logout-btn" onClick={handleLogout}>
+    <button className="mc-logout-btn" onClick={handleLogoutClick}>
       <i className="bi bi-box-arrow-right"></i> Log Out
     </button>
   </div>
 </aside>
 
-            {/* Main Content */}
       <main className="mc-main-content">
         
     <div className="mc-main-header">
+      <button 
+        className="mc-sidebar-toggle-btn" 
+        onClick={() => setSidebarOpen(!sidebarOpen)}
+        aria-label="Toggle Sidebar"
+      >
+        <i className={`bi ${sidebarOpen ? 'bi-x-lg' : 'bi-list'}`}></i>
+      </button>
     
     <div style={{ flex: 1 }}></div>
     <div style={{ display: 'flex', alignItems: 'center', gap: '20px' }}>
@@ -157,6 +171,26 @@ const ClientDashboard = () => {
           </Link>
         </div>
       </main>
+
+      {/* Modern Logout Modal */}
+      {showLogoutModal && (
+        <div className="mc-modal-overlay">
+          <div className="mc-logout-modal-card">
+            <div className="mc-logout-modal-header">
+              <h4>Confirm Logout</h4>
+            </div>
+            <p>Are you sure you want to logout from MindComfort?</p>
+            <div className="mc-logout-modal-actions">
+              <button className="btn-cancel-logout" onClick={cancelLogout}>
+                Cancel
+              </button>
+              <button className="btn-confirm-logout" onClick={confirmLogout}>
+                Logout
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

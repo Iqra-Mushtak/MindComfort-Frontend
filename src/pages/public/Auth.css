@@ -40,3 +40,26 @@
   font-size: 0.8rem;
   margin-top: 0.25rem;
 }
+
+@media (max-width: 576px) {
+  .auth-card-container {
+    width: 92%;
+    padding: 24px 18px;
+    margin: 20px auto;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+  }
+
+  .auth-header h2 {
+    font-size: 1.4rem;
+  }
+
+  .form-group-row {
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .auth-btn-primary {
+    padding: 12px;
+    font-size: 0.95rem;
+  }
+}

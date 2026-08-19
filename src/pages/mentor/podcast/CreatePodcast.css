@@ -2,13 +2,30 @@
   display: flex;
   min-height: 100vh;
   background-color: var(--mc-background);
+  position: relative;
 }
 
 .create-podcast-main {
-  margin-left: 260px;
-  flex-grow: 1;
-  padding: 1.5rem 4rem 4rem 4rem;
+  margin-left: 260px !important;
+  flex-grow: 1 !important;
+  padding: 0 4rem 4rem 4rem !important;
   min-height: 100vh;
+  width: calc(100% - 260px) !important;
+}
+
+.create-podcast-main .mc-main-header {
+  display: flex !important;
+  justify-content: space-between !important;
+  align-items: center !important;
+  padding: 1rem 0 !important;
+  margin-top: 0 !important;
+  margin-bottom: 2rem !important;
+  border-bottom: 1px solid rgba(0, 52, 61, 0.15) !important;
+  position: sticky !important;
+  top: 0 !important;
+  z-index: 900 !important;
+  background-color: var(--mc-background, #f6faf8) !important;
+  backdrop-filter: blur(10px) !important;
 }
 
 .create-podcast-header {
@@ -237,20 +254,59 @@
   border: 1px solid #f5c6cb;
 }
 
-@media (max-width: 992px) {
+@media (max-width: 991px) {
+  .mc-sidebar-toggle-btn {
+    display: block !important;
+  }
+
+  .create-podcast-container .mc-sidebar {
+    position: fixed !important;
+    top: 0 !important;
+    left: -280px !important;
+    width: 260px !important;
+    height: 100vh !important;
+    z-index: 1100 !important;
+    background: var(--mc-primary) !important;
+    box-shadow: 4px 0 20px rgba(0, 0, 0, 0.15) !important;
+    transition: left 0.3s ease-in-out !important;
+    transform: none !important;
+  }
+
+  .create-podcast-container .mc-sidebar.open {
+    left: 0 !important;
+  }
+
   .create-podcast-main {
-    margin-left: 0;
-    padding: 1.5rem;
+    margin-left: 0 !important;
+    width: 100% !important;
+    padding: 0 1rem 1.5rem 1rem !important;
   }
-  .form-row, .single-time-row, .timetable-row {
-    flex-direction: column;
-    gap: 0;
-  }
+
+  .form-row, 
+  .single-time-row, 
   .timetable-row {
-    align-items: flex-start;
-    gap: 1rem;
+    flex-direction: column !important;
+    gap: 0 !important;
   }
+
+  .timetable-row {
+    align-items: flex-start !important;
+    gap: 1rem !important;
+  }
+
   .timetable-times {
+    width: 100% !important;
+    flex-direction: column !important;
+    gap: 10px !important;
+  }
+
+  .form-actions {
+    flex-direction: column-reverse;
+    gap: 10px;
+  }
+
+  .save-btn,
+  .cancel-btn {
     width: 100%;
   }
 }

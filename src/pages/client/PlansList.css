@@ -153,3 +153,46 @@
   background-color: #95a5a6;
   cursor: not-allowed;
 }
+
+@media (max-width: 991px) {
+  .plans-grid {
+    grid-template-columns: repeat(2, 1fr) !important; 
+    gap: 1.5rem !important;
+  }
+
+  .plans-page-header h2 {
+    font-size: 1.6rem;
+  }
+
+  .plans-page-header p {
+    font-size: 0.95rem;
+  }
+}
+
+@media (max-width: 600px) {
+  .plans-grid {
+    grid-template-columns: 1fr !important; 
+    gap: 1.2rem !important;
+  }
+
+  .plan-card {
+    padding: 20px !important;
+    border-radius: 18px !important;
+  }
+
+  .plan-price {
+    font-size: 1.6rem !important;
+  }
+
+  .plans-page-header {
+    margin-bottom: 1.5rem;
+  }
+
+  .plans-page-header h2 {
+    font-size: 1.35rem;
+  }
+
+  .plans-page-header p {
+    font-size: 0.88rem;
+  }
+}

@@ -200,21 +200,33 @@
 
 @media (max-width: 600px) {
   .purchase-modal {
-    width: 95%;
-    max-width: none;
+    width: 92% !important;
+    max-width: none !important;
+    border-radius: 16px !important;
   }
 
   .purchase-modal-content {
-    padding: 1.5rem;
+    padding: 1.25rem !important;
+  }
+
+  .purchase-modal-content h3 {
+    font-size: 1.25rem !important;
+    margin-bottom: 1rem !important;
+  }
+
+  .price-amount {
+    font-size: 1.4rem !important;
   }
 
   .purchase-modal-actions {
-    padding: 1rem 1.5rem;
-    flex-direction: column-reverse;
+    padding: 1rem 1.25rem !important;
+    flex-direction: column-reverse !important; 
+    gap: 8px !important;
   }
 
   .btn-cancel,
   .btn-confirm {
-    width: 100%;
+    width: 100% !important;
+    text-align: center !important;
   }
 }

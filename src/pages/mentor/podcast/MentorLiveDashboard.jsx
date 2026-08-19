@@ -111,7 +111,7 @@ const MentorLiveDashboard = () => {
             ) : (
               comments.map((c, i) => (
                 <div key={c._id || i} className="comment-bubble">
-                  <span className="anon-id">{c.anonymousId.substring(0, 8)}...</span>
+                  <span className="anon-id">{(c.anonymousId || 'Anonymous').substring(0, 8)}...</span>
                   <p>{c.content}</p>
                 </div>
               ))

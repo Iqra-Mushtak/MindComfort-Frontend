@@ -1,10 +1,11 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import './LandingPage.css';
 import logoImg from '../../assets/logo.png'; 
 
 const LandingPage = () => {
   const navigate = useNavigate();
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   const handleJoinClient = () => {
     navigate('/signup?role=client');
@@ -21,34 +22,31 @@ const LandingPage = () => {
   return (
     <div>
       {/* --- Navbar --- */}
-      <nav className="navbar navbar-expand-lg fixed-top mc-navbar">
-        <div className="container">
-            <a className="navbar-brand d-flex align-items-center gap-2 mc-logo" href="/">
+      <nav className="mc-navbar fixed-top">
+        <div className="container mc-nav-container">
+          <a className="mc-logo d-flex align-items-center gap-2" href="/">
             <img src={logoImg} alt="MindComfort Logo" className="mc-logo-img" />
-            MindComfort
-            </a>
+            <span className="mc-brand-text">MindComfort</span>
+          </a>
 
-            <button className="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
-                <span className="navbar-toggler-icon"></span>
-            </button>
-            
-          <div className="collapse navbar-collapse justify-content-center" id="navbarNav">
-            <ul className="navbar-nav gap-4">
-              <li className="nav-item">
-                <a className="nav-link" href="/about">About</a>
+          <div className="mc-nav-menu-wrapper">
+            <ul className="mc-nav-links">
+              <li>
+                <a href="/about">About</a>
               </li>
-              <li className="nav-item">
-                <a className="nav-link" href="#how-it-works">How it Works</a>
+              <li>
+                <a href="#how-it-works">How it Works</a>
               </li>
             </ul>
-          </div>
-          <div className="d-flex gap-2">
-            <button className="btn btn-outline-secondary d-none d-lg-block" onClick={handleLogin}>
-            Login
-          </button>
-          <button className="btn btn-mc-primary d-none d-lg-block" onClick={handleJoinClient}>
-            Get Started
-          </button>
+
+            <div className="mc-nav-actions">
+              <button className="btn btn-outline-secondary" onClick={handleLogin}>
+                Login
+              </button>
+              <button className="btn btn-mc-primary d-none d-lg-block" onClick={handleJoinClient}>
+                Get Started
+              </button>
+            </div>
           </div>
         </div>
       </nav>

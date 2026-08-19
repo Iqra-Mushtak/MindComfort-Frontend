@@ -9,6 +9,8 @@ const CreatePodcast = () => {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+  const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [showLogoutModal, setShowLogoutModal] = useState(false);
   
   const [formData, setFormData] = useState({
     title: '',
@@ -56,6 +58,19 @@ const CreatePodcast = () => {
     setFormData(prev => ({ ...prev, startDate: today }));
     setSchedule([{ date: today, startTime: '', endTime: '' }]);
   }, [navigate]);
+
+  const handleLogoutClick = () => {
+    setShowLogoutModal(true);
+  };
+
+  const confirmLogout = () => {
+    localStorage.clear();
+    navigate('/login');
+  };
+
+  const cancelLogout = () => {
+    setShowLogoutModal(false);
+  };
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -169,7 +184,11 @@ const CreatePodcast = () => {
 
   return (
     <div className="create-podcast-container">
-      <aside className="mc-sidebar">
+      {sidebarOpen && (
+        <div className="mc-sidebar-overlay" onClick={() => setSidebarOpen(false)}></div>
+      )}
+
+      <aside className={`mc-sidebar ${sidebarOpen ? 'open' : ''}`}>
         <Link to="/mentor/profile" style={{ textDecoration: 'none' }}>
           <div className="mc-user-info-top">
             <div className="mc-user-avatar">{(user?.username || 'U').charAt(0).toUpperCase()}</div>
@@ -191,7 +210,7 @@ const CreatePodcast = () => {
           </li>
         </ul>
         <div className="mc-sidebar-footer">
-          <button className="mc-logout-btn" onClick={() => { localStorage.clear(); navigate('/login'); }}>
+          <button className="mc-logout-btn" onClick={handleLogoutClick}>
             <i className="bi bi-box-arrow-right"></i> Log Out
           </button>
         </div>
@@ -199,6 +218,14 @@ const CreatePodcast = () => {
 
       <main className="create-podcast-main">
         <div className="mc-main-header">
+          <button 
+            className="mc-sidebar-toggle-btn" 
+            onClick={() => setSidebarOpen(!sidebarOpen)}
+            aria-label="Toggle Sidebar"
+          >
+            <i className={`bi ${sidebarOpen ? 'bi-x-lg' : 'bi-list'}`}></i>
+          </button>
+
           <div style={{ flex: 1 }}></div>
           <Link to="/" className="mc-main-logo">MindComfort <img src={logoImg} alt="Logo" /></Link>
         </div>
@@ -352,6 +379,25 @@ const CreatePodcast = () => {
           </div>
         </form>
       </main>
+
+      {showLogoutModal && (
+        <div className="mc-modal-overlay">
+          <div className="mc-logout-modal-card">
+            <div className="mc-logout-modal-header">
+              <h4>Confirm Logout</h4>
+            </div>
+            <p>Are you sure you want to logout from MindComfort?</p>
+            <div className="mc-logout-modal-actions">
+              <button className="btn-cancel-logout" onClick={cancelLogout}>
+                Cancel
+              </button>
+              <button className="btn-confirm-logout" onClick={confirmLogout}>
+                Logout
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
