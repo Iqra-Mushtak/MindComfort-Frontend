@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import './ClientDashboard.css';
 import logoImg from '../../assets/logo.png'; 
+import NotificationBell from '../../components/NotificationBell';
 
 const ClientDashboard = () => {
   const navigate = useNavigate();
@@ -20,7 +21,7 @@ const ClientDashboard = () => {
     }
   }, [navigate]);
 
- const handleLogoutClick = () => {
+  const handleLogoutClick = () => {
     setShowLogoutModal(true);
   };
 
@@ -36,10 +37,6 @@ const ClientDashboard = () => {
 
   if (!user) return null; 
 
-  const getInitials = (name) => {
-    return name ? name.charAt(0).toUpperCase() : 'U';
-  };
-
   return (
     <div className="dashboard-container">
       {sidebarOpen && (
@@ -47,86 +44,80 @@ const ClientDashboard = () => {
       )}
 
       <aside className={`mc-sidebar ${sidebarOpen ? 'open' : ''}`}>
-  <Link to="/client/profile" style={{ textDecoration: 'none' }}>
-  <div className="mc-user-info-top">
-    <div className="mc-user-avatar">
-      {user.username.charAt(0).toUpperCase()}
-    </div>
-    <div className="mc-user-details">
-      <h6>{user.username}</h6>
-      <small>{user.role === 'mentor' ? 'Mentor' : 'Client'}</small>
-    </div>
-  </div>
-  </Link>
+        <Link to="/client/profile" style={{ textDecoration: 'none' }}>
+          <div className="mc-user-info-top">
+            <div className="mc-user-avatar">
+              {user.username.charAt(0).toUpperCase()}
+            </div>
+            <div className="mc-user-details">
+              <h6>{user.username}</h6>
+              <small>{user.role === 'mentor' ? 'Mentor' : 'Client'}</small>
+            </div>
+          </div>
+        </Link>
 
-  <ul className="mc-nav-menu">
-    <li className="mc-nav-item">
-      <Link to="/client/dashboard" className="mc-nav-link active">
-        <i className="bi bi-house-fill"></i> Home
-      </Link>
-    </li>
-    <li className="mc-nav-item">
-      <Link to="/client/plans" className="mc-nav-link">
-        <i className="bi bi-bookmark-star-fill"></i> Subscription Plans
-      </Link>
-    </li>
-    <li className="mc-nav-item">
-      <Link to="/chatrooms" className="mc-nav-link">
-        <i className="bi bi-chat-dots-fill"></i> Community Chat
-      </Link>
-    </li>
-    <li className="mc-nav-item">
-      <Link to="/client/podcasts" className="mc-nav-link">
-        <i className="bi bi-broadcast-pin"></i> Podcasts
-      </Link>
-    </li>
-    <li className="mc-nav-item">
-      <Link to="/client/mentors" className="mc-nav-link">
-        <i className="bi bi-person-heart"></i> Mentors
-      </Link>
-    </li>
-  </ul>
+        <ul className="mc-nav-menu">
+          <li className="mc-nav-item">
+            <Link to="/client/dashboard" className="mc-nav-link active">
+              <i className="bi bi-house-fill"></i> Home
+            </Link>
+          </li>
+          <li className="mc-nav-item">
+            <Link to="/client/plans" className="mc-nav-link">
+              <i className="bi bi-bookmark-star-fill"></i> Subscription Plans
+            </Link>
+          </li>
+          <li className="mc-nav-item">
+            <Link to="/chatrooms" className="mc-nav-link">
+              <i className="bi bi-chat-dots-fill"></i> Community Chat
+            </Link>
+          </li>
+          <li className="mc-nav-item">
+            <Link to="/client/podcasts" className="mc-nav-link">
+              <i className="bi bi-broadcast-pin"></i> Podcasts
+            </Link>
+          </li>
+          <li className="mc-nav-item">
+            <Link to="/client/mentors" className="mc-nav-link">
+              <i className="bi bi-person-heart"></i> Mentors
+            </Link>
+          </li>
+        </ul>
 
-  <div className="mc-sidebar-footer">
-    <button className="mc-logout-btn" onClick={handleLogoutClick}>
-      <i className="bi bi-box-arrow-right"></i> Log Out
-    </button>
-  </div>
-</aside>
+        <div className="mc-sidebar-footer">
+          <button className="mc-logout-btn" onClick={handleLogoutClick}>
+            <i className="bi bi-box-arrow-right"></i> Log Out
+          </button>
+        </div>
+      </aside>
 
       <main className="mc-main-content">
+        <div className="mc-main-header">
+          <button 
+            className="mc-sidebar-toggle-btn" 
+            onClick={() => setSidebarOpen(!sidebarOpen)}
+            aria-label="Toggle Sidebar"
+          >
+            <i className={`bi ${sidebarOpen ? 'bi-x-lg' : 'bi-list'}`}></i>
+          </button>
         
-    <div className="mc-main-header">
-      <button 
-        className="mc-sidebar-toggle-btn" 
-        onClick={() => setSidebarOpen(!sidebarOpen)}
-        aria-label="Toggle Sidebar"
-      >
-        <i className={`bi ${sidebarOpen ? 'bi-x-lg' : 'bi-list'}`}></i>
-      </button>
-    
-    <div style={{ flex: 1 }}></div>
-    <div style={{ display: 'flex', alignItems: 'center', gap: '20px' }}>
-      {/* Notification Bell */}
-      <button className="mc-notification-btn">
-        <i className="bi bi-bell-fill"></i>
-        <span className="mc-badge">3</span>
-      </button>
-      
-      <Link to="/client/dashboard" className="mc-main-logo">
-        MindComfort
-        <img src={logoImg} alt="MindComfort Logo" />
-      </Link>
-    </div>
-  </div>
+          <div style={{ flex: 1 }}></div>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '20px' }}>
+            <NotificationBell />
+            
+            <Link to="/client/dashboard" className="mc-main-logo">
+              MindComfort
+              <img src={logoImg} alt="MindComfort Logo" />
+            </Link>
+          </div>
+        </div>
 
-  <div className="mc-welcome-header">
-      <h3>Welcome, {user.username}!</h3>
-      <p>We're so glad to see you. What do you want to do today?</p>
-    </div>
+        <div className="mc-welcome-header">
+          <h3>Welcome, {user.username}!</h3>
+          <p>We're so glad to see you. What do you want to do today?</p>
+        </div>
 
         <div className="mc-dashboard-grid">
-          {/* Card 1: Chatrooms */}
           <Link to="/chatrooms" className="mc-dash-card">
             <div className="mc-card-visual visual-chat">
               <i className="bi bi-people-fill"></i>
@@ -137,7 +128,6 @@ const ClientDashboard = () => {
             </div>
           </Link>
 
-          {/* Card 2: Subscription Plans */}
           <Link to="/client/plans" className="mc-dash-card">
             <div className="mc-card-visual visual-plans">
               <i className="bi bi-tag-fill"></i>
@@ -148,7 +138,6 @@ const ClientDashboard = () => {
             </div>
           </Link>
 
-          {/* Card 3: Upcoming Podcasts */}
           <Link to="/client/podcasts?tab=discover" className="mc-dash-card">
             <div className="mc-card-visual visual-live">
               <i className="bi bi-calendar-event-fill"></i>
@@ -159,7 +148,6 @@ const ClientDashboard = () => {
             </div>
           </Link>
 
-          {/* Card 4: Purchased Podcasts */}
           <Link to="/client/podcasts?tab=library&view=upcoming" className="mc-dash-card">
             <div className="mc-card-visual visual-recordings">
               <i className="bi bi-play-circle-fill"></i>
@@ -172,7 +160,6 @@ const ClientDashboard = () => {
         </div>
       </main>
 
-      {/* Modern Logout Modal */}
       {showLogoutModal && (
         <div className="mc-modal-overlay">
           <div className="mc-logout-modal-card">

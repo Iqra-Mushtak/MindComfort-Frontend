@@ -3,6 +3,7 @@ import { useNavigate, Link } from 'react-router-dom';
 import api from '../../utils/api';
 import './ModeratorDashboard.css';
 import logoImg from '../../assets/logo.png';
+import NotificationBell from '../../components/NotificationBell';
 
 import ReportsManagement from '../admin/sections/ReportsManagement';
 import AdminProfile from '../admin/sections/AdminProfile';
@@ -185,10 +186,9 @@ const ModeratorDashboard = () => {
                 LIVE ({liveStreams.length})
               </button>
             )}
-            <button className="mod-notification-btn" onClick={() => handleNavClick('reports')}>
-              <i className="bi bi-bell-fill"></i>
-              {stats.pendingReports > 0 && <span className="mod-badge">{stats.pendingReports}</span>}
-            </button>
+            
+            <NotificationBell />
+
             <Link to="/moderator/dashboard" className="mod-logo-text">
               MindComfort <img src={logoImg} alt="Logo" />
             </Link>

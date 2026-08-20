@@ -4,6 +4,7 @@ import { io } from 'socket.io-client';
 import api from '../../utils/api';
 import './ChatInterface.css';
 import logoImg from '../../assets/logo.png';
+import NotificationBell from '../../components/NotificationBell';
 
 const ChatInterface = () => {
   const { id } = useParams();

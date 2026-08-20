@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import './MentorDashboard.css';
 import logoImg from '../../assets/logo.png'; 
+import NotificationBell from '../../components/NotificationBell';
 
 const MentorDashboard = () => {
   const navigate = useNavigate();
@@ -85,7 +86,6 @@ const MentorDashboard = () => {
       </aside>
 
       <main className="mc-main-content">
-        
         <div className="mc-main-header">
           <button 
             className="mc-sidebar-toggle-btn" 
@@ -97,11 +97,7 @@ const MentorDashboard = () => {
 
           <div style={{ flex: 1 }}></div>
           <div style={{ display: 'flex', alignItems: 'center', gap: '20px' }}>
-            
-            <button className="mc-notification-btn">
-              <i className="bi bi-bell-fill"></i>
-              <span className="mc-badge">3</span>
-            </button>
+            <NotificationBell />
             
             <Link to="/mentor/dashboard" className="mc-main-logo">
               MindComfort
@@ -110,9 +106,8 @@ const MentorDashboard = () => {
           </div>
         </div>
 
-        <div className="mc-welcome-header" >
-            <h3>Welcome, {user.username}!</h3>
-            {/* <p>We're so glad to see you. What do you want to do today?</p>  */}
+        <div className="mc-welcome-header">
+          <h3>Welcome, {user.username}!</h3>
         </div>
 
         <div className="mc-dashboard-grid">

@@ -1,4 +1,5 @@
 import { Routes, Route } from 'react-router-dom';
+import { NotificationProvider } from './components/NotificationContext';
 import LandingPage from './pages/public/LandingPage'; 
 import About from './pages/public/About';
 import Login from './pages/public/Login';
@@ -27,7 +28,7 @@ import ModeratorDashboard from './pages/moderator/ModeratorDashboard';
 
 function App() {
   return (
-    <>
+    <NotificationProvider>
     <Routes>
       <Route path="/" element={<LandingPage />} />
       <Route path="/about" element={<About />} />
@@ -60,7 +61,7 @@ function App() {
       <Route path="/moderator/dashboard" element={<ModeratorDashboard />} />
     </Routes>
           <GlobalLiveBadge />
-    </>
+    </NotificationProvider>
   );
 }
 

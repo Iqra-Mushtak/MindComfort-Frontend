@@ -3,6 +3,7 @@ import { useNavigate, Link } from 'react-router-dom';
 import api from '../../utils/api';
 import './AdminDashboard.css';
 import logoImg from '../../assets/logo.png';
+import NotificationBell from '../../components/NotificationBell';
 
 import ClientsManagement from './sections/ClientsManagement';
 import MentorsManagement from './sections/MentorsManagement';
@@ -200,20 +201,18 @@ const AdminDashboard = () => {
       <main className={`admin-main-content ${activeSection === 'live-chat' ? 'live-chat-active' : ''}`}>
         <div className="mc-main-header">
           <button 
-            className="mc-sidebar-toggle-btn" 
-            onClick={() => setSidebarOpen(!sidebarOpen)}
-            aria-label="Toggle Sidebar"
+            className="mc-sidebar-toggle-btn"
+            onClick={() => setIsSidebarOpen(!isSidebarOpen)}
+            title="Toggle Sidebar"
           >
-            <i className={`bi ${sidebarOpen ? 'bi-x-lg' : 'bi-list'}`}></i>
+            <i className="bi bi-list"></i>
           </button>
 
           <div style={{ flex: 1 }}></div>
           <div style={{ display: 'flex', alignItems: 'center', gap: '20px' }}>
-            <button className="mc-notification-btn">
-              <i className="bi bi-bell-fill"></i>
-              <span className="mc-badge">3</span>
-            </button>
-            <Link to="/" className="mc-main-logo">
+            <NotificationBell />
+
+            <Link to="/admin/dashboard" className="mc-main-logo">
               MindComfort <img src={logoImg} alt="Logo" />
             </Link>
           </div>
