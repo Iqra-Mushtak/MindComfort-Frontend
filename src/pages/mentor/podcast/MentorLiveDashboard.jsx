@@ -4,6 +4,7 @@ import { io } from 'socket.io-client';
 import AgoraRTC from 'agora-rtc-sdk-ng';
 import api from '../../../utils/api';
 import './MentorLiveDashboard.css';
+import NotificationBell from '../../../components/NotificationBell';
 
 const MentorLiveDashboard = () => {
   const { id } = useParams();
@@ -85,13 +86,16 @@ const MentorLiveDashboard = () => {
     <div className="mentor-live-container">
       <div className="live-header">
         <h2><i className="bi bi-broadcast text-danger"></i> LIVE NOW</h2>
-        <button 
-          className="btn-end-stream" 
-          onClick={handleEndStream}
-          disabled={isEndingStream}
-        >
-          {isEndingStream ? 'Ending Stream...' : 'End Stream'}
-        </button>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+          <NotificationBell />
+          <button 
+            className="btn-end-stream" 
+            onClick={handleEndStream}
+            disabled={isEndingStream}
+          >
+            {isEndingStream ? 'Ending Stream...' : 'End Stream'}
+          </button>
+        </div>
       </div>
 
       <div className="live-content-grid">

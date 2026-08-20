@@ -3,6 +3,7 @@ import { useNavigate, Link } from 'react-router-dom';
 import api from '../../../utils/api';
 import './CreatePodcast.css';
 import logoImg from '../../../assets/logo.png';
+import NotificationBell from '../../../components/NotificationBell';
 
 const CreatePodcast = () => {
   const navigate = useNavigate();
@@ -227,7 +228,10 @@ const CreatePodcast = () => {
           </button>
 
           <div style={{ flex: 1 }}></div>
-          <Link to="/" className="mc-main-logo">MindComfort <img src={logoImg} alt="Logo" /></Link>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '20px' }}>
+            <NotificationBell />
+            <Link to="/mentor/dashboard" className="mc-main-logo">MindComfort <img src={logoImg} alt="Logo" /></Link>
+          </div>
         </div>
 
         <div className="create-podcast-header">

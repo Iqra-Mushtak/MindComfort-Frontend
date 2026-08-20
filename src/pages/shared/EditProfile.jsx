@@ -3,6 +3,7 @@ import { useNavigate, Link, useSearchParams } from 'react-router-dom';
 import api from '../../utils/api';
 import './Profile.css';
 import logoImg from '../../assets/logo.png';
+import NotificationBell from '../../components/NotificationBell';
 
 const EditProfile = () => {
   const navigate = useNavigate();
@@ -288,10 +289,7 @@ const EditProfile = () => {
           </button>
           <div style={{ flex: 1 }}></div>
           <div style={{ display: 'flex', alignItems: 'center', gap: '20px' }}>
-            <button className="mc-notification-btn">
-              <i className="bi bi-bell-fill"></i>
-              <span className="mc-badge">3</span>
-            </button>
+            <NotificationBell />
             <Link to="/" className="mc-main-logo">MindComfort <img src={logoImg} alt="Logo" /></Link>
           </div>
         </div>

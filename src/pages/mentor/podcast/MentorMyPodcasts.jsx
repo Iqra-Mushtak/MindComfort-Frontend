@@ -5,6 +5,7 @@ import PodcastSummaryModal from './PodcastSummaryModal';
 import api from '../../../utils/api';
 import './MentorMyPodcasts.css';
 import logoImg from '../../../assets/logo.png';
+import NotificationBell from '../../../components/NotificationBell';
 
 const MentorMyPodcasts = () => {
   const navigate = useNavigate();
@@ -155,7 +156,10 @@ const MentorMyPodcasts = () => {
           </button>
 
           <div style={{ flex: 1 }}></div>
-          <Link to="/" className="mc-main-logo">MindComfort <img src={logoImg} alt="Logo" /></Link>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '20px' }}>
+            <NotificationBell />
+            <Link to="/mentor/dashboard" className="mc-main-logo">MindComfort <img src={logoImg} alt="Logo" /></Link>
+          </div>
         </div>
 
         <div className="mentor-podcasts-header">

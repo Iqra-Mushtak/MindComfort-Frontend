@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import '../client/ClientDashboard.css';
 import './PaymentSuccess.css';
+import NotificationBell from '../../components/NotificationBell';
 
 const PaymentSuccess = () => {
     const navigate = useNavigate();
@@ -119,6 +120,9 @@ const PaymentSuccess = () => {
         return (
             <div className="dashboard-container">
                 <main className="mc-main-content payment-container">
+                    <div style={{ display: 'flex', justifyContent: 'flex-end', padding: '16px 20px' }}>
+                        <NotificationBell />
+                    </div>
                     <div className="payment-loading">
                         <div className="payment-loading-icon">
                             <i className="bi bi-hourglass-split"></i>
@@ -139,6 +143,9 @@ const PaymentSuccess = () => {
         return (
             <div className="dashboard-container">
                 <main className="mc-main-content payment-container">
+                    <div style={{ display: 'flex', justifyContent: 'flex-end', padding: '16px 20px' }}>
+                        <NotificationBell />
+                    </div>
                     <div className="payment-error">
                         <div className="payment-error-icon">
                             <i className="bi bi-x-circle-fill"></i>
@@ -173,6 +180,9 @@ const PaymentSuccess = () => {
         return (
             <div className="dashboard-container">
                 <main className="mc-main-content payment-container">
+                    <div style={{ display: 'flex', justifyContent: 'flex-end', padding: '16px 20px' }}>
+                        <NotificationBell />
+                    </div>
                     <div className="payment-content">
                         <div className="payment-success-icon">
                             <i className="bi bi-check-circle-fill"></i>

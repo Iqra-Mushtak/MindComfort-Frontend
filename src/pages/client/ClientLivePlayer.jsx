@@ -4,6 +4,7 @@ import { io } from 'socket.io-client';
 import AgoraRTC from 'agora-rtc-sdk-ng';
 import api from '../../utils/api';
 import './ClientLivePlayer.css';
+import NotificationBell from '../../components/NotificationBell';
 
 const ClientLivePlayer = () => {
   const { id } = useParams();
@@ -87,7 +88,10 @@ const ClientLivePlayer = () => {
     <div className="client-live-container">
       <div className="live-header">
         <h2><i className="bi bi-broadcast text-danger"></i> LIVE SESSION</h2>
-        <button className="btn-leave" onClick={handleLeave}>Leave Session</button>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+          <NotificationBell />
+          <button className="btn-leave" onClick={handleLeave}>Leave Session</button>
+        </div>
       </div>
 
       <div className="live-content-grid">

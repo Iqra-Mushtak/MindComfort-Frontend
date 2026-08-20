@@ -4,6 +4,7 @@ import './ClientDashboard.css';
 import './PlansList.css';
 import logoImg from '../../assets/logo.png';
 import PurchaseModal from './PurchaseModal';
+import NotificationBell from '../../components/NotificationBell';
 
 const PlansList = () => {
     const navigate = useNavigate();
@@ -194,10 +195,7 @@ const PlansList = () => {
 
                     <div className="plans-header-spacer"></div>
                     <div className="plans-header-controls">
-                        <button className="mc-notification-btn">
-                            <i className="bi bi-bell-fill"></i>
-                            <span className="mc-badge">3</span>
-                        </button>
+                        <NotificationBell />
                         <Link to="/client/dashboard" className="mc-main-logo">
                             MindComfort
                             <img src={logoImg} alt="MindComfort Logo" />

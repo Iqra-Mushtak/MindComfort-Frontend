@@ -4,6 +4,7 @@ import api from '../../utils/api';
 import './ClientPodcast.css';
 import logoImg from '../../assets/logo.png';
 import PurchaseModal from './PurchaseModal';
+import NotificationBell from '../../components/NotificationBell';
 
 const ClientPodcasts = () => {
   const navigate = useNavigate();
@@ -243,10 +244,7 @@ const ClientPodcasts = () => {
 
           <div style={{ flex: 1 }}></div>
           <div style={{ display: 'flex', alignItems: 'center', gap: '20px' }}>
-            <button className="mc-notification-btn">
-              <i className="bi bi-bell-fill"></i>
-              <span className="mc-badge">3</span>
-            </button>
+            <NotificationBell />
             <Link to="/client/dashboard" className="mc-main-logo">
               MindComfort <img src={logoImg} alt="Logo" />
             </Link>
