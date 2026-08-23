@@ -123,7 +123,7 @@ const VerifyOTP = () => {
                   className="btn btn-link text-decoration-none p-0"
                   style={{ color: 'var(--mc-primary)' }}
                 >
-                  <i className="bi bi-arrow-left me-2"></i>Back to Signup
+                  Back to Signup
                 </button>
               </div>
 

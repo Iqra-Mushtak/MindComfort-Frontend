@@ -15,50 +15,92 @@ const MentorLiveDashboard = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [isEndingStream, setIsEndingStream] = useState(false);
+  const [isMuted, setIsMuted] = useState(false);
+  
+  const micTrackRef = useRef(null);
+  const isMountedRef = useRef(true);
 
   useEffect(() => {
+    isMountedRef.current = true;
     startLiveSession();
-    return () => cleanup();
+
+    return () => {
+      isMountedRef.current = false;
+      cleanup();
+    };
   }, [id]);
 
   const startLiveSession = async () => {
     try {
-      // 1. Call your existing backend endpoint
-      const res = await api.put(`/podcasts/${id}/start-stream`);
+      setLoading(true);
+      setError('');
+
+      const tokenStr = localStorage.getItem('token');
+      const res = await api.put(
+        `/podcasts/${id}/start-stream`,
+        {},
+        {
+          headers: {
+            Authorization: `Bearer ${tokenStr}`
+          }
+        }
+      );
+
+      if (!isMountedRef.current) return;
+
       const { token, channelName } = res.data;
 
-      // 2. Initialize Agora (Mentor = Publisher)
       const client = AgoraRTC.createClient({ mode: 'rtc', codec: 'vp8' });
-      await client.join(import.meta.env.VITE_AGORA_APP_ID, channelName, token, null);
-      
+
+      await client.join(import.meta.env.VITE_AGORA_APP_ID, channelName, token, 100);       
       const micTrack = await AgoraRTC.createMicrophoneAudioTrack();
-      await client.publish(micTrack);
+      micTrackRef.current = micTrack;
+      await client.publish([micTrack]);
+
+      if (!isMountedRef.current) {
+        micTrack.stop();
+        micTrack.close();
+        await client.leave();
+        return;
+      }
+
       setAgoraClient(client);
 
-      // 3. Initialize Socket for Comments
       const socketInstance = io(import.meta.env.VITE_SOCKET_URL || 'http://localhost:5000', {
-        auth: { token: localStorage.getItem('token') }
+        auth: { token: tokenStr }
       });
       
       socketInstance.on('connect', () => {
-        socketInstance.emit('joinPodcastRoom', id); // Uses your existing socketHandler event
+        socketInstance.emit('joinPodcastRoom', id);
       });
 
       socketInstance.on('newComment', (comment) => {
-        setComments(prev => [comment, ...prev]);
+        if (isMountedRef.current) {
+          setComments(prev => [comment, ...prev]);
+        }
       });
 
       setSocket(socketInstance);
       setLoading(false);
     } catch (err) {
-      console.error(err);
-      setError('Failed to start live session.');
-      setLoading(false);
+      console.error('CRITICAL START STREAM ERROR:', err);
+      if (isMountedRef.current) {
+        const serverMessage = err.response?.data?.message || err.message;
+        setError(serverMessage || 'Failed to start live session.');
+        setLoading(false);
+      }
+    }
+  };
+
+  const toggleMic = async () => {
+    if (micTrackRef.current) {
+      await micTrackRef.current.setEnabled(isMuted);
+      setIsMuted(!isMuted);
     }
   };
 
   const handleEndStream = async () => {
-    if (isEndingStream) return; // Prevent multiple submissions
+    if (isEndingStream) return;
     
     if (window.confirm('Are you sure you want to end the live stream?')) {
       try {
@@ -75,12 +117,37 @@ const MentorLiveDashboard = () => {
   };
 
   const cleanup = async () => {
-    if (agoraClient) await agoraClient.leave();
-    if (socket) socket.disconnect();
+    if (micTrackRef.current) {
+      micTrackRef.current.stop();
+      micTrackRef.current.close();
+      micTrackRef.current = null;
+    }
+    if (agoraClient) {
+      await agoraClient.leave();
+    }
+    if (socket) {
+      socket.disconnect();
+    }
   };
 
-  if (loading) return <div className="live-loading">Starting live stream...</div>;
-  if (error) return <div className="live-error">{error}</div>;
+  if (loading) {
+    return <div className="live-loading">Starting live stream and initializing recording...</div>;
+  }
+
+  if (error) {
+    return (
+      <div className="live-error-container">
+        <div className="live-error-card">
+          <i className="bi bi-exclamation-circle error-icon"></i>
+          <h3>Stream Error</h3>
+          <p>{error}</p>
+          <button className="btn-return-podcasts" onClick={() => navigate('/mentor/podcasts')}>
+            <i className="bi bi-arrow-left"></i> Return to Podcasts
+          </button>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="mentor-live-container">
@@ -99,14 +166,20 @@ const MentorLiveDashboard = () => {
       </div>
 
       <div className="live-content-grid">
-        {/* Left: Mentor Audio Status */}
         <div className="mentor-audio-card">
-          <i className="bi bi-mic-fill audio-icon"></i>
-          <h3>You are broadcasting</h3>
-          <p>Your microphone is active and streaming to clients.</p>
+          <i className={`bi ${isMuted ? 'bi-mic-mute-fill text-muted' : 'bi-mic-fill audio-icon'}`}></i>
+          <h3>{isMuted ? 'Microphone Muted' : 'You are broadcasting'}</h3>
+          <p>{isMuted ? 'Clients cannot hear you right now.' : 'Your microphone is active and streaming to clients.'}</p>
+          
+          <button 
+            className={`btn-toggle-mic ${isMuted ? 'unmute' : 'mute'}`}
+            onClick={toggleMic}
+          >
+            <i className={`bi ${isMuted ? 'bi-mic-fill' : 'bi-mic-mute-fill'}`}></i>
+            {isMuted ? 'Unmute Audio' : 'Mute Audio'}
+          </button>
         </div>
 
-        {/* Right: Live Comments (Only visible to Mentor) */}
         <div className="comments-feed">
           <h4>Live Comments ({comments.length})</h4>
           <div className="comments-list">

@@ -12,6 +12,7 @@ const Signup = () => {
     password: ''
   });
   const [error, setError] = useState('');
+  const [mentorPendingError, setMentorPendingError] = useState(null);
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
@@ -95,7 +96,17 @@ const Signup = () => {
       });
 
     } catch (err) {
-      setError(err.response?.data?.message || 'An error occurred during signup.');
+      const errorData = err.response?.data;
+      if (errorData?.status === 'mentor_pending_application') {
+        setMentorPendingError({
+          message: errorData.message,
+          email: errorData.email
+        });
+        setError('');
+      } else {
+        setError(err.response?.data?.message || 'An error occurred during signup.');
+        setMentorPendingError(null);
+      }
     } finally {
       setLoading(false);
     }
@@ -114,7 +125,7 @@ const Signup = () => {
                 className="btn btn-link text-decoration-none p-0"
                 style={{ color: 'var(--mc-primary)' }}
               >
-                <i className="bi bi-arrow-left me-2"></i>Back to Home
+                Back to Home
               </button>
             </div>
             
@@ -128,6 +139,28 @@ const Signup = () => {
               {error && (
                 <div className="alert alert-danger py-2 small mb-3" style={{ borderRadius: '12px' }}>
                   {error}
+                </div>
+              )}
+
+              {mentorPendingError && (
+                <div className="alert alert-warning py-3 small mb-3" style={{ borderRadius: '12px' }}>
+                  <p className="mb-3">{mentorPendingError.message}</p>
+                  <div className="d-flex gap-2">
+                    <Link 
+                      to="/login" 
+                      className="btn btn-sm btn-mc-primary"
+                      onClick={() => localStorage.setItem('redirectTo', '/mentor-application')}
+                    >
+                      Log In
+                    </Link>
+                    <Link 
+                      to="/mentor-application"
+                      state={{ email: mentorPendingError.email }}
+                      className="btn btn-sm btn-outline-warning"
+                    >
+                      Go to Application
+                    </Link>
+                  </div>
                 </div>
               )}
 

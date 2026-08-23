@@ -22,6 +22,7 @@ const MentorsManagement = () => {
   const [unsuspendUserId, setUnsuspendUserId] = useState(null);
 
   const [selectedApplication, setSelectedApplication] = useState(null);
+  const [showFullCoverLetter, setShowFullCoverLetter] = useState(false);
 
   useEffect(() => {
     if (tab === 'mentors') {
@@ -286,9 +287,9 @@ const MentorsManagement = () => {
                 <p>Loading details...</p>
               ) : mentorDetails ? (
                 <div className="profile-details-grid">
-                  <div className="detail-item">
+                  <div className="detail-row">
                     <label>Username</label>
-                    <span>{mentorDetails.mentor.username}</span>
+                    <span>{selectedApplication.fullName}</span>
                   </div>
                   <div className="detail-item">
                     <label>Email</label>
@@ -383,7 +384,7 @@ const MentorsManagement = () => {
                   </div>
                   <div className="detail-row">
                     <label>Username</label>
-                    <span>{selectedApplication.mentorId?.username || 'Not available'}</span>
+                    <span>{selectedApplication.fullName}</span>
                   </div>
                   <div className="detail-row">
                     <label>Applied On</label>
@@ -421,44 +422,57 @@ const MentorsManagement = () => {
                   </div>
                 </div>
 
-                <div className="detail-section full-width">
+                <div className="detail-section">
                   <h4>Uploaded Documents</h4>
-                  <div className="documents-grid">
-                    <div className="document-item full-width">
-                      <label>
-                        Combined Documents
-                        <small style={{fontWeight: 'normal', color: '#6c757d', marginLeft: '5px'}}>
-                          (CNIC, Education, Experience, Photo)
-                        </small>
-                      </label>
-                      {selectedApplication.documents?.combinedDocument ? (
-                        <a 
-                          href={`http://localhost:5000${selectedApplication.documents.combinedDocument}`}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="document-link"
-                        >
-                          View Combined Documents ({getFileName(selectedApplication.documents.combinedDocument)})
-                        </a>
-                      ) : (
-                        <span className="text-muted">Not uploaded</span>
-                      )}
-                    </div>
-                    {selectedApplication.documents?.coverLetter && (
-                      <div className="document-item full-width">
-                        <label>Cover Letter</label>
-                        <div className="cover-letter-preview">
-                          {selectedApplication.documents.coverLetter}
-                        </div>
-                      </div>
+                  <div className="document-item">
+                    <label>
+                      Required Documents
+                      <small style={{fontWeight: 'normal', color: '#6c757d', display: 'block'}}>
+                        (CNIC, Education, Experience, Photo)
+                      </small>
+                    </label>
+                    {selectedApplication.documents?.document ? (
+                      <a 
+                        href={
+                          selectedApplication.documents.document.startsWith('http')
+                            ? selectedApplication.documents.document
+                            : `https://f005.backblazeb2.com/file/documents-uploads/${selectedApplication.documents.document}`
+                        }
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="document-link"
+                        style={{ wordBreak: 'break-all' }}
+                      >
+                        View Required Documents ({getFileName(selectedApplication.documents.document)})
+                      </a>
+                    ) : (
+                      <span className="text-muted">Not uploaded</span>
                     )}
                   </div>
                 </div>
 
-                <div className="detail-section full-width">
-                  <div className={`declaration-box ${selectedApplication.declaration ? 'accepted' : 'rejected'}`}>
-                    <span>Declaration: {selectedApplication.declaration ? 'Accepted' : 'Not Accepted'}</span>
-                  </div>
+                <div className="detail-section">
+                  <h4>Cover Letter</h4>
+                  {selectedApplication.documents?.coverLetter ? (
+                    <div className="cover-letter-box">
+                      <p style={{ margin: 0, whiteSpace: 'pre-wrap' }}>
+                        {showFullCoverLetter || selectedApplication.documents.coverLetter.length <= 150
+                          ? selectedApplication.documents.coverLetter
+                          : `${selectedApplication.documents.coverLetter.substring(0, 150)}... `}
+                        {selectedApplication.documents.coverLetter.length > 150 && (
+                          <button 
+                            className="btn btn-link p-0 ms-1" 
+                            style={{ fontSize: '0.875rem', textDecoration: 'none' }}
+                            onClick={() => setShowFullCoverLetter(!showFullCoverLetter)}
+                          >
+                            {showFullCoverLetter ? 'Read Less' : 'Read More'}
+                          </button>
+                        )}
+                      </p>
+                    </div>
+                  ) : (
+                    <span className="text-muted">No cover letter provided</span>
+                  )}
                 </div>
               </div>
 

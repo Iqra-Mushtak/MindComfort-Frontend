@@ -14,6 +14,8 @@ const MentorApplication = () => {
   const email = location.state?.email;
   const token = location.state?.token;
   const userId = location.state?.userId;
+  const storedToken = localStorage.getItem('token');
+  const storedUser = localStorage.getItem('user');
 
   const [formData, setFormData] = useState({
     fullName: '',
@@ -22,8 +24,7 @@ const MentorApplication = () => {
     experience: '',
     expertise: '',
     documents: {
-      cnicDocument: null,
-      educationDocument: null,
+      mentorDocument: null,
       coverLetterText: '',
     },
     declaration: false
@@ -36,10 +37,20 @@ const MentorApplication = () => {
   const [isSubmitted, setIsSubmitted] = useState(false);
 
   useEffect(() => {
-    if (!email || !token || !userId) {
+    const hasStateData = email && token && userId;
+    const loggedInUser = storedUser ? (() => {
+      try {
+        return JSON.parse(storedUser);
+      } catch {
+        return null;
+      }
+    })() : null;
+    const isLoggedInMentor = storedToken && loggedInUser?.role === 'mentor';
+    
+    if (!hasStateData && !isLoggedInMentor) {
       navigate('/signup?role=mentor');
     }
-  }, [email, token, userId, navigate]);
+  }, [email, token, userId, storedToken, storedUser, navigate]);
 
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
@@ -73,6 +84,11 @@ const MentorApplication = () => {
     setError('');
     setSuccessMsg('');
 
+    if (!formData.documents.mentorDocument) {
+      setError('Please upload the required document file before proceeding.');
+      return;
+    }
+
     if (!formData.declaration) {
       setError('You must agree to the declaration to proceed.');
       return;
@@ -91,18 +107,18 @@ const MentorApplication = () => {
     setShowPreview(false);
     setLoading(true);
     try {
-      api.defaults.headers.common['Authorization'] = `Bearer ${token}`;
+      const authToken = token || storedToken;
+      api.defaults.headers.common['Authorization'] = `Bearer ${authToken}`;
       const form = new FormData();
-      form.append('email', email);
-      form.append('mentorId', userId);
       form.append('fullName', formData.fullName);
       form.append('qualification', JSON.stringify(formData.qualification));
       form.append('qualificationOther', formData.qualificationOther);
       form.append('experience', formData.experience);
       form.append('expertise', formData.expertise);
       form.append('declaration', formData.declaration);
-      if (formData.documents.cnicDocument) form.append('cnicDocument', formData.documents.cnicDocument);
-      if (formData.documents.educationDocument) form.append('educationDocument', formData.documents.educationDocument);
+      if (formData.documents.mentorDocument) {
+        form.append('mentorDocument', formData.documents.mentorDocument);
+      }
       form.append('coverLetterText', formData.documents.coverLetterText || '');
 
       const response = await api.post('/auth/submit-application', form, {
@@ -184,8 +200,7 @@ const MentorApplication = () => {
           </button>
         </div>
         <ul className="mb-0 ps-3">
-          <li>CNIC: {formData.documents.cnicDocument?.name || 'Not provided'}</li>
-          <li>Education: {formData.documents.educationDocument?.name || 'Not provided'}</li>
+          <li>Required documents: {formData.documents.mentorDocument?.name || 'Not provided'}</li>
           <li>Cover Letter: {formData.documents.coverLetterText ? `${formData.documents.coverLetterText.slice(0, 120)}${formData.documents.coverLetterText.length > 120 ? '...' : ''}` : 'Not provided'}</li>
         </ul>
       </div>
@@ -297,14 +312,10 @@ const MentorApplication = () => {
       </div>
 
       <div className="mb-3">
-        <label className="form-label small fw-semibold">Documents (CNIC and Attested Education - PDF preferred)</label>
+        <label className="form-label small fw-semibold">Required Documents (single file - PDF preferred)</label>
         <div className="mb-2">
-          <label className="form-label small">CNIC Document (required)</label>
-          <input type="file" accept=".pdf,.png,.jpg,.jpeg,.doc,.docx" name="cnicDocument" onChange={handleFileChange} required />
-        </div>
-        <div className="mb-2">
-          <label className="form-label small">Education Document (required)</label>
-          <input type="file" accept=".pdf,.png,.jpg,.jpeg,.doc,.docx" name="educationDocument" onChange={handleFileChange} required />
+          <label className="form-label small">CNIC, attested education, experience, and photo (required)</label>
+          <input type="file" accept=".pdf,.png,.jpg,.jpeg,.doc,.docx" name="mentorDocument" onChange={handleFileChange} required />
         </div>
         <div className="mb-2">
           <label className="form-label small">Cover Letter (optional)</label>
