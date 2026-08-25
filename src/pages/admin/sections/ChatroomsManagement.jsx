@@ -23,6 +23,7 @@ const ChatroomsManagement = ({ isModerator = false }) => {
   const [toggleAction, setToggleAction] = useState(''); 
 
   useEffect(() => {
+    document.title =  "Chatrooms Management | MindComfort";
     fetchChatrooms();
   }, [page, status, search]);
 

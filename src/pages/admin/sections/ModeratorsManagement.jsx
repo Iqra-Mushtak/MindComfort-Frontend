@@ -17,6 +17,7 @@ const ModeratorsManagement = () => {
   const [newModerator, setNewModerator] = useState({ username: '', email: '', password: '' });
 
   useEffect(() => {
+    document.title = "Moderators Management | MindComfort";
     fetchModerators();
   }, [page, status, search]);
 

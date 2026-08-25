@@ -25,6 +25,7 @@ const ClientPodcasts = () => {
   const [showLogoutModal, setShowLogoutModal] = useState(false);
 
   useEffect(() => {
+    document.title = "Audio Podcasts | MindComfort";
     const userData = JSON.parse(localStorage.getItem('user'));
     const token = localStorage.getItem('token');
     if (!token || !userData) { 

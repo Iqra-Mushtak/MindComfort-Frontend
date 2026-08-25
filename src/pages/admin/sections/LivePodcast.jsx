@@ -19,6 +19,7 @@ const LivePodcast = () => {
   const containerRef = useRef(null);
 
   useEffect(() => {
+    document.title = "Live Podcast | MindComfort";
     fetchLivePodcasts();
     const interval = setInterval(fetchLivePodcasts, 30000);
     return () => clearInterval(interval);

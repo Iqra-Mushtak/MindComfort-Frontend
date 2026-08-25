@@ -17,30 +17,28 @@ const ClientLivePlayer = () => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    document.title = "Podcast Live Player | MindComfort";
     joinLiveSession();
     return () => cleanup();
   }, [id]);
 
   const joinLiveSession = async () => {
     try {
-      // 1. Call your existing backend endpoint
       const res = await api.get(`/podcasts/${id}/join-stream`);
       const { token, channelName, anonymousId } = res.data;
       setAnonymousId(anonymousId);
 
-      // 2. Initialize Agora (Client = Subscriber)
       const client = AgoraRTC.createClient({ mode: 'rtc', codec: 'vp8' });
       await client.join(import.meta.env.VITE_AGORA_APP_ID, channelName, token, null);
       
       client.on('user-published', async (user, mediaType) => {
         await client.subscribe(user, mediaType);
         if (mediaType === 'audio') {
-          user.audioTrack.play(); // Plays the mentor's voice
+          user.audioTrack.play();
         }
       });
       setAgoraClient(client);
 
-      // 3. Initialize Socket
       const socketInstance = io(import.meta.env.VITE_SOCKET_URL || 'http://localhost:5000', {
         auth: { token: localStorage.getItem('token') }
       });
@@ -59,7 +57,6 @@ const ClientLivePlayer = () => {
     if (!commentText.trim()) return;
     
     try {
-      // Uses your existing addPodcastComment endpoint
       await api.post(`/podcasts/${id}/comment`, { 
         content: commentText, 
         anonymousId 

@@ -58,6 +58,10 @@ const Login = () => {
     }
   };
 
+  useEffect(() => {
+    document.title = "Login | MindComfort";
+  }, []);
+
   return (
     <div className="auth-page">
       <div className="container">

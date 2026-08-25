@@ -79,6 +79,7 @@ const ChatInterface = () => {
   };
 
   useEffect(() => {
+    document.title = " Live Chatroom | MindComfort ";
     let userData = null;
 
     try {

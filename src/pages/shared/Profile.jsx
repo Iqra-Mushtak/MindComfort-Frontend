@@ -15,6 +15,7 @@ const Profile = () => {
   const [showLogoutModal, setShowLogoutModal] = useState(false);
 
   useEffect(() => {
+    document.title = "Profile | MindComfort";
     const token = localStorage.getItem('token');
     const userData = JSON.parse(localStorage.getItem('user'));
 

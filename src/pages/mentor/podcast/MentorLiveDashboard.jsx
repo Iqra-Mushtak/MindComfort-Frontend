@@ -21,6 +21,7 @@ const MentorLiveDashboard = () => {
   const isMountedRef = useRef(true);
 
   useEffect(() => {
+    document.title = "Mentor Live Podcast | MindComfort";
     isMountedRef.current = true;
     startLiveSession();
 

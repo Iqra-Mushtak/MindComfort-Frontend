@@ -25,6 +25,7 @@ const AdminProfile = ({ user }) => {
   const [success, setSuccess] = useState('');
 
   useEffect(() => {
+    document.title = "Admin Profile | MindComfort";
     fetchProfile();
   }, []);
 

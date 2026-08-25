@@ -20,6 +20,7 @@ const ClientsManagement = () => {
   const [unsuspendUserId, setUnsuspendUserId] = useState(null);
 
   useEffect(() => {
+    document.title = "Clients Management | MindComfort";
     fetchClients();
   }, [page, status, search]);
 

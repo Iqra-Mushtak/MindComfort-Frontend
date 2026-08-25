@@ -49,6 +49,7 @@ const CreatePodcast = () => {
   };
 
   useEffect(() => {
+    document.title = "Create Podcast | MindComfort";
     const userData = JSON.parse(localStorage.getItem('user'));
     if (!userData || userData.role !== 'mentor') {
       navigate('/login');

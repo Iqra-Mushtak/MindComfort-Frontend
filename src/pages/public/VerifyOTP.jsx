@@ -21,6 +21,7 @@ const VerifyOTP = () => {
   const [timer, setTimer] = useState(0);
 
   useEffect(() => {
+    document.title = "Verify OTP | MindComfort";
     if (!email) {
       navigate('/signup');
     }

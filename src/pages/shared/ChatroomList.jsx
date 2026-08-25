@@ -17,6 +17,7 @@ const ChatroomList = () => {
   const [showLogoutModal, setShowLogoutModal] = useState(false);
 
   useEffect(() => {
+    document.title = "Chatroom List | MindComfort";
     let userData = null;
 
     try {

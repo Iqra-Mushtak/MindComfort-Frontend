@@ -57,6 +57,7 @@ const ModeratorDashboard = () => {
   };
 
   useEffect(() => {
+    document.title = "Moderator Dashboard | MindComfort";
     const userData = JSON.parse(localStorage.getItem('user'));
     if (!userData || userData.role !== 'moderator') {
       navigate('/login');

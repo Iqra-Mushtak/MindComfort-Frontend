@@ -37,6 +37,7 @@ const MentorApplication = () => {
   const [isSubmitted, setIsSubmitted] = useState(false);
 
   useEffect(() => {
+    document.title = "Mentor Application | MindComfort";
     const hasStateData = email && token && userId;
     const loggedInUser = storedUser ? (() => {
       try {

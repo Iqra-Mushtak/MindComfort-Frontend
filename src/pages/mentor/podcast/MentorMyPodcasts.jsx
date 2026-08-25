@@ -21,6 +21,7 @@ const MentorMyPodcasts = () => {
   const [showLogoutModal, setShowLogoutModal] = useState(false);
 
   useEffect(() => {
+    document.title = "My Podcasts | MindComfort";
     const userData = JSON.parse(localStorage.getItem('user'));
     if (!userData || userData.role !== 'mentor') {
       navigate('/login');

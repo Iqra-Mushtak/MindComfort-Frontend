@@ -16,6 +16,7 @@ const ClientMentors = () => {
   const [showLogoutModal, setShowLogoutModal] = useState(false);
 
   useEffect(() => {
+    document.title = "Mentors | MindComfort";
     const userData = JSON.parse(localStorage.getItem('user'));
     if (!userData) {
       navigate('/login');

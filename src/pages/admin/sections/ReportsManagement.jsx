@@ -20,6 +20,7 @@ const ReportsManagement = ({ isModerator = false }) => {
   const [total, setTotal] = useState(0);
 
   useEffect(() => {
+    document.title = "Reports Management | MindComfort";
     fetchReports();
   }, [page, search, statusFilter, dateFilter]);
 

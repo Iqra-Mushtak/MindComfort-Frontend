@@ -11,6 +11,7 @@ const MentorDashboard = () => {
   const [showLogoutModal, setShowLogoutModal] = useState(false);
 
   useEffect(() => {
+    document.title = "Mentor Dashboard | MindComfort";
     const token = localStorage.getItem('token');
     const userData = JSON.parse(localStorage.getItem('user'));
 

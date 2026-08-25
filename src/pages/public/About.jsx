@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import React, { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import './About.css';
 import logoImg from '../../assets/logo.png';
@@ -18,6 +19,10 @@ const About = () => {
   const handleLogin = () => {
     navigate('/login');
   };
+
+  useEffect(() => {
+    document.title = "About Us | MindComfort";
+}, []);
 
   return (
     <div className="about-page">

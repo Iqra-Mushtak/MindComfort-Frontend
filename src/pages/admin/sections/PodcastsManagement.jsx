@@ -28,6 +28,7 @@ const PodcastsManagement = ({ isModerator = false }) => {
   const [expandedPodcasts, setExpandedPodcasts] = useState({});
 
   useEffect(() => {
+    document.title = "Podcasts Management | MindComfort";
     if (tab === 'all') {
       fetchPodcasts();
     } else {

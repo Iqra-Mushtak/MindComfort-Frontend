@@ -19,6 +19,7 @@ const LiveChatFeed = () => {
   const socketRef = useRef(null);
 
   useEffect(() => {
+    document.title = "Live Chat Feed | MindComfort";
     fetchChatrooms();
   }, []);
 

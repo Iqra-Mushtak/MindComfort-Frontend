@@ -16,6 +16,7 @@ const PaymentSuccess = () => {
     const paymentId = localStorage.getItem('paymentId'); 
 
     useEffect(() => {
+        document.title = "Payment Success | MindComfort";
         if (!token) {
             navigate('/login');
             return;

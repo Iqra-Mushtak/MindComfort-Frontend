@@ -12,6 +12,7 @@ const PodcastRecording = () => {
   const [error, setError] = useState('');
 
   useEffect(() => {
+    document.title = "Podcast Recording | MindComfort";
     fetchRecording();
     fetchPodcastDetails();
   }, [id]);

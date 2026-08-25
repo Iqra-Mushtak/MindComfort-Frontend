@@ -27,6 +27,7 @@ const PlansList = () => {
     const userData = JSON.parse(localStorage.getItem('user') || '{}');
 
     useEffect(() => {
+        document.title = "Subscription Plans | MindComfort";
         if (!token || !userData) {
             navigate('/login');
             return;

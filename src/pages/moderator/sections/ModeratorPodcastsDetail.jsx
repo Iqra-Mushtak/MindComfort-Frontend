@@ -10,6 +10,7 @@ const ModeratorPodcastsDetail = () => {
   const [selectedPodcast, setSelectedPodcast] = useState(null);
 
   useEffect(() => {
+    document.title = "Live Podcasts | MindComfort";
     fetchPodcasts();
   }, [search, type]);
 

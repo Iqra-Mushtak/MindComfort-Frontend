@@ -11,6 +11,7 @@ const PaymentProcess = () => {
     const [error, setError] = useState(null);
 
     useEffect(() => {
+        document.title = "Payment Process | MindComfort";
         const initPayment = async () => {
             const token = localStorage.getItem('token');
             if (!token) {

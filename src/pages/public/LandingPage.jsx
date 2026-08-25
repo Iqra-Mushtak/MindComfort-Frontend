@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import './LandingPage.css';
 import logoImg from '../../assets/logo.png'; 
@@ -18,6 +18,10 @@ const LandingPage = () => {
   const handleLogin = () => {
     navigate('/login');
   };
+
+  useEffect(() => {
+    document.title = "Home | MindComfort";
+  }, []);
 
   return (
     <div>

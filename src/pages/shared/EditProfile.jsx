@@ -29,6 +29,7 @@ const EditProfile = () => {
   const [slotData, setSlotData] = useState({ day: '', endDay: '', date: '', endDate: '', startTime: '09:00', endTime: '12:00' });
 
   useEffect(() => {
+    document.title = " Edit Profile | MindComfort";
     const token = localStorage.getItem('token');
     const userData = JSON.parse(localStorage.getItem('user'));
     if (!token || !userData) { navigate('/login'); return; }

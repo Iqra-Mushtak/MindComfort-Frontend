@@ -25,6 +25,7 @@ const MentorsManagement = () => {
   const [showFullCoverLetter, setShowFullCoverLetter] = useState(false);
 
   useEffect(() => {
+    document.title = "Mentors Management | MindComfort";
     if (tab === 'mentors') {
       fetchMentors();
     } else {

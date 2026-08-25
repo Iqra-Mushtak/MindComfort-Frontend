@@ -56,6 +56,7 @@ const AdminDashboard = () => {
   };
 
   useEffect(() => {
+    document.title = "Admin Dashboard | MindComfort";
     const userData = JSON.parse(localStorage.getItem('user'));
     if (!userData || userData.role !== 'admin') {
       navigate('/login');

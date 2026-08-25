@@ -17,6 +17,7 @@ const Signup = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
+    document.title = "Signup | MindComfort";
     const urlRole = searchParams.get('role');
     if (urlRole === 'mentor') {
       setRole('mentor');

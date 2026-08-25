@@ -19,6 +19,7 @@ const SubscriptionsManagement = () => {
   const [message, setMessage] = useState({ type: '', text: '' });
 
   useEffect(() => {
+    document.title = "Subscriptions Management | MindComfort";
     fetchSubscriptions();
   }, [page, typeFilter, statusFilter]);
 
