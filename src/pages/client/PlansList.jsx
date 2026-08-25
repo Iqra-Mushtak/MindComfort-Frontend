@@ -40,7 +40,7 @@ const PlansList = () => {
         try {
             setLoading(true);
             setLoadError(false);
-            const response = await fetch('http://localhost:5000/api/plans/available', {
+            const response = await fetch(''http://13.60.72.235:5000'/api/plans/available', {
                 method: 'GET',
                 headers: {
                     'Authorization': `Bearer ${token}`,
@@ -74,7 +74,7 @@ const PlansList = () => {
         setIsPurchasing(true);
         setPurchaseError('');
         try {
-            const response = await fetch('http://localhost:5000/api/subscriptions/purchase', {
+            const response = await fetch(''http://13.60.72.235:5000'/api/subscriptions/purchase', {
                 method: 'POST',
                 headers: {
                     'Authorization': `Bearer ${token}`,

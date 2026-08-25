@@ -39,7 +39,7 @@ const PaymentSuccess = () => {
 
             if (paymentId) {
                 console.log('paymentId found, calling complete-payment...');
-                const completeResponse = await fetch('http://localhost:5000/api/webhooks/complete-payment', {
+                const completeResponse = await fetch(''http://13.60.72.235:5000'/api/webhooks/complete-payment', {
                     method: 'POST',
                     headers: {
                         'Authorization': `Bearer ${token}`,
@@ -69,7 +69,7 @@ const PaymentSuccess = () => {
 
             if (sessionId) {
                 console.log('sessionId found, calling session-status...');
-                const response = await fetch(`http://localhost:5000/api/subscriptions/session-status?sessionId=${encodeURIComponent(sessionId)}`, {
+                const response = await fetch(`'http://13.60.72.235:5000'/api/subscriptions/session-status?sessionId=${encodeURIComponent(sessionId)}`, {
                     method: 'GET',
                     headers: {
                         'Authorization': `Bearer ${token}`,

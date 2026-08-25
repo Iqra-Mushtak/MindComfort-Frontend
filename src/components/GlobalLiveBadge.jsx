@@ -7,7 +7,7 @@ const GlobalLiveBadge = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    const socket = io(import.meta.env.VITE_SOCKET_URL || 'http://localhost:5000', {
+    const socket = io(import.meta.env.VITE_SOCKET_URL || ''http://13.60.72.235:5000'', {
       auth: { token: localStorage.getItem('token') }
     });
 

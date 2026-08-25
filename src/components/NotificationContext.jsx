@@ -38,7 +38,7 @@ export const NotificationProvider = ({ children }) => {
 
     fetchNotifications();
 
-    const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+    const apiUrl = import.meta.env.VITE_API_URL || 'http://13.60.72.235:5000';
     const socket = io(apiUrl, {
       auth: { token },
       transports: ['websocket', 'polling']

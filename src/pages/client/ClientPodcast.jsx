@@ -92,7 +92,7 @@ const ClientPodcasts = () => {
       setPurchaseError('');
       try {
           const token = localStorage.getItem('token');
-          const response = await fetch(`http://localhost:5000/api/subscriptions/podcast/${selectedPodcast._id}`, {
+          const response = await fetch(`'http://13.60.72.235:5000'/api/subscriptions/podcast/${selectedPodcast._id}`, {
               method: 'POST',
               headers: {
                   'Authorization': `Bearer ${token}`,

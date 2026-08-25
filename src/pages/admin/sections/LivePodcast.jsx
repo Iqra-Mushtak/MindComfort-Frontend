@@ -46,7 +46,7 @@ const LivePodcast = () => {
 
   const initializeSocket = () => {
     const token = localStorage.getItem('token');
-    const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+    const apiUrl = import.meta.env.VITE_API_URL || ''http://13.60.72.235:5000'';
     const newSocket = io(apiUrl, {
       auth: { token },
       transports: ['websocket', 'polling']
