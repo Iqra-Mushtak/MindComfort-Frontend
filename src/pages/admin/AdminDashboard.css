@@ -3836,3 +3836,49 @@ html::-webkit-scrollbar, body::-webkit-scrollbar, #root::-webkit-scrollbar,
 .cover-letter-box button:hover {
   text-decoration: underline !important;
 }
+
+.client-card .card-body p strong {
+  color: #212529 !important;
+  font-weight: 600;
+}
+
+.client-card ul {
+  list-style-type: none !important;
+  padding-left: 0 !important;
+  margin-top: 10px !important;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.client-card ul li {
+  font-size: 0.85rem;
+  color: #495057 !important;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.client-card ul li::before {
+  content: "✓";
+  color: #28a745;
+  font-weight: bold;
+  font-size: 0.9rem;
+}
+
+.modal-content form .form-group textarea {
+  min-height: 70px;
+  resize: vertical;
+}
+
+.modal-content form .form-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 15px;
+}
+
+@media (max-width: 576px) {
+  .modal-content form .form-grid {
+    grid-template-columns: 1fr !important;
+  }
+}

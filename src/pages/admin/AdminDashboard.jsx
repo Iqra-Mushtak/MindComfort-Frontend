@@ -4,6 +4,7 @@ import api from '../../utils/api';
 import './AdminDashboard.css';
 import logoImg from '../../assets/logo.png';
 import NotificationBell from '../../components/NotificationBell';
+import PlansManagement from './sections/PlansManagement';
 
 import ClientsManagement from './sections/ClientsManagement';
 import MentorsManagement from './sections/MentorsManagement';
@@ -98,6 +99,8 @@ const AdminDashboard = () => {
         return <MentorsManagement />;
       case 'moderators':
         return <ModeratorsManagement />;
+      case 'plans':
+        return <PlansManagement />;
       case 'chatrooms':
         return <ChatroomsManagement />;
       case 'podcasts':
@@ -158,6 +161,11 @@ const AdminDashboard = () => {
           <li className={`mc-nav-item ${activeSection === 'moderators' ? 'active' : ''}`}>
             <button className="mc-nav-link" onClick={() => { setActiveSection('moderators'); setSidebarOpen(false); }}>
               <i className="bi bi-shield-lock-fill"></i> Moderators
+            </button>
+          </li>
+          <li className={`mc-nav-item ${activeSection === 'plans' ? 'active' : ''}`}>
+            <button className="mc-nav-link" onClick={() => { setActiveSection('plans'); setSidebarOpen(false); }}>
+              <i className="bi bi-tags-fill"></i> Plans
             </button>
           </li>
           <li className={`mc-nav-item ${activeSection === 'chatrooms' ? 'active' : ''}`}>

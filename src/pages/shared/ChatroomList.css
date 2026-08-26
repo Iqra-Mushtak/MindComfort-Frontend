@@ -83,15 +83,21 @@
 
 /* Join Button */
 .join-btn {
-  background-color: var(--mc-primary);
-  color: white;
-  padding: 0.6rem 1.8rem;
-  border-radius: 25px;
+  background-color: var(--mc-primary, #092c2c);
+  color: #ffffff;
+  padding: 8px 24px;
+  border-radius: 50px;
   font-weight: 600;
   font-size: 0.9rem;
-  transition: background 0.3s;
+  transition: all 0.2s ease;
   border: none;
   cursor: pointer;
+  white-space: nowrap;
+  min-width: 80px;
+  text-align: center;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .join-btn:hover {

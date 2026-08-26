@@ -212,8 +212,7 @@ const ChatroomList = () => {
                   <p>{room.description || 'No description available.'}</p>
                 </div>
                 <button onClick={() => handleJoin(room._id)} className="join-btn">
-                  {user.role === 'mentor' ? 'Join' : 
-                   (user?.isSubscribed || user?.subscriptionStatus === 'active' || subscriptionStatus?.isSubscribed || subscriptionStatus?.hasActiveChat) ? 'Join' : 'Join Room'}
+                  Join
                 </button>
               </div>
             ))}
