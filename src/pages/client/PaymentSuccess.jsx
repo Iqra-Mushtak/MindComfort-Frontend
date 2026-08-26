@@ -121,9 +121,7 @@ const PaymentSuccess = () => {
         return (
             <div className="dashboard-container">
                 <main className="mc-main-content payment-container">
-                    <div style={{ display: 'flex', justifyContent: 'flex-end', padding: '16px 20px' }}>
-                        <NotificationBell />
-                    </div>
+                    
                     <div className="payment-loading">
                         <div className="payment-loading-icon">
                             <i className="bi bi-hourglass-split"></i>
