@@ -74,7 +74,7 @@ const PlansList = () => {
         setIsPurchasing(true);
         setPurchaseError('');
         try {
-            const response = await fetch('http://13.60.72.235:5000/api/plans/available', {
+            const response = await fetch('http://13.60.72.235:5000/api/subscriptions/subscribe', {
                 method: 'POST',
                 headers: {
                     'Authorization': `Bearer ${token}`,

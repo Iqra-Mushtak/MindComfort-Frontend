@@ -36,7 +36,7 @@ const PaymentProcess = () => {
                     throw new Error('Failed to load Stripe');
                 }
 
-                const response = await fetch(`'http://13.60.72.235:5000'/api/webhooks/payment-status?paymentId=${encodeURIComponent(paymentId)}`, {
+                const response = await fetch(`http://13.60.72.235:5000/api/webhooks/payment-status?paymentId=${encodeURIComponent(paymentId)}`, {
                     method: 'GET',
                     headers: {
                         'Authorization': `Bearer ${token}`,

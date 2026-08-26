@@ -3877,6 +3877,29 @@ html::-webkit-scrollbar, body::-webkit-scrollbar, #root::-webkit-scrollbar,
   gap: 15px;
 }
 
+.modal-footer {
+  display: flex !important;
+  flex-direction: row !important;
+  justify-content: flex-end !important;
+  align-items: center !important;
+  gap: 12px !important;
+  padding: 20px !important;
+  border-top: 1px solid #e9ecef !important;
+}
+
+.modal-footer button {
+  width: auto !important;
+  min-width: 120px !important;
+  margin: 0 !important;
+  flex: 0 0 auto !important;
+}
+
+.modal-footer .btn-submit {
+  width: auto !important;
+  padding: 10px 24px !important;
+  border-radius: 6px !important;
+}
+
 @media (max-width: 576px) {
   .modal-content form .form-grid {
     grid-template-columns: 1fr !important;
