@@ -2,7 +2,6 @@ import React, { useEffect, useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { loadStripe } from '@stripe/stripe-js';
 import './PaymentSuccess.css';
-import NotificationBell from '../../components/NotificationBell';
 
 const PaymentProcess = () => {
     const navigate = useNavigate();
@@ -84,9 +83,6 @@ const PaymentProcess = () => {
     if (loading && !error) {
         return (
             <div className="payment-container">
-                <div style={{ display: 'flex', justifyContent: 'flex-end', padding: '16px 20px' }}>
-                    <NotificationBell />
-                </div>
                 <div className="payment-loading">
                     <p>Processing your payment...</p>
                 </div>

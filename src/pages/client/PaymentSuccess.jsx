@@ -2,7 +2,6 @@ import React, { useEffect, useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import '../client/ClientDashboard.css';
 import './PaymentSuccess.css';
-import NotificationBell from '../../components/NotificationBell';
 
 const PaymentSuccess = () => {
     const navigate = useNavigate();
@@ -142,9 +141,6 @@ const PaymentSuccess = () => {
         return (
             <div className="dashboard-container">
                 <main className="mc-main-content payment-container">
-                    <div style={{ display: 'flex', justifyContent: 'flex-end', padding: '16px 20px' }}>
-                        <NotificationBell />
-                    </div>
                     <div className="payment-error">
                         <div className="payment-error-icon">
                             <i className="bi bi-x-circle-fill"></i>
@@ -239,12 +235,12 @@ const PaymentSuccess = () => {
                         </div>
 
                         <div className="payment-action-buttons">
-                            <button
+                            {/* <button
                                 onClick={handleViewSubscription}
                                 className="payment-btn-primary"
                             >
                                 View Subscription
-                            </button>
+                            </button> */}
                             <button
                                 onClick={handleReturnHome}
                                 className="payment-btn-secondary"
