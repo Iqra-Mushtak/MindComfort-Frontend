@@ -87,34 +87,29 @@ const ClientPodcasts = () => {
   };
 
   const handleConfirmPurchase = async () => {
-  if (!selectedPodcast) return;
-  setIsPurchasing(true);
-  setPurchaseError('');
-  try {
-    const response = await api.post(`/subscriptions/podcast/${selectedPodcast._id}`);
-    const data = response.data;
-    
-    if (data.clientSecret && data.stripePaymentIntentId) {
-     localStorage.setItem('stripePaymentIntentId', data.stripePaymentIntentId);
-      localStorage.setItem('stripeClientSecret', data.clientSecret);
-      localStorage.setItem('paymentId', data.paymentId);
-      navigate('/payment/process', { 
-        state: { 
-          clientSecret: data.clientSecret, 
-          paymentIntentId: data.stripePaymentIntentId,
-          paymentId: data.paymentId 
-        } 
-      });
-    } else {
-      throw new Error('No Stripe payment data received');
+    if (!selectedPodcast) return;
+    setIsPurchasing(true);
+    setPurchaseError('');
+    try {
+      const response = await api.post(`/subscriptions/podcast/${selectedPodcast._id}`);
+      const data = response.data;
+
+      if (data.checkoutUrl) {
+        localStorage.setItem('paymentId', data.paymentId);
+
+        window.location.href = data.checkoutUrl;
+      } else if (data.isFree) {
+        navigate('/payment-success', { state: { paymentId: data.paymentId } });
+      } else {
+        throw new Error('Invalid response from payment server');
+      }
+    } catch (err) {
+      console.error('Purchase error:', err);
+      setPurchaseError(err.response?.data?.message || err.message || 'Failed to process purchase');
+    } finally {
+      setIsPurchasing(false);
     }
-  } catch (err) {
-    console.error('Purchase error:', err);
-    setPurchaseError(err.response?.data?.message || err.message || 'Failed to process purchase');
-  } finally {
-    setIsPurchasing(false);
-  }
-};
+  };
 
   const handleCancelPurchase = () => {
     setIsPurchaseModalOpen(false);
