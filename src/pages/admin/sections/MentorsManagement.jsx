@@ -432,21 +432,17 @@ const MentorsManagement = () => {
                         (CNIC, Education, Experience, Photo)
                       </small>
                     </label>
-                    {selectedApplication.documents?.document ? (
-                      <a 
-                        href={
-                          selectedApplication.documents.document.startsWith('http')
-                            ? selectedApplication.documents.document
-                            : `https://f005.backblazeb2.com/file/documents-uploads/${selectedApplication.documents.document}`
-                        }
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="document-link"
-                        style={{ wordBreak: 'break-all' }}
-                      >
-                        View Required Documents ({getFileName(selectedApplication.documents.document)})
-                      </a>
-                    ) : (
+                      {selectedApplication.documents?.document ? (
+                        <a 
+                          href={`${api.defaults.baseURL || ''}/admin/mentors/document-proxy?key=${encodeURIComponent(selectedApplication.documents.document)}`}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="document-link"
+                          style={{ wordBreak: 'break-all' }}
+                        >
+                          View Required Documents ({getFileName(selectedApplication.documents.document)})
+                        </a>
+                      ) : (
                       <span className="text-muted">Not uploaded</span>
                     )}
                   </div>
