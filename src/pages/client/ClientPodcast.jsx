@@ -87,39 +87,30 @@ const ClientPodcasts = () => {
   };
 
   const handleConfirmPurchase = async () => {
-      if (!selectedPodcast) return;
-      setIsPurchasing(true);
-      setPurchaseError('');
-      try {
-          const token = localStorage.getItem('token');
-          const response = await fetch(`'http://13.60.72.235:5000'/api/subscriptions/podcast/${selectedPodcast._id}`, {
-              method: 'POST',
-              headers: {
-                  'Authorization': `Bearer ${token}`,
-                  'Content-Type': 'application/json'
-              }
-          });
-          if (!response.ok) {
-              const errorData = await response.json();
-              throw new Error(errorData.message || 'Failed to create purchase');
-          }
-          const data = await response.json();
-          
-          if (data.clientSecret && data.stripePaymentIntentId) {
-              console.log('Stripe payment intent created:', data.stripePaymentIntentId);
-              localStorage.setItem('stripePaymentIntentId', data.stripePaymentIntentId);
-              localStorage.setItem('stripeClientSecret', data.clientSecret);
-              localStorage.setItem('paymentId', data.paymentId);
-              navigate('/payment/process', { state: { clientSecret: data.clientSecret, paymentIntentId: data.stripePaymentIntentId } });
-          } else {
-              throw new Error('No Stripe payment data received');
-          }
-      } catch (err) {
-          console.error('Purchase error:', err);
-          setPurchaseError(err.message || 'Failed to process purchase. Please try again.');
-      } finally {
-          setIsPurchasing(false);
+    if (!selectedPodcast) return;
+    setIsPurchasing(true);
+    setPurchaseError('');
+    try {
+      const response = await api.post(`/subscriptions/podcast/${selectedPodcast._id}`);
+      const data = response.data;
+      
+      if (data.clientSecret && data.stripePaymentIntentId) {
+        console.log('Stripe payment intent created:', data.stripePaymentIntentId);
+        localStorage.setItem('stripePaymentIntentId', data.stripePaymentIntentId);
+        localStorage.setItem('stripeClientSecret', data.clientSecret);
+        localStorage.setItem('paymentId', data.paymentId);
+        navigate('/payment/process', { 
+          state: { clientSecret: data.clientSecret, paymentIntentId: data.stripePaymentIntentId } 
+        });
+      } else {
+        throw new Error('No Stripe payment data received');
       }
+    } catch (err) {
+      console.error('Purchase error:', err);
+      setPurchaseError(err.response?.data?.message || err.message || 'Failed to process purchase. Please try again.');
+    } finally {
+      setIsPurchasing(false);
+    }
   };
 
   const handleCancelPurchase = () => {
