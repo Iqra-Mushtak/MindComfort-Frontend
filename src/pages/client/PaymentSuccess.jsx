@@ -1,11 +1,12 @@
 import React, { useEffect, useState } from 'react';
-import { useNavigate, useSearchParams } from 'react-router-dom';
+import { useNavigate, useSearchParams, useLocation } from 'react-router-dom';
 import api from '../../utils/api';
 import '../client/ClientDashboard.css';
 import './PaymentSuccess.css';
 
 const PaymentSuccess = () => {
     const navigate = useNavigate();
+    const location = useLocation();
     const [searchParams] = useSearchParams();
     const [paymentStatus, setPaymentStatus] = useState('loading');
     const [subscriptionDetails, setSubscriptionDetails] = useState(null);
@@ -13,7 +14,7 @@ const PaymentSuccess = () => {
 
     const token = localStorage.getItem('token');
     const sessionId = searchParams.get('session_id');
-    const paymentId = localStorage.getItem('paymentId'); 
+    const paymentId = location.state?.paymentId || localStorage.getItem('paymentId'); 
 
     useEffect(() => {
         document.title = "Payment Success | MindComfort";
@@ -34,7 +35,7 @@ const PaymentSuccess = () => {
     const fetchPaymentStatus = async () => {
         try {
             if (paymentId) {
-                const completeRes = await api.post('/webhooks/complete-payment', { paymentId });
+                const completeRes = await api.post('/subscriptions/complete-payment', { paymentId });
                 setPaymentStatus('success');
                 setSubscriptionDetails(completeRes.data);
                 localStorage.removeItem('paymentId');
