@@ -434,7 +434,7 @@ const MentorsManagement = () => {
                     </label>
                       {selectedApplication.documents?.document ? (
                         <a 
-                          href={`${api.defaults.baseURL || ''}/admin/mentors/document-proxy?key=${encodeURIComponent(selectedApplication.documents.document)}`}
+                          href={`${api.defaults.baseURL || ''}/admin/mentors/document-proxy?key=${encodeURIComponent(selectedApplication.documents.document)}&token=${localStorage.getItem('token')}`}
                           target="_blank"
                           rel="noopener noreferrer"
                           className="document-link"
@@ -443,8 +443,8 @@ const MentorsManagement = () => {
                           View Required Documents ({getFileName(selectedApplication.documents.document)})
                         </a>
                       ) : (
-                      <span className="text-muted">Not uploaded</span>
-                    )}
+                        <span className="text-muted">Not uploaded</span>
+                      )}
                   </div>
                 </div>
 

@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
+import api from '../../utils/api';
 import '../client/ClientDashboard.css';
 import './PaymentSuccess.css';
 
@@ -32,67 +33,24 @@ const PaymentSuccess = () => {
 
     const fetchPaymentStatus = async () => {
         try {
-            console.log('fetchPaymentStatus CALLED');
-            console.log('paymentId from localStorage:', paymentId);
-            console.log('sessionId from URL:', sessionId);
-
             if (paymentId) {
-                console.log('paymentId found, calling complete-payment...');
-                const completeResponse = await fetch('http://13.60.72.235:5000/api/webhooks/complete-payment', {
-                    method: 'POST',
-                    headers: {
-                        'Authorization': `Bearer ${token}`,
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({ paymentId })
-                });
-
-                console.log('complete-payment response status:', completeResponse.status);
-                console.log('complete-payment response ok:', completeResponse.ok);
-
-                if (completeResponse.ok) {
-                    const completeData = await completeResponse.json();
-                    console.log('complete-payment SUCCESS:', completeData);
-                    setPaymentStatus('success');
-                    setSubscriptionDetails(completeData);
-                    localStorage.removeItem('paymentId');
-                    localStorage.removeItem('stripePaymentIntentId');
-                    localStorage.removeItem('stripeClientSecret');
-                    return;
-                } else {
-                    console.log('complete-payment NOT ok, trying fallback...');
-                }
-            } else {
-                console.log('NO paymentId in localStorage!');
+                const completeRes = await api.post('/webhooks/complete-payment', { paymentId });
+                setPaymentStatus('success');
+                setSubscriptionDetails(completeRes.data);
+                localStorage.removeItem('paymentId');
+                localStorage.removeItem('stripePaymentIntentId');
+                localStorage.removeItem('stripeClientSecret');
+                return;
             }
 
             if (sessionId) {
-                console.log('sessionId found, calling session-status...');
-                const response = await fetch(`http://13.60.72.235:5000/api/subscriptions/session-status?sessionId=${encodeURIComponent(sessionId)}`, {
-                    method: 'GET',
-                    headers: {
-                        'Authorization': `Bearer ${token}`,
-                        'Content-Type': 'application/json'
-                    }
-                });
-
-                console.log('session-status response status:', response.status);
-
-                if (!response.ok) {
-                    throw new Error('Failed to fetch payment status');
-                }
-
-                const data = await response.json();
-                console.log('session-status data:', data);
+                const response = await api.get(`/subscriptions/session-status?sessionId=${encodeURIComponent(sessionId)}`);
+                const data = response.data;
 
                 if (data.payment && data.payment.status === 'completed') {
-                    
-                    console.log('Payment completed from session-status');
                     setPaymentStatus('success');
                     setSubscriptionDetails(data);
                 } else if (data.status === 'pending' || (data.payment && data.payment.status === 'pending')) {
-                   
-                    console.log('Payment pending, retrying in 2 seconds...');
                     setPaymentStatus('pending');
                     setSubscriptionDetails(data);
                     setTimeout(fetchPaymentStatus, 2000);
@@ -104,7 +62,7 @@ const PaymentSuccess = () => {
         } catch (err) {
             console.error('Error fetching payment status:', err);
             setPaymentStatus('error');
-            setError(err.message || 'Failed to verify payment');
+            setError(err.response?.data?.message || err.message || 'Failed to verify payment');
         }
     };
 
@@ -112,15 +70,10 @@ const PaymentSuccess = () => {
         navigate('/client/dashboard');
     };
 
-    const handleViewSubscription = () => {
-        navigate('/client/dashboard', { state: { activeTab: 'subscriptions' } });
-    };
-
     if (paymentStatus === 'loading' || paymentStatus === 'pending') {
         return (
             <div className="dashboard-container">
                 <main className="mc-main-content payment-container">
-                    
                     <div className="payment-loading">
                         <div className="payment-loading-icon">
                             <i className="bi bi-hourglass-split"></i>
@@ -175,9 +128,6 @@ const PaymentSuccess = () => {
         return (
             <div className="dashboard-container">
                 <main className="mc-main-content payment-container">
-                    <div style={{ display: 'flex', justifyContent: 'flex-end', padding: '16px 20px' }}>
-                        <NotificationBell />
-                    </div>
                     <div className="payment-content">
                         <div className="payment-success-icon">
                             <i className="bi bi-check-circle-fill"></i>
@@ -204,7 +154,7 @@ const PaymentSuccess = () => {
                                     <div className="payment-detail-item">
                                         <p className="payment-detail-label">Amount Paid</p>
                                         <p className="payment-detail-value">
-                                            {payment.currency} {payment.amount.toFixed(2)}
+                                            {payment.currency} {payment.amount ? payment.amount.toFixed(2) : '0.00'}
                                         </p>
                                     </div>
                                     <div className="payment-detail-item">
@@ -235,12 +185,6 @@ const PaymentSuccess = () => {
                         </div>
 
                         <div className="payment-action-buttons">
-                            {/* <button
-                                onClick={handleViewSubscription}
-                                className="payment-btn-primary"
-                            >
-                                View Subscription
-                            </button> */}
                             <button
                                 onClick={handleReturnHome}
                                 className="payment-btn-secondary"

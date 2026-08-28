@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { loadStripe } from '@stripe/stripe-js';
+import api from '../../utils/api';
 import './PaymentSuccess.css';
 
 const PaymentProcess = () => {
@@ -35,32 +36,13 @@ const PaymentProcess = () => {
                     throw new Error('Failed to load Stripe');
                 }
 
-                const response = await fetch(`http://13.60.72.235:5000/api/webhooks/payment-status?paymentId=${encodeURIComponent(paymentId)}`, {
-                    method: 'GET',
-                    headers: {
-                        'Authorization': `Bearer ${token}`,
-                        'Content-Type': 'application/json'
-                    }
-                });
+                const response = await api.get(`/webhooks/payment-status?paymentId=${encodeURIComponent(paymentId)}`);
+                const data = response.data;
 
-                if (!response.ok) {
-                    const errorData = await response.json();
-                    throw new Error(errorData.message || 'Failed to verify payment');
-                }
-
-                const data = await response.json();
-
-                if (data.payment.status === 'completed') {
+                if (data.payment && (data.payment.status === 'completed' || data.payment.status === 'pending')) {
                     localStorage.removeItem('stripePaymentIntentId');
                     localStorage.removeItem('stripeClientSecret');
                     localStorage.removeItem('paymentId');
-                    navigate('/payment-success', { 
-                        state: { 
-                            paymentIntentId: paymentIntentId,
-                            paymentId: paymentId
-                        }
-                    });
-                } else if (data.payment.status === 'pending') {
                     navigate('/payment-success', { 
                         state: { 
                             paymentIntentId: paymentIntentId,
@@ -72,7 +54,7 @@ const PaymentProcess = () => {
                 }
             } catch (err) {
                 console.error('Payment error:', err);
-                setError(err.message || 'Failed to process payment. Please try again.');
+                setError(err.response?.data?.message || err.message || 'Failed to process payment. Please try again.');
                 setLoading(false);
             }
         };
@@ -93,9 +75,6 @@ const PaymentProcess = () => {
     if (error) {
         return (
             <div className="payment-container">
-                <div style={{ display: 'flex', justifyContent: 'flex-end', padding: '16px 20px' }}>
-                    <NotificationBell />
-                </div>
                 <div className="payment-error-box">
                     <i className="bi bi-exclamation-circle"></i>
                     <p>{error}</p>
