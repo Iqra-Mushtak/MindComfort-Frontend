@@ -212,8 +212,14 @@ const MentorsManagement = () => {
                     <div className="mentor-info">
                       <h4>{mentor.username}</h4>
                       <p title={mentor.email}>{mentor.email}</p>
-                      <small>Application: <strong style={{textTransform: 'capitalize'}}>{mentor.status}</strong></small>
-                    </div>
+                      <small>
+                        Application: <strong>
+                          {mentor.status === 'not_submitted' || !mentor.status
+                            ? 'Not Submitted'
+                            : mentor.status.charAt(0).toUpperCase() + mentor.status.slice(1)}
+                        </strong>
+                      </small>
+                  </div>
                     {mentor.status !== 'pending' && (
                       <span className={`status-badge ${mentor.isSuspended ? 'suspended' : 'active'}`}>
                         {mentor.isSuspended ? 'Suspended' : 'Active'}
