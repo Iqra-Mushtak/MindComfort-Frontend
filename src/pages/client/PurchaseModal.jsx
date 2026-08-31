@@ -1,7 +1,5 @@
-import React from 'react';
-import './PurchaseModal.css';
-
 import React, { useEffect } from 'react';
+import './PurchaseModal.css';
 
 const PurchaseModal = ({ 
   isOpen, 
