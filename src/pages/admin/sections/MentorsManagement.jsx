@@ -215,7 +215,7 @@ const MentorsManagement = () => {
                       <small>
                         Application: <strong>
                           {mentor.status === 'not_submitted' || !mentor.status
-                            ? 'Not Submitted'
+                            ? 'Null'
                             : mentor.status.charAt(0).toUpperCase() + mentor.status.slice(1)}
                         </strong>
                       </small>

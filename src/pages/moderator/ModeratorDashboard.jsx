@@ -167,6 +167,11 @@ const ModeratorDashboard = () => {
 
       <div className="mod-main-content">
         <div className="mod-navbar">
+          <button className="mod-dashboard-back-btn" onClick={() => navigate(-1)}>
+            <i className="bi bi-arrow-left"></i>
+            Back
+          </button>
+
           <button 
             className="mc-sidebar-toggle-btn"
             onClick={() => setIsSidebarOpen(!isSidebarOpen)}

@@ -65,6 +65,12 @@ const AdminDashboard = () => {
     }
     setUser(userData);
     fetchAdminStats();
+
+    const refreshInterval = setInterval(() => {
+      fetchAdminStats();
+    }, 15000);
+
+    return () => clearInterval(refreshInterval);
   }, [navigate]);
 
   useEffect(() => {
@@ -211,7 +217,7 @@ const AdminDashboard = () => {
         <div className="mc-main-header">
           <button 
             className="mc-sidebar-toggle-btn"
-            onClick={() => setIsSidebarOpen(!isSidebarOpen)}
+            onClick={() => setSidebarOpen(!sidebarOpen)}
             title="Toggle Sidebar"
           >
             <i className="bi bi-list"></i>
@@ -336,30 +342,39 @@ const StatCard = ({ title, value, icon, color, isNew = false }) => (
   </div>
 );
 
-const QuickViewCard = ({ title, linkText, items, onViewAll, onItemClick }) => (
-  <div className="quick-view-card">
-    <div className="qv-header">
-      <h4>{title}</h4>
-      <button className="qv-view-all" onClick={onViewAll}>{linkText}</button>
+const QuickViewCard = ({ title, linkText, items, onViewAll, onItemClick }) => {
+  const safeItems = Array.isArray(items) ? items : [];
+
+  return (
+    <div className="quick-view-card">
+      <div className="qv-header">
+        <h4>{title}</h4>
+        <button className="qv-view-all" onClick={onViewAll}>{linkText}</button>
+      </div>
+      <div className="qv-body">
+        {safeItems.length === 0 ? (
+          <p className="empty-state">No pending items.</p>
+        ) : (
+          safeItems.map((item, idx) => {
+            const itemTitle = item?.title ?? item?.name ?? item?.reason ?? 'New item';
+            const itemSubtitle = item?.speaker ?? item?.fullName ?? item?.reportedBy ?? item?.username ?? 'Unknown';
+
+            return (
+              <div 
+                key={`${itemTitle}-${idx}`} 
+                className="qv-item clickable"
+                onClick={() => onItemClick && onItemClick(item)}
+              >
+                <p className="qv-item-title">{itemTitle}</p>
+                {itemSubtitle && <small className="qv-item-sub">{itemSubtitle}</small>}
+                <small className="qv-item-time">{item?.time || 'Just now'}</small>
+              </div>
+            );
+          })
+        )}
+      </div>
     </div>
-    <div className="qv-body">
-      {items.length === 0 ? (
-        <p className="empty-state">No pending items.</p>
-      ) : (
-        items.map((item, idx) => (
-          <div 
-            key={idx} 
-            className="qv-item clickable"
-            onClick={() => onItemClick && onItemClick(item)}
-          >
-            <p className="qv-item-title">{item.title || item.name}</p>
-            {item.speaker && <small className="qv-item-sub">{item.speaker}</small>}
-            <small className="qv-item-time">{item.time || 'Just now'}</small>
-          </div>
-        ))
-      )}
-    </div>
-  </div>
-);
+  );
+};
 
 export default AdminDashboard;

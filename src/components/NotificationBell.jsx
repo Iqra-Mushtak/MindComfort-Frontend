@@ -1,13 +1,11 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
 import { useNotifications } from '../components/NotificationContext';
 import './NotificationBell.css';
 
 const NotificationBell = () => {
-  const { notifications, unreadCount, markAsRead, markAllAsRead } = useNotifications();
+  const { notifications, unreadCount } = useNotifications();
   const [isOpen, setIsOpen] = useState(false);
   const dropdownRef = useRef(null);
-  const navigate = useNavigate();
 
   useEffect(() => {
     const handleClickOutside = (e) => {
@@ -18,16 +16,6 @@ const NotificationBell = () => {
     document.addEventListener('mousedown', handleClickOutside);
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
-
-  const handleNotificationClick = async (notif) => {
-    if (!notif.isRead) {
-      await markAsRead(notif._id);
-    }
-    setIsOpen(false);
-    if (notif.link) {
-      navigate(notif.link);
-    }
-  };
 
   const getNotificationIcon = (type) => {
     switch (type) {
@@ -76,11 +64,6 @@ const NotificationBell = () => {
         <div className="notification-dropdown">
           <div className="notification-header">
             <h4>Notifications</h4>
-            {unreadCount > 0 && (
-              <button className="mark-all-btn" onClick={markAllAsRead}>
-                Mark all as read
-              </button>
-            )}
           </div>
 
           <div className="notification-list">
@@ -91,7 +74,6 @@ const NotificationBell = () => {
                 <div
                   key={item._id}
                   className={`notification-item ${!item.isRead ? 'unread' : ''}`}
-                  onClick={() => handleNotificationClick(item)}
                 >
                   <div className="notification-icon">
                     {getNotificationIcon(item.type)}
@@ -100,7 +82,6 @@ const NotificationBell = () => {
                     <p className="notification-message">{item.message}</p>
                     <span className="notification-time">{formatTime(item.createdAt)}</span>
                   </div>
-                  {!item.isRead && <span className="unread-dot"></span>}
                 </div>
               ))
             )}

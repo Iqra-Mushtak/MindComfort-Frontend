@@ -207,17 +207,60 @@ html::-webkit-scrollbar, body::-webkit-scrollbar, #root::-webkit-scrollbar,
   color: #495057 !important;
   cursor: pointer;
   position: relative;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  padding: 6px !important;
+  line-height: 1 !important;
+}
+
+.admin-dashboard-container .notification-bell-container {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.admin-dashboard-container .notification-bell-btn {
+  position: relative;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  padding: 6px !important;
+  line-height: 1 !important;
+}
+
+.admin-dashboard-container .notification-badge {
+  position: absolute;
+  top: -4px;
+  right: -4px;
+  background: #dc3545 !important;
+  color: #ffffff !important;
+  font-size: 0.65rem;
+  font-weight: 700;
+  min-width: 18px;
+  padding: 2px 5px;
+  border-radius: 10px;
+  line-height: 1 !important;
+  text-align: center;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.15);
+  transform: none;
+  pointer-events: none;
 }
 
 .admin-dashboard-container .mc-badge {
   position: absolute;
-  top: -5px;
-  right: -5px;
+  top: 0px;
+  right: 0px;
   background: #dc3545 !important;
   color: #ffffff !important;
   font-size: 0.65rem;
+  font-weight: 700;
   padding: 2px 5px;
   border-radius: 10px;
+  line-height: 1 !important;
+  transform: none;
+  pointer-events: none;
 }
 
 .admin-dashboard-container .mc-main-logo {
@@ -2604,6 +2647,22 @@ html::-webkit-scrollbar, body::-webkit-scrollbar, #root::-webkit-scrollbar,
   align-items: flex-start;
   margin-bottom: 2px;
   position: relative;
+}
+
+.admin-date-separator {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  align-self: center;
+  margin: 12px auto 8px;
+  padding: 4px 12px;
+  background: rgba(0, 123, 255, 0.08);
+  color: #495057;
+  border-radius: 999px;
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.03em;
+  text-transform: none;
 }
 
 .admin-message-item {

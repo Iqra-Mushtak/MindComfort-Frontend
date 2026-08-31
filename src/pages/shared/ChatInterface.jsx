@@ -640,32 +640,35 @@ const ChatInterface = () => {
 
             <form className="chat-input-area" onSubmit={handleSendMessage}>
               {replyingTo && (
-              <div className="reply-preview">
-                <div className="reply-preview-content">
-                  <span className="reply-preview-sender">Replying to {replyingTo.anonymousId}</span>
-                  <span className="reply-preview-text">{replyingTo.content}</span>
+                <div className="reply-preview">
+                  <div className="reply-preview-content">
+                    <span className="reply-preview-sender">Replying to {replyingTo.anonymousId}</span>
+                    <span className="reply-preview-text">{replyingTo.content}</span>
+                  </div>
+                  <button type="button" className="reply-cancel-btn" onClick={cancelReply}>
+                    <i className="bi bi-x"></i>
+                  </button>
                 </div>
-                <button type="button" className="reply-cancel-btn" onClick={cancelReply}>
-                  <i className="bi bi-x"></i>
+              )}
+              <div className="chat-input-wrap">
+                <input
+                  type="text"
+                  className="chat-input"
+                  placeholder="Type your message..."
+                  value={newMessage}
+                  onChange={(e) => setNewMessage(e.target.value)}
+                  maxLength={2000}
+                  disabled={messageCount >= 15}
+                />
+                <button
+                  type="submit"
+                  className="chat-send-btn"
+                  disabled={!newMessage.trim() || messageCount >= 15}
+                  aria-label="Send message"
+                >
+                  <i className="bi bi-send-fill"></i>
                 </button>
               </div>
-            )}
-              <input
-                type="text"
-                className="chat-input"
-                placeholder="Type your message..."
-                value={newMessage}
-                onChange={(e) => setNewMessage(e.target.value)}
-                maxLength={2000}
-                disabled={messageCount >= 15}
-              />
-              <button 
-                type="submit" 
-                className="chat-send-btn" 
-                disabled={!newMessage.trim() || messageCount >= 15}
-              >
-                Send
-              </button>
             </form>
           </>
         )}

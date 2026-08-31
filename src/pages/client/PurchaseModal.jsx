@@ -1,6 +1,8 @@
 import React from 'react';
 import './PurchaseModal.css';
 
+import React, { useEffect } from 'react';
+
 const PurchaseModal = ({ 
   isOpen, 
   item, 
@@ -8,8 +10,18 @@ const PurchaseModal = ({
   onConfirm, 
   onCancel, 
   isLoading, 
-  error 
+  error,
+  onClearError
 }) => {
+  useEffect(() => {
+    if (error) {
+      const timer = setTimeout(() => {
+        if (onClearError) onClearError();
+      }, 3000);
+      return () => clearTimeout(timer);
+    }
+  }, [error, onClearError]);
+
   if (!isOpen || !item) return null;
 
   const isPlan = itemType === 'plan';

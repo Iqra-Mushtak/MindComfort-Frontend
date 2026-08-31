@@ -5,7 +5,6 @@ import './Auth.css';
 
 const ForgotPassword = () => {
   const navigate = useNavigate();
-  
   const [step, setStep] = useState(1); 
 
   const [email, setEmail] = useState('');
@@ -33,7 +32,6 @@ const ForgotPassword = () => {
     e.preventDefault();
     setError('');
     setLoading(true);
-
     try {
       await api.post('/auth/forgot-password', { email });
       setSuccessMsg('A reset code has been sent to your email.');
@@ -62,11 +60,9 @@ const ForgotPassword = () => {
         email: String(email), 
         otp: String(otp) 
       });
-      
       setResetToken(response.data.resetToken);
       setSuccessMsg('Code verified! Please set your new password.');
       setStep(3); 
-
     } catch (err) {
       setError(err.response?.data?.message || 'Invalid code.');
     } finally {
@@ -117,15 +113,9 @@ const ForgotPassword = () => {
 
     setLoading(true);
     try {
-      await api.post('/auth/reset-password', {
-        resetToken,
-        newPassword,
-        confirmPassword
-      });
-      
+      await api.post('/auth/reset-password', { resetToken, newPassword, confirmPassword });
       alert('Password updated successfully! Please login.');
       navigate('/login');
-
     } catch (err) {
       setError(err.response?.data?.message || 'Failed to reset password.');
     } finally {
@@ -134,143 +124,158 @@ const ForgotPassword = () => {
   };
 
   return (
-    <div className="auth-page">
-      <div className="container">
-        <div className="row justify-content-center">
-          <div className="col-12">
-            <div className="mc-card p-4 p-md-5 text-center auth-card">
-          
-              <div className="text-start mb-3">
-                <button 
-                  onClick={() => step === 1 ? navigate('/login') : setStep(step - 1)} 
-                  className="btn btn-link text-decoration-none p-0"
-                  style={{ color: 'var(--mc-primary)' }}
-                >
-                  <i className="bi bi-arrow-left me-2"></i>
-                  {step === 1 ? 'Back to Login' : 'Go Back'}
-                </button>
+    <div className="auth-wrapper">
+      <div className="auth-hero-panel">
+        <div className="auth-brand" onClick={() => navigate('/')}>
+          <img src="/src/assets/logo.png" alt="MindComfort Logo" />
+          <span>MindComfort</span>
+        </div>
+        <div className="auth-hero-content">
+          <h1>Account Recovery</h1>
+          <p>Don't worry—we'll help you securely reset your password and regain access to your account.</p>
+        </div>
+        <div className="auth-hero-footer">
+          &copy; 2026 MindComfort. All rights reserved.
+        </div>
+      </div>
+
+      <div className="auth-form-panel">
+        <div className="auth-form-container">
+          <div className="mb-4 d-flex justify-content-between align-items-center">
+            <button 
+              onClick={() => step === 1 ? navigate('/login') : setStep(step - 1)} 
+              className="btn-back-home"
+            >
+              {step === 1 ? 'Back to Login' : 'Go Back'}
+            </button>
+
+            <div className="d-flex gap-1">
+              <span className={`badge rounded-pill ${step >= 1 ? 'btn-mc-primary' : 'bg-light text-muted'}`}>1</span>
+              <span className={`badge rounded-pill ${step >= 2 ? 'btn-mc-primary' : 'bg-light text-muted'}`}>2</span>
+              <span className={`badge rounded-pill ${step >= 3 ? 'btn-mc-primary' : 'bg-light text-muted'}`}>3</span>
+            </div>
+          </div>
+
+          {error && (
+            <div className="alert alert-danger py-2 small mb-3" style={{ borderRadius: '10px' }}>
+              {error}
+            </div>
+          )}
+
+          {successMsg && (
+            <div className="alert alert-success py-2 small mb-3" style={{ borderRadius: '10px' }}>
+              {successMsg}
+            </div>
+          )}
+
+          {step === 1 && (
+            <form onSubmit={handleSendCode}>
+              <div className="mb-4">
+                <h2 className="auth-header-title mb-1">Forgot Password?</h2>
+                <p className="auth-header-sub">Enter your registered email to receive a 6-digit verification code.</p>
               </div>
 
               <div className="mb-4">
-                <span className={`badge rounded-pill ${step >= 1 ? 'btn-mc-primary' : 'bg-light text-muted'} me-1`}>1</span>
-                <span className={`badge rounded-pill ${step >= 2 ? 'btn-mc-primary' : 'bg-light text-muted'} me-1`}>2</span>
-                <span className={`badge rounded-pill ${step >= 3 ? 'btn-mc-primary' : 'bg-light text-muted'}`}>3</span>
+                <label className="form-label small fw-semibold">Email Address</label>
+                <input 
+                  type="email" 
+                  className="form-control mc-input" 
+                  value={email} 
+                  onChange={(e) => setEmail(e.target.value)} 
+                  required 
+                  placeholder="name@gmail.com"
+                />
               </div>
 
-              {error && (
-                <div className="alert alert-danger py-2 small mb-3" style={{ borderRadius: '12px' }}>
-                  {error}
-                </div>
-              )}
+              <button type="submit" className="btn btn-mc-primary w-100 mb-3" disabled={loading}>
+                {loading ? 'Sending...' : 'Send Reset Code'}
+              </button>
+            </form>
+          )}
 
-              {successMsg && (
-                <div className="alert alert-success py-2 small mb-3" style={{ borderRadius: '12px' }}>
-                  {successMsg}
-                </div>
-              )}
+          {step === 2 && (
+            <form onSubmit={handleVerifyOtp}>
+              <div className="mb-4">
+                <h2 className="auth-header-title mb-1">Verify Code</h2>
+                <p className="auth-header-sub">
+                  We sent a 6-digit verification code to <span className="fw-bold text-dark">{email}</span>
+                </p>
+              </div>
 
-              {step === 1 && (
-                <form onSubmit={handleSendCode}>
-                  <h2 className="fw-bold mb-2" style={{ color: 'var(--mc-primary)' }}>Forgot Password?</h2>
-                  <p className="text-muted mb-4 small">Enter your email to receive a reset code.</p>
-                  
-                  <div className="mb-4">
-                    <input 
-                      type="email" 
-                      className="form-control mc-input text-center" 
-                      value={email} 
-                      onChange={(e) => setEmail(e.target.value)} 
-                      required 
-                      placeholder="Enter your registered email"
-                    />
-                  </div>
+              <div className="mb-4">
+                <input 
+                  type="text" 
+                  className="form-control mc-input text-center" 
+                  value={otp}
+                  onChange={(e) => setOtp(e.target.value.replace(/\D/g, '').slice(0, 6))}
+                  placeholder="000000"
+                  style={{ fontSize: '1.5rem', letterSpacing: '0.4rem', fontWeight: 'bold' }}
+                  required
+                />
+              </div>
 
-                  <button type="submit" className="btn btn-mc-primary w-100 mb-3" disabled={loading}>
-                    {loading ? 'Sending...' : 'Send Reset Code'}
-                  </button>
-                </form>
-              )}
+              <button type="submit" className="btn btn-mc-primary w-100 mb-3" disabled={loading || otp.length !== 6}>
+                {loading ? 'Verify Code' : 'Verify Code'}
+              </button>
 
-              {step === 2 && (
-                <form onSubmit={handleVerifyOtp}>
-                  <h2 className="fw-bold mb-2" style={{ color: 'var(--mc-primary)' }}>Verify Code</h2>
-                  {!verificationAttempted ? (
-                    <p className="text-muted mb-4 small">We sent a 6-digit code to <strong>{email}</strong></p>
-                  ) : error ? (
-                    <p className="text-muted mb-4 small"><span className="text-danger fw-semibold">Incorrect code. </span>Try again.</p>
-                  ) : null}
-                  
-                  <div className="mb-4">
-                    <input 
-                      type="text" 
-                      className="form-control mc-input text-center" 
-                      value={otp}
-                      onChange={(e) => setOtp(e.target.value.replace(/\D/g, '').slice(0, 6))}
-                      placeholder="000000"
-                      style={{ fontSize: '1.5rem', letterSpacing: '0.5rem', fontWeight: 'bold' }}
-                      required
-                    />
-                  </div>
+              <div className="text-center mb-3">
+                <span className="small text-muted">Didn't receive the code? </span>
+                <button 
+                  type="button" 
+                  className="btn btn-link text-decoration-none small fw-semibold p-0 ms-1" 
+                  style={{ color: 'var(--mc-primary)' }}
+                  onClick={handleResendOtp}
+                  disabled={loading || timer > 0}
+                >
+                  {timer > 0 ? `Resend in ${timer}s` : 'Resend Code'}
+                </button>
+              </div>
+            </form>
+          )}
 
-                  <button type="submit" className="btn btn-mc-primary w-100 mb-3" disabled={loading || otp.length !== 6}>
-                    {loading ? 'Verifying...' : 'Verify Code'}
-                  </button>
+          {step === 3 && (
+            <form onSubmit={handleResetPassword}>
+              <div className="mb-4">
+                <h2 className="auth-header-title mb-1">Set New Password</h2>
+                <p className="auth-header-sub">Create a strong new password for your account.</p>
+              </div>
 
-                  <div className="text-center">
-                    <button 
-                      type="button" 
-                      className="btn btn-link text-decoration-none small fw-semibold" 
-                      style={{ color: 'var(--mc-primary)' }}
-                      onClick={handleResendOtp}
-                      disabled={loading || timer > 0}
-                    >
-                      {timer > 0 ? `Resend in ${timer}s` : 'Resend Code'}
-                    </button>
-                  </div>
-                </form>
-              )}
+              <div className="mb-3">
+                <label className="form-label small fw-semibold">New Password</label>
+                <input 
+                  type="password" 
+                  className="form-control mc-input" 
+                  value={newPassword} 
+                  onChange={(e) => setNewPassword(e.target.value)} 
+                  required 
+                  placeholder="••••••••"
+                />
+              </div>
 
-              {step === 3 && (
-                <form onSubmit={handleResetPassword}>
-                  <h2 className="fw-bold mb-2" style={{ color: 'var(--mc-primary)' }}>Set New Password</h2>
-                  <p className="text-muted mb-4 small">Create a strong new password.</p>
-                  
-                  <div className="mb-3">
-                    <input 
-                      type="password" 
-                      className="form-control mc-input" 
-                      value={newPassword} 
-                      onChange={(e) => setNewPassword(e.target.value)} 
-                      required 
-                      placeholder="New Password"
-                    />
-                  </div>
+              <div className="mb-4">
+                <label className="form-label small fw-semibold">Confirm Password</label>
+                <input 
+                  type="password" 
+                  className="form-control mc-input" 
+                  value={confirmPassword} 
+                  onChange={(e) => setConfirmPassword(e.target.value)} 
+                  required 
+                  placeholder="••••••••"
+                />
+              </div>
 
-                  <div className="mb-4">
-                    <input 
-                      type="password" 
-                      className="form-control mc-input" 
-                      value={confirmPassword} 
-                      onChange={(e) => setConfirmPassword(e.target.value)} 
-                      required 
-                      placeholder="Confirm New Password"
-                    />
-                  </div>
+              <button type="submit" className="btn btn-mc-primary w-100 mb-3" disabled={loading}>
+                {loading ? 'Updating...' : 'Reset Password'}
+              </button>
+            </form>
+          )}
 
-                  <button type="submit" className="btn btn-mc-primary w-100 mb-3" disabled={loading}>
-                    {loading ? 'Updating...' : 'Reset Password'}
-                  </button>
-                </form>
-              )}
-
-              <p className="small mb-0 text-center text-muted">
-                Remember your password?{' '}
-                <Link to="/login" className="fw-semibold text-decoration-none" style={{ color: 'var(--mc-primary)' }}>
-                  Login
-                </Link>
-              </p>
-            </div>
-          </div>
+          <p className="small mb-0 text-center text-muted">
+            Remember your password?{' '}
+            <Link to="/login" className="fw-semibold text-decoration-none" style={{ color: 'var(--mc-primary)' }}>
+              Login
+            </Link>
+          </p>
         </div>
       </div>
     </div>

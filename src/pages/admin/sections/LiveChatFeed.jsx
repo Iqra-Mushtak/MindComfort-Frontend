@@ -108,6 +108,29 @@ const LiveChatFeed = () => {
     setIsFeedScrolled(false);
   };
 
+  const getDateLabel = (createdAt) => {
+    if (!createdAt) return '';
+    const messageDate = new Date(createdAt);
+    if (isNaN(messageDate.getTime())) return '';
+
+    const now = new Date();
+    const msgDateOnly = new Date(messageDate.getFullYear(), messageDate.getMonth(), messageDate.getDate());
+    const nowDateOnly = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+    const diffDays = Math.floor((nowDateOnly - msgDateOnly) / (1000 * 60 * 60 * 24));
+
+    if (diffDays === 0) return 'Today';
+    if (diffDays === 1) return 'Yesterday';
+
+    return `${messageDate.getDate()}/${messageDate.getMonth() + 1}/${messageDate.getFullYear()}`;
+  };
+
+  const getDateKey = (createdAt) => {
+    if (!createdAt) return 'invalid';
+    const d = new Date(createdAt);
+    if (isNaN(d.getTime())) return 'invalid';
+    return `${d.getFullYear()}-${d.getMonth()}-${d.getDate()}`;
+  };
+
   const fetchChatrooms = async () => {
     try {
       const user = JSON.parse(localStorage.getItem('user'));
@@ -287,45 +310,54 @@ const LiveChatFeed = () => {
                       const prevMsg = index > 0 ? messages[index - 1] : null;
                       const isSameSender = prevMsg && prevMsg.anonymousId === msg.anonymousId;
                       const showSenderId = !isSameSender;
+                      const showDateSeparator = !prevMsg || getDateKey(prevMsg.createdAt) !== getDateKey(msg.createdAt);
 
                       return (
-                        <div key={msg._id} className={`admin-message-item ${isSameSender ? 'same-sender' : ''}`}>
-                          {showSenderId && (
-                            <div className="admin-message-sender-name">
-                              {msg.anonymousId || 'Anonymous'}
+                        <React.Fragment key={msg._id}>
+                          {showDateSeparator && (
+                            <div className="admin-date-separator">
+                              {getDateLabel(msg.createdAt)}
                             </div>
                           )}
-                          <div style={{ display: 'flex', gap: '4px', alignItems: 'flex-start' }}>
-                            <div className="admin-message-bubble">
-                              <div style={{ display: 'flex', gap: '8px', alignItems: 'flex-start', justifyContent: 'space-between' }}>
-                                <div className="admin-message-content">
-                                  {msg.content}
+
+                          <div className={`admin-message-item ${isSameSender ? 'same-sender' : ''}`}>
+                            {showSenderId && (
+                              <div className="admin-message-sender-name">
+                                {msg.anonymousId || 'Anonymous'}
+                              </div>
+                            )}
+                            <div style={{ display: 'flex', gap: '4px', alignItems: 'flex-start' }}>
+                              <div className="admin-message-bubble">
+                                <div style={{ display: 'flex', gap: '8px', alignItems: 'flex-start', justifyContent: 'space-between' }}>
+                                  <div className="admin-message-content">
+                                    {msg.content}
+                                  </div>
+                                  <span className="admin-message-timestamp">
+                                    {new Date(msg.createdAt).toLocaleTimeString()}
+                                  </span>
                                 </div>
-                                <span className="admin-message-timestamp">
-                                  {new Date(msg.createdAt).toLocaleTimeString()}
-                                </span>
+                              </div>
+                              <div className="admin-action-menu-container">
+                                <button
+                                  className="admin-btn-dots"
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    setOpenMenuId(openMenuId === msg._id ? null : msg._id);
+                                  }}
+                                >
+                                  ⋮
+                                </button>
+                                {openMenuId === msg._id && (
+                                  <div className="admin-action-menu" onClick={(e) => e.stopPropagation()}>
+                                    <button className="admin-menu-item delete" onClick={() => handleDeleteMessage(msg._id, msg.senderId?._id)}>Delete Message</button>
+                                    <button className="admin-menu-item warn" onClick={() => handleWarnUser(msg.senderId?._id, msg._id)}>Warn User</button>
+                                    <button className="admin-menu-item suspend" onClick={() => handleSuspendUser(msg.senderId?._id, msg._id)}>Suspend User</button>
+                                  </div>
+                                )}
                               </div>
                             </div>
-                            <div className="admin-action-menu-container">
-                              <button
-                                className="admin-btn-dots"
-                                onClick={(e) => {
-                                  e.stopPropagation();
-                                  setOpenMenuId(openMenuId === msg._id ? null : msg._id);
-                                }}
-                              >
-                                ⋮
-                              </button>
-                              {openMenuId === msg._id && (
-                                <div className="admin-action-menu" onClick={(e) => e.stopPropagation()}>
-                                  <button className="admin-menu-item delete" onClick={() => handleDeleteMessage(msg._id, msg.senderId?._id)}>Delete Message</button>
-                                  <button className="admin-menu-item warn" onClick={() => handleWarnUser(msg.senderId?._id, msg._id)}>Warn User</button>
-                                  <button className="admin-menu-item suspend" onClick={() => handleSuspendUser(msg.senderId?._id, msg._id)}>Suspend User</button>
-                                </div>
-                              )}
-                            </div>
                           </div>
-                        </div>
+                        </React.Fragment>
                       );
                     })
                   )}

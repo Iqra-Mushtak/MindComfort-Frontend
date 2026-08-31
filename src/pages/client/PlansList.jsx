@@ -279,6 +279,7 @@ const PlansList = () => {
                 onCancel={handleCancelPurchase}
                 isLoading={isPurchasing}
                 error={purchaseError}
+                onClearError={() => setPurchaseError('')}
             />
 
             {showLogoutModal && (

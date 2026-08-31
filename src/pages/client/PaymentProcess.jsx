@@ -73,32 +73,8 @@ const PaymentProcess = () => {
     }
 
     if (error) {
-        return (
-            <div className="payment-container">
-                <div className="payment-error-box">
-                    <i className="bi bi-exclamation-circle"></i>
-                    <p>{error}</p>
-                    <div className="error-actions">
-                        <button 
-                            onClick={() => navigate('/client/plans')}
-                            className="btn-back"
-                        >
-                            Back to Plans
-                        </button>
-                        <button 
-                            onClick={() => {
-                                setLoading(true);
-                                setError(null);
-                                window.location.reload();
-                            }}
-                            className="btn-retry"
-                        >
-                            Retry
-                        </button>
-                    </div>
-                </div>
-            </div>
-        );
+        navigate('/client/plans', { state: { purchaseError: error } });
+        return null;
     }
 
     return null;

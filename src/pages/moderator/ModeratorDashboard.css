@@ -180,6 +180,28 @@
   flex-shrink: 0;
 }
 
+.mod-dashboard-back-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: #ffffff;
+  color: #212529;
+  border: 1px solid #e9ecef;
+  border-radius: 8px;
+  padding: 8px 14px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+}
+
+.mod-dashboard-back-btn:hover {
+  background: #f8f9fa;
+  border-color: #dfe3e8;
+  transform: translateX(-2px);
+}
+
 .mod-dashboard-container .mod-live-btn {
   display: flex;
   align-items: center;
@@ -214,18 +236,49 @@
   50%, 99% { opacity: 0.3; }
 }
 
-.mod-dashboard-container .mod-notification-btn {
+.mod-dashboard-container .notification-bell-container {
   position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.mod-dashboard-container .notification-bell-btn {
+  position: relative;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  padding: 6px !important;
+  line-height: 1 !important;
+  color: #212529 !important;
   background: none;
   border: none;
   cursor: pointer;
   font-size: 1.2rem;
-  color: #212529 !important;
   transition: all 0.2s;
 }
 
-.mod-dashboard-container .mod-notification-btn:hover {
+.mod-dashboard-container .notification-bell-btn:hover {
   color: #6f42c1 !important;
+}
+
+.mod-dashboard-container .notification-badge {
+  position: absolute;
+  top: -4px;
+  right: -4px;
+  background: #dc3545;
+  color: white;
+  font-size: 0.65rem;
+  font-weight: 700;
+  min-width: 18px;
+  padding: 2px 5px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  line-height: 1;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.15);
+  pointer-events: none;
 }
 
 .mod-dashboard-container .mod-badge {

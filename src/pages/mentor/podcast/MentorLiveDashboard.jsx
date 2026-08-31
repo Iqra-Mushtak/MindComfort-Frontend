@@ -139,11 +139,10 @@ const MentorLiveDashboard = () => {
     return (
       <div className="live-error-container">
         <div className="live-error-card">
-          <i className="bi bi-exclamation-circle error-icon"></i>
           <h3>Stream Error</h3>
           <p>{error}</p>
           <button className="btn-return-podcasts" onClick={() => navigate('/mentor/podcasts')}>
-            <i className="bi bi-arrow-left"></i> Return to Podcasts
+            Return to Podcasts
           </button>
         </div>
       </div>

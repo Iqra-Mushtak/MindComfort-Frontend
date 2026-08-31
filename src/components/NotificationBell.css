@@ -39,9 +39,10 @@
 }
 
 .notification-dropdown {
-  position: absolute;
-  top: 100%;
-  right: 0;
+  position: fixed; 
+  top: 65px; 
+  right: 20px; 
+  left: auto;
   width: 340px;
   max-height: 420px;
   background: #ffffff;
@@ -52,7 +53,6 @@
   display: flex;
   flex-direction: column;
   overflow: hidden;
-  margin-top: 10px;
   animation: dropdownFadeIn 0.2s ease-out;
 }
 
@@ -77,20 +77,6 @@
   color: #212529;
 }
 
-.mark-all-btn {
-  background: none;
-  border: none;
-  color: var(--mc-primary, #007bff);
-  font-size: 0.8rem;
-  font-weight: 600;
-  cursor: pointer;
-  padding: 0;
-}
-
-.mark-all-btn:hover {
-  text-decoration: underline;
-}
-
 .notification-list {
   overflow-y: auto;
   flex: 1;
@@ -103,7 +89,6 @@
   gap: 12px;
   padding: 12px 16px;
   border-bottom: 1px solid #f1f3f5;
-  cursor: pointer;
   transition: background-color 0.2s ease;
   position: relative;
 }
@@ -145,15 +130,6 @@
   color: #6c757d;
 }
 
-.unread-dot {
-  width: 8px;
-  height: 8px;
-  background-color: var(--mc-primary, #007bff);
-  border-radius: 50%;
-  flex-shrink: 0;
-  margin-top: 6px;
-}
-
 .notification-empty {
   padding: 30px 20px;
   text-align: center;
@@ -164,7 +140,8 @@
 
 @media (max-width: 480px) {
   .notification-dropdown {
-    width: 290px;
-    right: -10px;
+    width: calc(100vw - 30px);
+    right: 15px;
+    top: 60px;
   }
 }

@@ -92,35 +92,8 @@ const PaymentSuccess = () => {
     }
 
     if (paymentStatus === 'error' || paymentStatus === 'failed') {
-        return (
-            <div className="dashboard-container">
-                <main className="mc-main-content payment-container">
-                    <div className="payment-error">
-                        <div className="payment-error-icon">
-                            <i className="bi bi-x-circle-fill"></i>
-                        </div>
-                        <h2>Payment Failed</h2>
-                        <p className="payment-error-message">
-                            {error || 'Your payment could not be processed. Please try again.'}
-                        </p>
-                        <div className="payment-error-buttons">
-                            <button
-                                onClick={() => navigate('/client/plans')}
-                                className="payment-btn-error"
-                            >
-                                Try Again
-                            </button>
-                            <button
-                                onClick={handleReturnHome}
-                                className="payment-btn-secondary-error"
-                            >
-                                Return Home
-                            </button>
-                        </div>
-                    </div>
-                </main>
-            </div>
-        );
+        navigate('/client/plans', { state: { purchaseError: error || 'Payment failed. Please try again.' } });
+        return null;
     }
 
     if (paymentStatus === 'success' && subscriptionDetails) {

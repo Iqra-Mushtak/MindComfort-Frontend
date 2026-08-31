@@ -236,9 +236,6 @@ const CreatePodcast = () => {
         </div>
 
         <div className="create-podcast-header">
-          <button className="back-btn" onClick={() => navigate('/mentor/dashboard')}>
-            <i className="bi bi-arrow-left"></i> Back to Home
-          </button>
           <h2>Create New Podcast Session</h2>
           <p>Schedule an upcoming live audio session for your clients.</p>
         </div>

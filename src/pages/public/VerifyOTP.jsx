@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate, useLocation, Link } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import api from '../../utils/api';
 import './Auth.css';
 
@@ -9,15 +9,13 @@ const VerifyOTP = () => {
   
   const queryParams = new URLSearchParams(location.search);
   const email = location.state?.email || queryParams.get('email');
-  const role = location.state?.role || queryParams.get('role');
+  const role = location.state?.role || queryParams.get('role') || 'client';
 
   const [otp, setOtp] = useState('');
   const [error, setError] = useState('');
   const [successMsg, setSuccessMsg] = useState('');
   const [loading, setLoading] = useState(false);
   const [resendLoading, setResendLoading] = useState(false);
-  const [verificationAttempted, setVerificationAttempted] = useState(false);
-  
   const [timer, setTimer] = useState(0);
 
   useEffect(() => {
@@ -38,14 +36,12 @@ const VerifyOTP = () => {
     const value = e.target.value.replace(/\D/g, '').slice(0, 6);
     setOtp(value);
     setError('');
-    console.log('OTP state updated to:', value, 'Length:', value.length);
   };
 
   const handleVerify = async (e) => {
     e.preventDefault();
     setError('');
     setSuccessMsg('');
-    setVerificationAttempted(true);
 
     if (!email) {
       setError('Missing email address. Please restart signup.');
@@ -53,8 +49,6 @@ const VerifyOTP = () => {
     }
 
     const normalizedOtp = otp.trim();
-    console.log('Submitting OTP verification', { email, otp: normalizedOtp });
-
     if (normalizedOtp.length !== 6) {
       setError('Please enter the full 6-digit code.');
       return;
@@ -63,12 +57,9 @@ const VerifyOTP = () => {
     setLoading(true);
     try {
       const response = await api.post('/auth/verifyRegister-otp', { email, otp: normalizedOtp });
-      console.log('Verification response:', response.data);
       setSuccessMsg(response.data.message || 'Verified successfully. Redirecting...');
       setTimeout(() => {
-
         if (response.data.role === 'mentor') {
-      
           navigate('/mentor-application', {
             state: {
               email: email,
@@ -77,11 +68,10 @@ const VerifyOTP = () => {
             }
           });
         } else {
-        navigate('/login');
-      }
+          navigate('/login');
+        }
       }, 2000);
     } catch (err) {
-      console.error('OTP verification error:', err);
       const apiMessage = err.response?.data?.message || err.response?.data?.error;
       setError(apiMessage || err.message || 'Verification failed. Please try again.');
     } finally {
@@ -112,80 +102,104 @@ const VerifyOTP = () => {
   };
 
   return (
-    <div className="auth-page">
-      <div className="container">
-        <div className="row justify-content-center">
-          <div className="col-12">
-            <div className="mc-card p-4 p-md-5 text-center auth-card">
-              
-              <div className="text-start mb-3">
-                <button 
-                  onClick={() => navigate('/signup')} 
-                  className="btn btn-link text-decoration-none p-0"
-                  style={{ color: 'var(--mc-primary)' }}
-                >
-                  Back to Signup
-                </button>
-              </div>
-
-              <h2 className="fw-bold mb-2" style={{ color: 'var(--mc-primary)' }}>Verify Your Email</h2>
-              <p className="text-muted mb-4 small">
-                We sent a 6-digit code to <strong>{email}</strong>
+    <div className="auth-wrapper">
+      <div className="auth-hero-panel">
+        <div className="auth-brand" onClick={() => navigate('/')}>
+          <img src="/src/assets/logo.png" alt="MindComfort Logo" />
+          <span>MindComfort</span>
+        </div>
+        
+        <div className="auth-hero-content">
+          {role === 'client' ? (
+            <>
+              <h1>Start your journey toward mental clarity today.</h1>
+              <p>
+                Create an anonymous account to connect with empathetic mentors, access private catharsis spaces, and heal at your own pace.
               </p>
-              
-              {error && (
-                <div className="alert alert-danger py-2 small mb-3" style={{ borderRadius: '12px' }}>
-                  {error}
-                </div>
-              )}
+            </>
+          ) : (
+            <>
+              <h1>Guide others with empathy and experience.</h1>
+              <p>
+                Apply to become a verified MindComfort mentor. Support individuals seeking catharsis in a safe, structured, and professional environment.
+              </p>
+            </>
+          )}
+        </div>
 
-              {successMsg && (
-                <div className="alert alert-success py-2 small mb-3" style={{ borderRadius: '12px' }}>
-                  {successMsg}
-                </div>
-              )}
+        <div className="auth-hero-footer">
+          &copy; 2026 MindComfort. All rights reserved.
+        </div>
+      </div>
 
-              <form onSubmit={handleVerify}>
-                <div className="mb-4">
-                  <input 
-                    type="tel" 
-                    inputMode="numeric"
-                    pattern="[0-9]{6}"
-                    maxLength={6}
-                    className="form-control mc-input text-center" 
-                    value={otp}
-                    onChange={handleOtpChange}
-                    placeholder="000000"
-                    style={{ fontSize: '1.5rem', letterSpacing: '0.5rem', fontWeight: 'bold' }}
-                    autoComplete="one-time-code"
-                    required
-                  />
-                </div>
-
-                <button 
-                  type="submit" 
-                  className="btn btn-mc-primary w-100 mb-3" 
-                  disabled={loading || otp.length !== 6}
-                  onClick={() => console.log('Button clicked! OTP:', otp, 'Length:', otp.length)}
-                >
-                  {loading ? 'Verifying...' : 'Verify Code'}
-                </button>
-
-                <div className="text-center">
-                  <p className="small text-muted mb-2">Didn't receive the code?</p>
-                  <button 
-                    type="button" 
-                    className="btn btn-link text-decoration-none small fw-semibold" 
-                    style={{ color: 'var(--mc-primary)' }}
-                    onClick={handleResend}
-                    disabled={resendLoading || timer > 0}
-                  >
-                    {timer > 0 ? `Resend in ${timer}s` : resendLoading ? 'Sending...' : 'Resend Code'}
-                  </button>
-                </div>
-              </form>
-            </div>
+      <div className="auth-form-panel">
+        <div className="auth-form-container">
+          <div className="mb-4">
+            <button 
+              onClick={() => navigate('/signup')} 
+              className="btn-back-home"
+            >
+              Back to Signup
+            </button>
           </div>
+
+          <div className="mb-4">
+            <h2 className="auth-header-title mb-1">Verify Your Email</h2>
+            <p className="auth-header-sub">
+              We sent a 6-digit confirmation code to <span className="fw-bold text-dark">{email}</span>
+            </p>
+          </div>
+
+          {error && (
+            <div className="alert alert-danger py-2 small mb-3" style={{ borderRadius: '10px' }}>
+              {error}
+            </div>
+          )}
+
+          {successMsg && (
+            <div className="alert alert-success py-2 small mb-3" style={{ borderRadius: '10px' }}>
+              {successMsg}
+            </div>
+          )}
+
+          <form onSubmit={handleVerify}>
+            <div className="mb-4">
+              <input 
+                type="tel" 
+                inputMode="numeric"
+                pattern="[0-9]{6}"
+                maxLength={6}
+                className="form-control mc-input text-center" 
+                value={otp}
+                onChange={handleOtpChange}
+                placeholder="000000"
+                style={{ fontSize: '1.5rem', letterSpacing: '0.4rem', fontWeight: 'bold' }}
+                autoComplete="one-time-code"
+                required
+              />
+            </div>
+
+            <button 
+              type="submit" 
+              className="btn btn-mc-primary w-100 mb-2" 
+              disabled={loading || otp.length !== 6}
+            >
+              {loading ? 'Verifying...' : 'Verify Code'}
+            </button>
+
+            <div className="text-center mt-2">
+              <span className="small text-muted me-1">Didn't receive the code?</span>
+              <button 
+                type="button" 
+                className="btn btn-link text-decoration-none small fw-semibold p-0" 
+                style={{ color: 'var(--mc-primary)' }}
+                onClick={handleResend}
+                disabled={resendLoading || timer > 0}
+              >
+                {timer > 0 ? `Resend code in ${timer}s` : resendLoading ? 'Sending...' : 'Resend Code'}
+              </button>
+            </div>
+          </form>
         </div>
       </div>
     </div>
