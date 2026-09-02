@@ -45,6 +45,7 @@
   left: auto;
   width: 340px;
   max-height: 420px;
+  height: auto; 
   background: #ffffff;
   border: 1px solid #e9ecef;
   border-radius: 12px;
@@ -52,6 +53,7 @@
   z-index: 1200;
   display: flex;
   flex-direction: column;
+  justify-content: flex-start;
   overflow: hidden;
   animation: dropdownFadeIn 0.2s ease-out;
 }
@@ -79,7 +81,10 @@
 
 .notification-list {
   overflow-y: auto;
-  flex: 1;
+  flex: 0 1 auto; 
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
   max-height: 350px;
 }
 
@@ -91,6 +96,7 @@
   border-bottom: 1px solid #f1f3f5;
   transition: background-color 0.2s ease;
   position: relative;
+  flex-shrink: 0;
 }
 
 .notification-item:hover {

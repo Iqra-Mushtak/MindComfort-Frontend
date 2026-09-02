@@ -1,9 +1,9 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { useNotifications } from '../components/NotificationContext';
+import { useNotifications } from './NotificationContext';
 import './NotificationBell.css';
 
 const NotificationBell = () => {
-  const { notifications, unreadCount } = useNotifications();
+  const { notifications, unreadCount, markAllAsRead } = useNotifications();
   const [isOpen, setIsOpen] = useState(false);
   const dropdownRef = useRef(null);
 
@@ -16,6 +16,15 @@ const NotificationBell = () => {
     document.addEventListener('mousedown', handleClickOutside);
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
+
+  const handleToggle = () => {
+    const nextState = !isOpen;
+    setIsOpen(nextState);
+
+    if (nextState && unreadCount > 0 && markAllAsRead) {
+      markAllAsRead();
+    }
+  };
 
   const getNotificationIcon = (type) => {
     switch (type) {
@@ -51,7 +60,7 @@ const NotificationBell = () => {
     <div className="notification-bell-container" ref={dropdownRef}>
       <button 
         className="notification-bell-btn" 
-        onClick={() => setIsOpen(!isOpen)}
+        onClick={handleToggle}
         title="Notifications"
       >
         <i className="bi bi-bell-fill"></i>

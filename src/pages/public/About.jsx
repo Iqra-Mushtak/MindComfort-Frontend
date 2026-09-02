@@ -290,7 +290,6 @@ const About = () => {
           <div className="d-flex flex-wrap justify-content-center gap-2 small">
             <a href="#">Privacy Policy</a>
             <a href="#">Terms of Service</a>
-            <a href="#">Contact Support</a>
           </div>
         </div>
       </footer>

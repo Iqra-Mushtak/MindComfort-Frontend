@@ -192,6 +192,14 @@
     display: none !important; 
   }
 
+  .mc-hero-title {
+    font-size: 2.5rem !important;
+  }
+
+  .mc-hero-subtitle {
+    font-size: 1rem !important;
+  }
+
   .mc-nav-menu-wrapper {
     margin-left: 0 !important;
     justify-content: flex-end !important;
@@ -222,5 +230,28 @@
   .mc-nav-actions .btn-outline-secondary:active {
     background-color: var(--mc-primary) !important;
     color: #ffffff !important;
+  }
+
+  .mc-cta-box {
+    padding: 35px 20px !important;
+    border-radius: 18px !important;
+    width: 90% !important;
+    margin: 0 auto !important;
+  }
+
+  .mc-cta-box h2 {
+    font-size: 1.6rem !important;
+    margin-bottom: 0.75rem !important;
+  }
+
+  .mc-cta-box p {
+    font-size: 0.9rem !important;
+    margin-bottom: 1.25rem !important;
+    line-height: 1.5 !important;
+  }
+
+  .mc-cta-box .btn-lg {
+    padding: 10px 20px !important;
+    font-size: 0.9rem !important;
   }
 }
