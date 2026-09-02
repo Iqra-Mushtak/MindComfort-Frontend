@@ -27,6 +27,7 @@ const Login = () => {
       
       localStorage.setItem('token', response.data.token);
       localStorage.setItem('user', JSON.stringify(response.data.user));
+      window.dispatchEvent(new Event('auth-changed'));
       
       const userRole = response.data.user.role;
       if (userRole === 'mentor') {

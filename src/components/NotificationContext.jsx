@@ -28,29 +28,48 @@ export const NotificationProvider = ({ children }) => {
   };
 
   useEffect(() => {
-    const user = JSON.parse(localStorage.getItem('user'));
-    const token = localStorage.getItem('token');
+    let socket;
 
-    if (!user || !token) {
-      setLoading(false);
-      return;
-    }
+    const initializeNotifications = () => {
+      const token = localStorage.getItem('token');
+      const user = localStorage.getItem('user');
 
-    fetchNotifications();
+      socket?.disconnect();
+      socket = undefined;
 
-    const apiUrl = import.meta.env.VITE_API_URL || 'http://13.60.72.235:5000';
-    const socket = io(apiUrl, {
-      auth: { token },
-      transports: ['websocket', 'polling']
-    });
+      if (!user || !token) {
+        setNotifications([]);
+        setUnreadCount(0);
+        setLoading(false);
+        return;
+      }
 
-    socket.on('newNotification', (newNotif) => {
-      setNotifications(prev => [newNotif, ...prev]);
-      setUnreadCount(prev => prev + 1);
-    });
+      fetchNotifications();
+
+      const apiUrl = (import.meta.env.VITE_API_URL || 'http://13.60.72.235:5000/api').replace(/\/api\/?$/, '');
+      socket = io(apiUrl, {
+        auth: { token },
+        transports: ['websocket', 'polling']
+      });
+
+      socket.on('connect_error', (socketError) => {
+        console.error('Notification socket error:', socketError.message);
+      });
+
+      socket.on('newNotification', (newNotif) => {
+        setNotifications(prev => [newNotif, ...prev]);
+        setUnreadCount(prev => prev + 1);
+      });
+    };
+
+    initializeNotifications();
+    window.addEventListener('auth-changed', initializeNotifications);
+    window.addEventListener('storage', initializeNotifications);
 
     return () => {
-      socket.disconnect();
+      window.removeEventListener('auth-changed', initializeNotifications);
+      window.removeEventListener('storage', initializeNotifications);
+      socket?.disconnect();
     };
   }, []);
 
