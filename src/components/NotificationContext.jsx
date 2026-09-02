@@ -68,14 +68,16 @@ export const NotificationProvider = ({ children }) => {
   };
 
   const markAllAsRead = async () => {
-    try {
-      setNotifications(prev => prev.map(n => ({ ...n, isRead: true })));
-      setUnreadCount(0);
+    setNotifications(prev => prev.map(n => ({ ...n, isRead: true })));
+    setUnreadCount(0);
 
-      const unreadItems = notifications.filter(n => !n.isRead);
-      await Promise.all(unreadItems.map(n => api.put(`/notifications/${n._id}/read`)));
-    } catch (err) {
-      fetchNotifications();
+    const unreadItems = notifications.filter(n => !n.isRead);
+    if (unreadItems.length > 0) {
+      try {
+        await Promise.allSettled(unreadItems.map(n => api.put(`/notifications/${n._id}/read`)));
+      } catch (err) {
+        console.error('Failed to sync read status:', err);
+      }
     }
   };
 
