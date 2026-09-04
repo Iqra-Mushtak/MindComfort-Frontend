@@ -123,14 +123,14 @@ const ModeratorDashboard = () => {
             className={`mod-nav-item ${activeSection === 'dashboard' ? 'active' : ''}`}
             onClick={() => handleNavClick('dashboard')}
           >
-            <i className="bi bi-speedometer2"></i> Home
+            <i className="bi bi-grid-fill"></i> Home
           </button>
 
           <button
             className={`mod-nav-item ${activeSection === 'podcasts' ? 'active' : ''}`}
             onClick={() => handleNavClick('podcasts')}
           >
-            <i className="bi bi-broadcast"></i> Podcasts
+            <i className="bi bi-broadcast-pin"></i> Podcasts
           </button>
 
           <button
@@ -151,7 +151,7 @@ const ModeratorDashboard = () => {
             className={`mod-nav-item ${activeSection === 'reports' ? 'active' : ''}`}
             onClick={() => handleNavClick('reports')}
           >
-            <i className="bi bi-flag"></i> Reports
+            <i className="bi bi-flag-fill"></i> Reports
             {stats.pendingReports > 0 && (
               <span className="mod-badge-danger">{stats.pendingReports}</span>
             )}

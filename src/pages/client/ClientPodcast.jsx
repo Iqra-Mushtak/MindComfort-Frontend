@@ -446,14 +446,14 @@ const ClientPodcasts = () => {
 
       <PurchaseModal
         isOpen={isPurchaseModalOpen}
-        item={selectedPlan}
-        itemType="plan"
+        item={selectedPodcast}
+        itemType="podcast"
         onConfirm={handleConfirmPurchase}
         onCancel={handleCancelPurchase}
         isLoading={isPurchasing}
         error={purchaseError}
         onClearError={() => setPurchaseError('')}
-    />
+      />
 
       {showLogoutModal && (
         <div className="mc-modal-overlay">
