@@ -80,7 +80,10 @@ const LivePodcast = () => {
 
   const initializeAgora = async () => {
     try {
-      const res = await api.get(`/podcasts/${selectedPodcast}/admin/join-stream`);
+      const tokenStr = localStorage.getItem('token');
+      const res = await api.get(`/podcasts/${selectedPodcast}/admin/join-stream`, {
+        headers: { Authorization: `Bearer ${tokenStr}` }
+      });
       const { token, channelName, sessionId, appId, uid } = res.data;
 
       const targetAppId = appId || import.meta.env.VITE_AGORA_APP_ID;
@@ -107,22 +110,33 @@ const LivePodcast = () => {
         }
       });
 
-      await client.join(targetAppId, channelName, token, uid
-      );
+      await client.join(targetAppId, channelName, token, uid);
       setAgoraClient(client);
       setIsListening(true);
 
-      const user = JSON.parse(localStorage.getItem('user'));
-      const apiPrefix = user?.role === 'moderator' ? '/moderator' : '/admin';
-      
-      const podcastRes = await api.get(`${apiPrefix}/podcasts/${selectedPodcast}`);
-      setPodcastDetails(podcastRes.data.podcast);
+      try {
+        const user = JSON.parse(localStorage.getItem('user'));
+        const apiPrefix = user?.role === 'moderator' ? '/moderator' : '/admin';
+        
+        const [podcastRes, commentsRes] = await Promise.allSettled([
+          api.get(`${apiPrefix}/podcasts/${selectedPodcast}`),
+          api.get(`${apiPrefix}/podcasts/${selectedPodcast}/comments`)
+        ]);
 
-      const commentsRes = await api.get(`${apiPrefix}/podcasts/${selectedPodcast}/comments`);
-      setComments(commentsRes.data.comments || []);
+        if (podcastRes.status === 'fulfilled') {
+          setPodcastDetails(podcastRes.value.data.podcast || podcastRes.value.data.data);
+        }
+        if (commentsRes.status === 'fulfilled') {
+          setComments(commentsRes.value.data.comments || []);
+        }
+      } catch (metaErr) {
+        console.warn('Non-blocking metadata fetch warning:', metaErr);
+      }
+
     } catch (err) {
       console.error('Error joining podcast stream:', err);
-      alert('Failed to join podcast stream: ' + err.response?.data?.message || err.message);
+      const msg = err.response?.data?.message || err.message || 'Unknown error';
+      alert(`Failed to join podcast stream: ${msg}`);
     }
   };
 
