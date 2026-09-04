@@ -49,11 +49,16 @@ const MentorLiveDashboard = () => {
 
       if (!isMountedRef.current) return;
 
-      const { token, channelName } = res.data;
+      const { token, channelName, appId } = res.data;
+      const targetAppId = appId || import.meta.env.VITE_AGORA_APP_ID;
+
+      if (!targetAppId) {
+        throw new Error('Agora App ID not received from backend server.');
+      }
 
       const client = AgoraRTC.createClient({ mode: 'rtc', codec: 'vp8' });
 
-      await client.join(import.meta.env.VITE_AGORA_APP_ID, channelName, token, 100);       
+      await client.join(targetAppId, channelName, token, 100);       
       const micTrack = await AgoraRTC.createMicrophoneAudioTrack();
       micTrackRef.current = micTrack;
       await client.publish([micTrack]);
