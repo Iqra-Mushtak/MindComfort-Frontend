@@ -52,8 +52,10 @@ const ClientLivePlayer = () => {
       
       setLoading(false);
     } catch (err) {
-      alert('Failed to join live session.');
-      navigate('/client/podcasts');
+      console.error('CRITICAL CLIENT JOIN ERROR:', err);
+      const serverMessage = err.response?.data?.message || err.message || 'Failed to join live session.';
+      alert(`Join Stream Error: ${serverMessage}`);
+      // navigate('/client/podcasts');
     }
   };
 
