@@ -25,11 +25,16 @@ const ClientLivePlayer = () => {
   const joinLiveSession = async () => {
     try {
       const res = await api.get(`/podcasts/${id}/join-stream`);
-      const { token, channelName, anonymousId } = res.data;
+      const { token, channelName, anonymousId, appId } = res.data;
       setAnonymousId(anonymousId);
 
+      const targetAppId = appId || import.meta.env.VITE_AGORA_APP_ID;
+      if (!targetAppId) {
+        throw new Error('Agora App ID not provided by server.');
+      }
+
       const client = AgoraRTC.createClient({ mode: 'rtc', codec: 'vp8' });
-      await client.join(import.meta.env.VITE_AGORA_APP_ID, channelName, token, null);
+      await client.join(targetAppId, channelName, token, null);
       
       client.on('user-published', async (user, mediaType) => {
         await client.subscribe(user, mediaType);
