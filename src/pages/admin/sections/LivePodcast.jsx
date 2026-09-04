@@ -81,7 +81,7 @@ const LivePodcast = () => {
   const initializeAgora = async () => {
     try {
       const res = await api.get(`/podcasts/${selectedPodcast}/admin/join-stream`);
-      const { token, channelName, sessionId, appId } = res.data;
+      const { token, channelName, sessionId, appId, uid } = res.data;
 
       const targetAppId = appId || import.meta.env.VITE_AGORA_APP_ID;
       if (!targetAppId) {
@@ -107,7 +107,8 @@ const LivePodcast = () => {
         }
       });
 
-      await client.join(targetAppId, channelName, token, null);
+      await client.join(targetAppId, channelName, token, uid
+      );
       setAgoraClient(client);
       setIsListening(true);
 
