@@ -46,8 +46,8 @@ const PodcastsManagement = ({ isModerator = false }) => {
       query.append('limit', 20);
 
       const res = await api.get(`${apiPrefix}/podcasts?${query}`);
-      setPodcasts(res.data.podcasts);
-      setTotal(res.data.total);
+      setPodcasts(res.data.podcasts || []);
+      setTotal(res.data.total || 0);
     } catch (err) {
       console.error('Error fetching podcasts:', err);
     } finally {
@@ -63,12 +63,25 @@ const PodcastsManagement = ({ isModerator = false }) => {
       query.append('limit', 20);
 
       const res = await api.get(`${apiPrefix}/podcasts/pending/list?${query}`);
-      setPendingPodcasts(res.data.podcasts);
-      setTotal(res.data.total);
+      setPendingPodcasts(res.data.podcasts || []);
+      setTotal(res.data.total || 0);
     } catch (err) {
       console.error('Error fetching pending podcasts:', err);
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleViewDetails = async (podcast) => {
+    setSelectedPodcast(podcast);
+    try {
+      const res = await api.get(`${apiPrefix}/podcasts/${podcast._id}`);
+      const freshData = res.data.podcast || res.data.data;
+      if (freshData) {
+        setSelectedPodcast(freshData);
+      }
+    } catch (err) {
+      console.error('Error fetching dynamic podcast details:', err);
     }
   };
 
@@ -198,7 +211,6 @@ const PodcastsManagement = ({ isModerator = false }) => {
               podcasts.map(podcast => {
                 const isExpanded = expandedPodcasts[podcast._id];
                 const isSeries = podcast.sessions && podcast.sessions.length > 1;
-                const displaySessions = isExpanded ? podcast.sessions : podcast.sessions?.slice(0, 2);
                 
                 return (
                   <div key={podcast._id} className="podcast-card">
@@ -244,7 +256,7 @@ const PodcastsManagement = ({ isModerator = false }) => {
                       <p><strong>Price:</strong> PKR {podcast.price}</p>
                     </div>
                     <div className="card-actions">
-                      <button className="btn-view" onClick={() => setSelectedPodcast(podcast)}>
+                      <button className="btn-view" onClick={() => handleViewDetails(podcast)}>
                         View Details
                       </button>
                     </div>
@@ -344,28 +356,28 @@ const PodcastsManagement = ({ isModerator = false }) => {
                 </div>
 
                 <div className="detail-section">
-                  {selectedPodcast.streamStatus === 'scheduled' && (
-                    <div className="detail-row">
-                      <label>Tickets Sold</label>
-                      <span className="stat-value">{selectedPodcast.ticketsSold || 0}</span>
-                    </div>
-                  )}
-                  {selectedPodcast.streamStatus === 'ended' && (
-                    <>
-                      <div className="detail-row">
-                        <label>Tickets Sold</label>
-                        <span className="stat-value">{selectedPodcast.ticketsSold || 0}</span>
-                      </div>
-                      <div className="detail-row">
-                        <label>Actual Attendees</label>
-                        <span className="stat-value">{selectedPodcast.attendees || 0}</span>
-                      </div>
-                    </>
-                  )}
+                  <div className="detail-row">
+                    <label>Tickets Sold</label>
+                    <span className="stat-value">
+                      {selectedPodcast.ticketsSold ?? selectedPodcast.purchaseCount ?? 0}
+                    </span>
+                  </div>
+
                   {selectedPodcast.streamStatus === 'live' && (
                     <div className="detail-row">
                       <label>Current Viewers</label>
-                      <span className="stat-value live-count">{selectedPodcast.currentViewers || 0}</span>
+                      <span className="stat-value live-count">
+                        {selectedPodcast.currentViewers ?? selectedPodcast.listenCount ?? 0}
+                      </span>
+                    </div>
+                  )}
+
+                  {selectedPodcast.streamStatus === 'ended' && (
+                    <div className="detail-row">
+                      <label>Actual Attendees</label>
+                      <span className="stat-value">
+                        {selectedPodcast.attendees ?? selectedPodcast.listenCount ?? 0}
+                      </span>
                     </div>
                   )}
                 </div>

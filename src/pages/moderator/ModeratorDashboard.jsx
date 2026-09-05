@@ -179,15 +179,6 @@ const ModeratorDashboard = () => {
           <div style={{ flex: 1 }}></div>
 
           <div style={{ display: 'flex', alignItems: 'center', gap: '15px' }}>
-            {liveStreams.length > 0 && (
-              <button 
-                className="mod-live-btn"
-                onClick={() => handleNavClick('live-podcast')}
-              >
-                <span className="mod-live-dot"></span>
-                LIVE ({liveStreams.length})
-              </button>
-            )}
             
             <NotificationBell />
 

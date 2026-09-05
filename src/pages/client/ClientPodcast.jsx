@@ -23,6 +23,7 @@ const ClientPodcasts = () => {
   const [isPurchasing, setIsPurchasing] = useState(false);
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [showLogoutModal, setShowLogoutModal] = useState(false);
+  const [expandedPodcastIds, setExpandedPodcastIds] = useState(new Set());
 
   useEffect(() => {
     document.title = "Audio Podcasts | MindComfort";
@@ -78,6 +79,18 @@ const ClientPodcasts = () => {
     } finally {
       setLoading(false);
     }
+  };
+
+  const toggleExpand = (podcastId) => {
+    setExpandedPodcastIds(prev => {
+      const next = new Set(prev);
+      if (next.has(podcastId)) {
+        next.delete(podcastId);
+      } else {
+        next.add(podcastId);
+      }
+      return next;
+    });
   };
 
   const handlePurchase = (podcast) => {
@@ -291,7 +304,18 @@ const ClientPodcasts = () => {
                         <p className="podcast-speaker">
                           <i className="bi bi-person-fill"></i> {podcast.speaker?.fullName || podcast.speaker?.username}
                         </p>
-                        <p className="podcast-desc">{podcast.description}</p>
+                        <div className="podcast-desc-container">
+                          <p className="podcast-desc">{podcast.description}</p>
+                          {podcast.description && podcast.description.length > 80 && (
+                            <button
+                              type="button"
+                              className="btn-read-toggle"
+                              onClick={() => toggleExpand(podcast._id)}
+                            >
+                              {expandedPodcastIds.has(podcast._id) ? 'Read less' : 'Read more'}
+                            </button>
+                          )}
+                        </div>
                         <div className="podcast-meta">
                           <span><i className="bi bi-calendar3"></i> {formatDate(podcast.startTime)}</span>
                           <span><i className="bi bi-clock"></i> {formatTime(podcast.startTime)}</span>
@@ -353,7 +377,7 @@ const ClientPodcasts = () => {
                             <i className="bi bi-mic-fill"></i>
                             {podcast.streamStatus === 'live' && (
                               <span className="live-badge">
-                                <span className="live-dot"></span> LIVE
+                                <span className="live-dot"></span><i className="bi bi-circle-fill me-1" style={{ fontSize: '7px' }}></i> LIVE
                               </span>
                             )}
                           </div>
@@ -362,7 +386,20 @@ const ClientPodcasts = () => {
                             <p className="podcast-speaker">
                               <i className="bi bi-person-fill"></i> {podcast.speaker?.fullName || podcast.speaker?.username}
                             </p>
-                            <p className="podcast-desc">{podcast.description}</p>
+                            <div className="podcast-desc-container">
+                              <p className={`podcast-desc ${expandedPodcastIds.has(podcast._id) ? 'expanded' : ''}`}>
+                                {podcast.description}
+                              </p>
+                              {podcast.description && podcast.description.length > 80 && (
+                                <button
+                                  type="button"
+                                  className="btn-read-toggle"
+                                  onClick={() => toggleExpand(podcast._id)}
+                                >
+                                  {expandedPodcastIds.has(podcast._id) ? 'Read less' : 'Read more'}
+                                </button>
+                              )}
+                            </div>
                             <div className="podcast-meta">
                               <span><i className="bi bi-calendar3"></i> {formatDate(podcast.startTime)}</span>
                               <span><i className="bi bi-clock"></i> {formatTime(podcast.startTime)}</span>
@@ -414,7 +451,18 @@ const ClientPodcasts = () => {
                             <p className="podcast-speaker">
                               <i className="bi bi-person-fill"></i> {podcast.speaker?.fullName || podcast.speaker?.username}
                             </p>
-                            <p className="podcast-desc">{podcast.description}</p>
+                            <div className="podcast-desc-container">
+                              <p className="podcast-desc">{podcast.description}</p>
+                              {podcast.description && podcast.description.length > 80 && (
+                                <button
+                                  type="button"
+                                  className="btn-read-toggle"
+                                  onClick={() => toggleExpand(podcast._id)}
+                                >
+                                  {expandedPodcastIds.has(podcast._id) ? 'Read less' : 'Read more'}
+                                </button>
+                              )}
+                            </div>
                             <div className="podcast-meta">
                               <span><i className="bi bi-calendar3"></i> {formatDate(podcast.endTime)}</span>
                             </div>
