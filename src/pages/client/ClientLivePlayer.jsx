@@ -97,6 +97,15 @@ const ClientLivePlayer = () => {
         auth: { token: localStorage.getItem('token') }
       });
       socketInstance.on('connect', () => socketInstance.emit('joinPodcastRoom', id));
+
+      socketInstance.on('podcastEnded', (data) => {
+        alert(data?.message || 'The host has ended this live podcast session.');
+        if (agoraClient) {
+          agoraClient.leave();
+        }
+        navigate('/client/podcasts');
+      });
+
       setSocket(socketInstance);
 
       setLoading(false);
@@ -301,7 +310,7 @@ const ClientLivePlayer = () => {
               <div className="form-bottom-row">
                 {sendStatus && <span className="send-status-msg">{sendStatus}</span>}
                 <button type="submit" disabled={!commentText.trim()} className="btn-send-comment">
-                  <i className="bi bi-send-fill me-1"></i> Send to Host
+                  Send
                 </button>
               </div>
             </form>

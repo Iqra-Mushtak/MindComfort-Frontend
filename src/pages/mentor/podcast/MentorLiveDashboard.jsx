@@ -158,14 +158,17 @@ const MentorLiveDashboard = () => {
   };
 
   const handleAutoEndStream = async () => {
+    if (isEndingStream) return;
     setIsEndingStream(true);
     try {
       await api.put(`/podcasts/${id}/end-stream`);
       destroyGlobalStream();
-      alert('Podcast duration has ended. The session has finished.');
+      alert('Time is up! Your live podcast duration has completed.');
       navigate('/mentor/podcasts');
     } catch (err) {
       console.error('Auto end stream error:', err);
+      destroyGlobalStream();
+      navigate('/mentor/podcasts');
     }
   };
 
@@ -214,6 +217,13 @@ const MentorLiveDashboard = () => {
     return `${pad(h)}:${pad(m)}:${pad(s)}`;
   };
 
+  const decodeHtml = (html) => {
+    if (!html) return '';
+    const txt = document.createElement("textarea");
+    txt.innerHTML = html;
+    return txt.value;
+  };
+
   const groupedComments = comments.reduce((groups, comment) => {
     const lastGroup = groups[groups.length - 1];
     const commentId = comment.anonymousId || 'Anonymous';
@@ -228,6 +238,9 @@ const MentorLiveDashboard = () => {
     }
     return groups;
   }, []);
+
+  const totalDurationSec = (podcast?.duration || 60) * 60;
+  const progressPercent = Math.min(100, Math.max(0, (elapsedSeconds / totalDurationSec) * 100));
 
   if (loading) {
     return <div className="mentor-live-loading">Connecting to audio broadcast...</div>;
@@ -321,7 +334,7 @@ const MentorLiveDashboard = () => {
                 </span>
               </div>
 
-              <h2 className="podcast-title-text">{podcast?.title || 'Live Broadcast'}</h2>
+              <h2 className="podcast-title-text">{decodeHtml(podcast?.title) || 'Live Broadcast'}</h2>
 
               <div className="mentor-desc-box">
                 <p className={`podcast-desc-text ${isDescExpanded ? 'expanded' : ''}`}>
@@ -350,38 +363,19 @@ const MentorLiveDashboard = () => {
                   : 'Your microphone is active and streaming live audio.'}
               </p>
 
-              <div className="stream-timeline-row">
-                <span className="timer-badge">
-                  <i className="bi bi-stopwatch me-1"></i> {formatHMS(elapsedSeconds)}
-                </span>
-                <div className="timeline-track">
-                  <div className="timeline-fill"></div>
+              <div className="dual-timer-container">
+                <div className="dual-timer-labels">
+                  <span className="timer-elapsed">
+                    <i className="bi bi-stopwatch me-1"></i> {formatHMS(elapsedSeconds)}
+                  </span>
+                  <span className={`timer-remaining ${secondsRemaining !== null && secondsRemaining <= 300 ? 'urgent' : ''}`}>
+                    <i className="bi bi-hourglass-split me-1"></i> {formatHMS(secondsRemaining !== null ? secondsRemaining : 0)} left
+                  </span>
+                </div>
+                <div className="dual-timeline-bar">
+                  <div className="dual-timeline-fill" style={{ width: `${progressPercent}%` }}></div>
                 </div>
               </div>
-
-              {secondsRemaining !== null && (
-                <div className={`countdown-timeline-box ${secondsRemaining < 300 ? 'warning' : ''}`}>
-                  <div className="countdown-labels">
-                    <span>
-                      <i className="bi bi-hourglass-split me-1"></i> Time Left
-                    </span>
-                    <strong>{formatHMS(secondsRemaining)}</strong>
-                  </div>
-                  <div className="countdown-track">
-                    <div
-                      className="countdown-fill"
-                      style={{
-                        width: `${Math.max(0, Math.min(100, (secondsRemaining / ((podcast?.duration || 60) * 60)) * 100))}%`
-                      }}
-                    ></div>
-                  </div>
-                  {secondsRemaining <= 300 && secondsRemaining > 0 && (
-                    <small className="time-warning-text">
-                      Stream will automatically end when timer reaches 00:00:00
-                    </small>
-                  )}
-                </div>
-              )}
 
               <div className="mentor-control-buttons">
                 <button
@@ -422,7 +416,6 @@ const MentorLiveDashboard = () => {
                 groupedComments.map((group, groupIdx) => (
                   <div key={groupIdx} className="comment-user-cluster">
                     <div className="user-id-header">
-                      <i className="bi bi-person-badge-fill me-1"></i>
                       <span className="full-id-code">ID: {group.anonymousId}</span>
                     </div>
 
@@ -431,7 +424,7 @@ const MentorLiveDashboard = () => {
                         <div key={c._id || mIdx} className="message-item">
                           <p className="message-content">{c.content}</p>
                           <span className="message-time">
-                            {c.createdAt ? new Date(c.createdAt).toLocaleTimeString() : 'Just now'}
+                            {c.createdAt ? new Date(c.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : 'Just now'}
                           </span>
                         </div>
                       ))}

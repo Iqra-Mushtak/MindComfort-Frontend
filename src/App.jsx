@@ -22,7 +22,6 @@ import PaymentProcess from './pages/client/PaymentProcess';
 import ClientMentors from './pages/client/ClientMentors';
 import MentorLiveDashboard from './pages/mentor/podcast/MentorLiveDashboard';
 import ClientLivePlayer from './pages/client/ClientLivePlayer';
-import GlobalLiveBadge from './components/GlobalLiveBadge';
 import AdminDashboard from './pages/admin/AdminDashboard';
 import ModeratorDashboard from './pages/moderator/ModeratorDashboard';
 
@@ -60,7 +59,6 @@ function App() {
       <Route path="/admin/dashboard" element={<AdminDashboard />} />
       <Route path="/moderator/dashboard" element={<ModeratorDashboard />} />
     </Routes>
-          <GlobalLiveBadge />
     </NotificationProvider>
   );
 }

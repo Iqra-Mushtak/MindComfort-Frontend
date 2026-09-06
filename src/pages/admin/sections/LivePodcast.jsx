@@ -134,6 +134,12 @@ const LivePodcast = () => {
         setListenerCount(count);
       });
 
+      newSocket.on('podcastEnded', (data) => {
+        alert(data?.message || 'The host has ended this live podcast session.');
+        handleLeaveSession();
+        fetchLivePodcasts();
+      });
+
       socketRef.current = newSocket;
       setSocket(newSocket);
 
@@ -215,6 +221,38 @@ const LivePodcast = () => {
     return `${pad(hours)}:${pad(minutes)}:${pad(seconds)}`;
   };
 
+  const decodeHtml = (html) => {
+    if (!html) return '';
+    const txt = document.createElement("textarea");
+    txt.innerHTML = html;
+    return txt.value;
+  };
+
+  const clusteredComments = comments.reduce((acc, comment) => {
+    const senderId = comment.anonymousId || comment.user?.username || 'Client';
+    const lastCluster = acc[acc.length - 1];
+
+    if (lastCluster && lastCluster.senderId === senderId) {
+      lastCluster.messages.push({
+        _id: comment._id,
+        content: comment.content,
+        createdAt: comment.createdAt,
+        user: comment.user
+      });
+    } else {
+      acc.push({
+        senderId,
+        messages: [{
+          _id: comment._id,
+          content: comment.content,
+          createdAt: comment.createdAt,
+          user: comment.user
+        }]
+      });
+    }
+    return acc;
+  }, []);
+
   if (loading) {
     return <div className="apm-loading-state">Loading live podcast monitor...</div>;
   }
@@ -242,7 +280,7 @@ const LivePodcast = () => {
             </span>
           </div>
 
-          <h2 className="apm-details-title">{activePodcast?.title}</h2>
+          <h2 className="apm-details-title">{decodeHtml(activePodcast?.title)}</h2>
           
           <p className="apm-details-speaker">
             <i className="bi bi-person-fill me-1"></i> Speaker: <strong>{activePodcast?.speaker?.fullName || activePodcast?.speaker?.username || 'Mentor'}</strong>
@@ -266,14 +304,14 @@ const LivePodcast = () => {
           <div className="apm-stage-pane">
             <div className="apm-stage-top">
               <div className="apm-title-group">
-                <h3 className="apm-live-title">{activePodcast?.title}</h3>
+                <h3 className="apm-live-title">{decodeHtml(activePodcast?.title)}</h3>
                 <p className="apm-speaker-tag">
                   <i className="bi bi-person-fill me-1"></i> {activePodcast?.speaker?.fullName || activePodcast?.speaker?.username || 'Mentor'}
                 </p>
               </div>
 
               <button className="apm-btn-leave" onClick={handleLeaveSession}>
-                <i className="bi bi-box-arrow-right me-1"></i> Leave Session
+                Leave Session
               </button>
             </div>
 
@@ -308,52 +346,58 @@ const LivePodcast = () => {
               {comments.length === 0 ? (
                 <div className="apm-empty-comments">No client comments yet</div>
               ) : (
-                comments.map((comment) => (
-                  <div key={comment._id} className="apm-comment-bubble">
+                clusteredComments.map((cluster, clusterIdx) => (
+                  <div key={clusterIdx} className="apm-comment-bubble">
                     <div className="apm-bubble-head">
                       <code className="apm-user-id">
-                        ID: {comment.anonymousId || comment.user?.username || 'Client'}
+                        ID: {cluster.senderId}
                       </code>
-                      <span className="apm-comment-time">
-                        {new Date(comment.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-                      </span>
                     </div>
 
-                    <div className="apm-bubble-body">
-                      <p className="apm-comment-text">{comment.content}</p>
-
-                      <div className="apm-action-anchor">
-                        <button
-                          className="apm-btn-dots"
-                          onClick={() => setOpenMenuId(openMenuId === comment._id ? null : comment._id)}
-                          title="Actions"
-                        >
-                          <i className="bi bi-three-dots-vertical"></i>
-                        </button>
-
-                        {openMenuId === comment._id && (
-                          <div className="apm-menu-popover">
-                            <button
-                              className="apm-menu-opt delete"
-                              onClick={() => handleDeleteComment(comment._id, comment.user?._id)}
-                            >
-                              Delete Comment
-                            </button>
-                            <button
-                              className="apm-menu-opt warn"
-                              onClick={() => handleWarnUser(comment.user?._id, comment._id)}
-                            >
-                              Warn User
-                            </button>
-                            <button
-                              className="apm-menu-opt suspend"
-                              onClick={() => handleSuspendUser(comment.user?._id, comment._id)}
-                            >
-                              Suspend User
-                            </button>
+                    <div className="apm-cluster-body">
+                      {cluster.messages.map((msg) => (
+                        <div key={msg._id} className="apm-stacked-row">
+                          <div className="apm-message-main">
+                            <p className="apm-comment-text">{msg.content}</p>
+                            <span className="apm-comment-time">
+                              {new Date(msg.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                            </span>
                           </div>
-                        )}
-                      </div>
+
+                          <div className="apm-action-anchor">
+                            <button
+                              className="apm-btn-dots"
+                              onClick={() => setOpenMenuId(openMenuId === msg._id ? null : msg._id)}
+                              title="Actions"
+                            >
+                              <i className="bi bi-three-dots-vertical"></i>
+                            </button>
+
+                            {openMenuId === msg._id && (
+                              <div className="apm-menu-popover">
+                                <button
+                                  className="apm-menu-opt delete"
+                                  onClick={() => handleDeleteComment(msg._id, msg.user?._id)}
+                                >
+                                  Delete Comment
+                                </button>
+                                <button
+                                  className="apm-menu-opt warn"
+                                  onClick={() => handleWarnUser(msg.user?._id, msg._id)}
+                                >
+                                  Warn User
+                                </button>
+                                <button
+                                  className="apm-menu-opt suspend"
+                                  onClick={() => handleSuspendUser(msg.user?._id, msg._id)}
+                                >
+                                  Suspend User
+                                </button>
+                              </div>
+                            )}
+                          </div>
+                        </div>
+                      ))}
                     </div>
                   </div>
                 ))
