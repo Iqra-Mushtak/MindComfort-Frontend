@@ -35,9 +35,11 @@ const NotificationBell = () => {
       case 'account_suspended':
       case 'user_suspended':
       case 'message_reported':
+      case 'podcast_rejected':
         return <i className="bi bi-slash-circle-fill notif-icon-danger"></i>;
       case 'podcast_live':
       case 'podcast_submitted':
+      case 'podcast_approved':
         return <i className="bi bi-broadcast notif-icon-primary"></i>;
       default:
         return <i className="bi bi-bell-fill notif-icon-secondary"></i>;

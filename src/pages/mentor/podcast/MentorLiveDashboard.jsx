@@ -106,7 +106,12 @@ const MentorLiveDashboard = () => {
       const client = AgoraRTC.createClient({ mode: 'rtc', codec: 'vp8' });
       await client.join(targetAppId, channelName, token, 100);
 
-      const micTrack = await AgoraRTC.createMicrophoneAudioTrack();
+      const micTrack = await AgoraRTC.createMicrophoneAudioTrack({
+        AEC: true,
+        ANS: true,
+        AGC: true,
+        encoderConfig: 'high_quality_stereo',
+      });
       await client.publish([micTrack]);
 
       const socketInstance = io(import.meta.env.VITE_SOCKET_URL || 'http://13.60.72.235:5000', {
