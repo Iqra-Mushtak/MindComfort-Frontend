@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import api from '../../utils/api';
+import { useDialog } from '../../components/ToastModalContext';
 import './Auth.css';
 
 const MAX_COVER_LETTER_WORDS = 4000;
@@ -8,6 +9,7 @@ const MAX_COVER_LETTER_WORDS = 4000;
 const getWordCount = (text = '') => text.trim().split(/\s+/).filter(Boolean).length;
 
 const MentorApplication = () => {
+  const { toastSuccess, toastError } = useDialog();
   const navigate = useNavigate();
   const location = useLocation();
   
@@ -86,18 +88,24 @@ const MentorApplication = () => {
     setSuccessMsg('');
 
     if (!formData.documents.mentorDocument) {
-      setError('Please upload the required document file before proceeding.');
+      const msg = 'Please upload the required document file before proceeding.';
+      setError(msg);
+      toastError(msg);
       return;
     }
 
     if (!formData.declaration) {
-      setError('You must agree to the declaration to proceed.');
+      const msg = 'You must agree to the declaration to proceed.';
+      setError(msg);
+      toastError(msg);
       return;
     }
 
     const coverLetterWordCount = getWordCount(formData.documents.coverLetterText);
     if (coverLetterWordCount > MAX_COVER_LETTER_WORDS) {
-      setError(`Cover letter should not exceed ${MAX_COVER_LETTER_WORDS} words.`);
+      const msg = `Cover letter should not exceed ${MAX_COVER_LETTER_WORDS} words.`;
+      setError(msg);
+      toastError(msg);
       return;
     }
 
@@ -127,13 +135,16 @@ const MentorApplication = () => {
       });
 
       setSuccessMsg(response.data.message);
+      toastSuccess('Application submitted successfully!');
       setShowPreview(false);
       setIsSubmitted(true);
       localStorage.removeItem('token');
       localStorage.removeItem('user');
     } catch (err) {
       console.error('Application error:', err.response?.data);
-      setError(err.response?.data?.message || 'Failed to submit application. Please try again.');
+      const errMsg = err.response?.data?.message || 'Failed to submit application. Please try again.';
+      setError(errMsg);
+      toastError(errMsg);
     } finally {
       setLoading(false);
     }

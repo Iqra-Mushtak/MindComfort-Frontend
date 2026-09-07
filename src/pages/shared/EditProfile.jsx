@@ -4,12 +4,13 @@ import api from '../../utils/api';
 import './Profile.css';
 import logoImg from '../../assets/logo.png';
 import NotificationBell from '../../components/NotificationBell';
+import { useDialog } from '../../components/ToastModalContext';
 
 const EditProfile = () => {
+  const { toastSuccess, toastError, toastInfo, confirm } = useDialog();
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const initialTab = searchParams.get('tab') || 'mentor';
-
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState(initialTab);
@@ -73,25 +74,25 @@ const EditProfile = () => {
     e.preventDefault();
     try {
       await api.put(`/profile/mentor/${user.id}`, mentorData);
-      alert('Mentor profile updated successfully!');
+      toastSuccess('Mentor profile updated successfully!');
       navigate(`/${user.role}/profile`);
     } catch (err) {
-      alert(err.response?.data?.message || 'Failed to update');
+      toastError(err.response?.data?.message || 'Failed to update');
     }
   };
 
   const handlePasswordSubmit = async (e) => {
     e.preventDefault();
     if (passwordData.newPassword !== passwordData.confirmPassword) {
-      return alert('New passwords do not match!');
+      return toastError('New passwords do not match!');
     }
     try {
       await api.put(`/profile/change-password/${user.id}`, passwordData);
-      alert('Password updated successfully!');
+      toastSuccess('Password updated successfully!');
       setPasswordData({ currentPassword: '', newPassword: '', confirmPassword: '' });
       navigate(`/${user.role}/profile`);
     } catch (err) {
-      alert(err.response?.data?.message || 'Failed to update password');
+      toastError(err.response?.data?.message || 'Failed to update password');
     }
   };
 
@@ -100,10 +101,10 @@ const EditProfile = () => {
     setEmailLoading(true);
     try {
       await api.post(`/profile/${user.id}/change-email/initiate`, { currentEmail: emailData.currentEmail });
-      alert('OTP sent to your current email.');
+      toastInfo('OTP sent to your current email.');
       setEmailStep(2);
     } catch (err) {
-      alert(err.response?.data?.message || 'Failed to initiate');
+      toastError(err.response?.data?.message || 'Failed to initiate');
     } finally {
       setEmailLoading(false);
     }
@@ -114,11 +115,11 @@ const EditProfile = () => {
     setEmailLoading(true);
     try {
       await api.post(`/profile/${user.id}/change-email/verify-current`, { otp: emailData.otp });
-      alert('Current email verified. Please enter your new email.');
+      toastSuccess('Current email verified. Please enter your new email.');
       setEmailStep(3);
       setEmailData({ ...emailData, otp: '' });
     } catch (err) {
-      alert(err.response?.data?.message || 'Invalid OTP');
+      toastError(err.response?.data?.message || 'Invalid OTP');
     } finally {
       setEmailLoading(false);
     }
@@ -129,10 +130,10 @@ const EditProfile = () => {
     setEmailLoading(true);
     try {
       await api.post(`/profile/${user.id}/change-email/set-new`, { newEmail: emailData.newEmail });
-      alert('OTP sent to your new email.');
+      toastInfo('OTP sent to your new email.');
       setEmailStep(4);
     } catch (err) {
-      alert(err.response?.data?.message || 'Failed to set new email');
+      toastError(err.response?.data?.message || 'Failed to set new email');
     } finally {
       setEmailLoading(false);
     }
@@ -143,11 +144,11 @@ const EditProfile = () => {
     setEmailLoading(true);
     try {
       await api.post(`/profile/${user.id}/change-email/verify-new`, { otp: emailData.otp, newEmail: emailData.newEmail });
-      alert('Email updated successfully! Please login again.');
+      toastSuccess('Email updated successfully! Please login again.');
       localStorage.clear();
       navigate('/login');
     } catch (err) {
-      alert(err.response?.data?.message || 'Failed to verify new email');
+      toastError(err.response?.data?.message || 'Failed to verify new email');
     } finally {
       setEmailLoading(false);
     }
@@ -161,7 +162,7 @@ const EditProfile = () => {
     e.preventDefault();
     
     if (!slotData.day && !slotData.date) {
-      return alert('Please select at least a Day or a specific Date.');
+      return toastError('Please select at least a Day or a specific Date.');
     }
 
     try {
@@ -179,15 +180,17 @@ const EditProfile = () => {
         await api.put(`/profile/mentor/${user.id}/availability/${editingSlotId}`, payload);
         setSlots(slots.map(s => s._id === editingSlotId ? { ...s, ...payload } : s));
         setEditingSlotId(null);
+        toastSuccess('Availability slot updated');
       } else {
         const res = await api.post(`/profile/mentor/${user.id}/availability`, payload);
         setSlots([...slots, res.data.slot]);
+        toastSuccess('Availability slot added');
       }
       
       setSlotData({ day: '', endDay: '', date: '', endDate: '', startTime: '09:00', endTime: '12:00' });
       setIsAddingSlot(false);
     } catch (err) {
-      alert(err.response?.data?.message || 'Failed to save slot');
+      toastError(err.response?.data?.message || 'Failed to save slot');
     }
   };
 
@@ -205,12 +208,20 @@ const EditProfile = () => {
   };
 
   const handleDeleteSlot = async (slotId) => {
-    if (!window.confirm('Are you sure you want to delete this availability slot?')) return;
+    const ok = await confirm({
+      title: 'Delete Availability Slot',
+      message: 'Are you sure you want to delete this availability slot?',
+      confirmText: 'Delete Slot',
+      isDanger: true
+    });
+    if (!ok) return;
+
     try {
       await api.delete(`/profile/mentor/${user.id}/availability/${slotId}`);
       setSlots(slots.filter(s => s._id !== slotId));
+      toastSuccess('Slot removed successfully');
     } catch (err) {
-      alert(err.response?.data?.message || 'Failed to delete slot');
+      toastError(err.response?.data?.message || 'Failed to delete slot');
     }
   };
   

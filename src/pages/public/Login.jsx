@@ -1,9 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import api from '../../utils/api';
+import { useDialog } from '../../components/ToastModalContext';
 import './Auth.css';
+import logoImg from '../../assets/logo.png';
 
 const Login = () => {
+  const { toastSuccess, toastError } = useDialog();
   const [formData, setFormData] = useState({ email: '', password: '' });
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
@@ -29,6 +32,8 @@ const Login = () => {
       localStorage.setItem('user', JSON.stringify(response.data.user));
       window.dispatchEvent(new Event('auth-changed'));
       
+      toastSuccess(`Welcome back, ${response.data.user.username || 'User'}!`);
+
       const userRole = response.data.user.role;
       if (userRole === 'mentor') {
         navigate('/mentor/dashboard');
@@ -40,7 +45,9 @@ const Login = () => {
         navigate('/client/dashboard');
       }
     } catch (err) {
-      setError(err.response?.data?.message || 'An error occurred during login.');
+      const errorMsg = err.response?.data?.message || 'An error occurred during login.';
+      setError(errorMsg);
+      toastError(errorMsg);
     } finally {
       setLoading(false);
     }
@@ -50,7 +57,7 @@ const Login = () => {
     <div className="auth-wrapper">
       <div className="auth-hero-panel">
         <div className="auth-brand" onClick={() => navigate('/')}>
-          <img src="/src/assets/logo.png" alt="MindComfort Logo" />
+          <img src={logoImg} alt="MindComfort Logo" />
           <span>MindComfort</span>
         </div>
         <div className="auth-hero-content">

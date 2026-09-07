@@ -2,8 +2,10 @@ import React, { useState, useEffect, useLayoutEffect, useRef } from 'react';
 import api from '../../../utils/api';
 import '../AdminDashboard.css';
 import io from 'socket.io-client';
+import { useDialog } from '../../../components/ToastModalContext';
 
 const LiveChatFeed = () => {
+  const { toastSuccess, toastError } = useDialog();
   const [messages, setMessages] = useState([]);
   const [chatrooms, setChatrooms] = useState([]);
   const [selectedChatroom, setSelectedChatroom] = useState(null);
@@ -66,7 +68,7 @@ const LiveChatFeed = () => {
 
       newSocket.on('moderationError', (error) => {
         console.error('Moderation error:', error);
-        alert('Error: ' + error);
+        toastError('Moderation error: ' + error);
       });
 
       socketRef.current = newSocket;
@@ -190,31 +192,34 @@ const LiveChatFeed = () => {
         chatroomId: selectedChatroom,
         userId: formData.userId
       });
+      toastSuccess('Message deleted');
       closeForm();
       setOpenMenuId(null);
     } else if (activeForm === 'warn') {
-      if (!formInput.trim()) return alert('Please enter a reason for warning');
+      if (!formInput.trim()) return toastError('Please enter a reason for warning');
       if (socketRef.current) {
         socketRef.current.emit('adminWarnUser', {
           userId: formData.userId,
           messageId: formData.messageId,
           chatroomId: selectedChatroom,
-          reason: formInput,
+          reason: formInput.trim(),
           content: formData.content
         });
+        toastSuccess('Warning sent to user');
       }
       closeForm();
       setOpenMenuId(null);
     } else if (activeForm === 'suspend') {
-      if (!formInput.trim()) return alert('Please enter a reason for suspension');
+      if (!formInput.trim()) return toastError('Please enter a reason for suspension');
       if (socketRef.current) {
         socketRef.current.emit('adminSuspendUser', {
           userId: formData.userId,
           messageId: formData.messageId,
           chatroomId: selectedChatroom,
-          reason: formInput,
+          reason: formInput.trim(),
           content: formData.content
         });
+        toastSuccess('User suspended');
       }
       closeForm();
       setOpenMenuId(null);

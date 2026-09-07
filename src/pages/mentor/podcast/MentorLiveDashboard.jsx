@@ -6,8 +6,10 @@ import api from '../../../utils/api';
 import './MentorLiveDashboard.css';
 import logoImg from '../../../assets/logo.png';
 import NotificationBell from '../../../components/NotificationBell';
+import { useDialog } from '../../../components/ToastModalContext';
 
 const MentorLiveDashboard = () => {
+  const { toastInfo, toastError, confirm } = useDialog();
   const { id } = useParams();
   const navigate = useNavigate();
   const [user, setUser] = useState(null);
@@ -168,7 +170,7 @@ const MentorLiveDashboard = () => {
     try {
       await api.put(`/podcasts/${id}/end-stream`);
       destroyGlobalStream();
-      alert('Time is up! Your live podcast duration has completed.');
+      toastInfo('Time is up! Your live podcast duration has completed.');
       navigate('/mentor/podcasts');
     } catch (err) {
       console.error('Auto end stream error:', err);
@@ -179,7 +181,14 @@ const MentorLiveDashboard = () => {
 
   const handleEndStream = async () => {
     if (isEndingStream) return;
-    if (window.confirm('Are you sure you want to end this live broadcast for all attendees?')) {
+    const ok = await confirm({
+      title: 'End Broadcast',
+      message: 'Are you sure you want to end this live broadcast for all attendees?',
+      confirmText: 'End Stream',
+      isDanger: true
+    });
+
+    if (ok) {
       try {
         setIsEndingStream(true);
         await api.put(`/podcasts/${id}/end-stream`);
@@ -187,7 +196,7 @@ const MentorLiveDashboard = () => {
         navigate('/mentor/podcasts');
       } catch (err) {
         console.error(err);
-        alert('Failed to end stream.');
+        toastError('Failed to end stream.');
         setIsEndingStream(false);
       }
     }

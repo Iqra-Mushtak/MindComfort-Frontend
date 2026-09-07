@@ -1,8 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import api from '../../../utils/api';
 import '../AdminDashboard.css';
+import { useDialog } from '../../../components/ToastModalContext';
 
 const MentorsManagement = () => {
+  const { toastSuccess, toastError, confirm, prompt } = useDialog();
   const [mentors, setMentors] = useState([]);
   const [applications, setApplications] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -80,12 +82,13 @@ const MentorsManagement = () => {
     if (!suspendUserId) return;
     try {
       await api.patch(`/admin/mentors/${suspendUserId}/suspend`, { reason: suspendReason });
+      toastSuccess('Mentor suspended successfully');
       setSuspendUserId(null);
       setSuspendReason('');
       fetchMentors();
     } catch (err) {
       console.error('Error suspending mentor:', err);
-      alert('Failed to suspend mentor');
+      toastError(err.response?.data?.message || 'Failed to suspend mentor');
     }
   };
 
@@ -98,37 +101,52 @@ const MentorsManagement = () => {
     if (!unsuspendUserId) return;
     try {
       await api.patch(`/admin/mentors/${unsuspendUserId}/unsuspend`, {});
+      toastSuccess('Mentor unsuspended successfully');
       setUnsuspendUserId(null);
       fetchMentors();
     } catch (err) {
       console.error('Error unsuspending mentor:', err);
-      alert('Failed to unsuspend mentor');
+      toastError(err.response?.data?.message || 'Failed to unsuspend mentor');
     }
   };
 
   const handleApprove = async (applicationId) => {
-    if (window.confirm('Approve this mentor application?')) {
+    const ok = await confirm({
+      title: 'Approve Application',
+      message: 'Are you sure you want to approve this mentor application?',
+      confirmText: 'Approve'
+    });
+
+    if (ok) {
       try {
         await api.patch(`/admin/applications/${applicationId}/approve`, {});
         fetchApplications();
-        alert('Mentor approved successfully!');
+        toastSuccess('Mentor approved successfully!');
+        setSelectedApplication(null);
       } catch (err) {
         console.error('Error approving application:', err);
-        alert('Failed to approve application');
+        toastError(err.response?.data?.message || 'Failed to approve application');
       }
     }
   };
 
   const handleReject = async (applicationId) => {
-    const reason = window.prompt('Enter rejection reason:');
-    if (reason) {
+    const reason = await prompt({
+      title: 'Reject Application',
+      message: 'Please provide a reason for rejection:',
+      placeholder: 'Does not meet minimum qualification criteria...',
+      confirmText: 'Reject'
+    });
+
+    if (reason && reason.trim()) {
       try {
-        await api.patch(`/admin/applications/${applicationId}/reject`, { reason });
+        await api.patch(`/admin/applications/${applicationId}/reject`, { reason: reason.trim() });
         fetchApplications();
-        alert('Application rejected');
+        toastSuccess('Application rejected');
+        setSelectedApplication(null);
       } catch (err) {
         console.error('Error rejecting application:', err);
-        alert('Failed to reject application');
+        toastError(err.response?.data?.message || 'Failed to reject application');
       }
     }
   };
@@ -141,7 +159,7 @@ const MentorsManagement = () => {
       setMentorDetails(res.data);
     } catch (err) {
       console.error('Error fetching mentor details:', err);
-      alert('Failed to load mentor details');
+      toastError('Failed to load mentor details');
     } finally {
       setDetailsLoading(false);
     }

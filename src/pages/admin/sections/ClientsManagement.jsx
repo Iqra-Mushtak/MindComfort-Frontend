@@ -1,8 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import api from '../../../utils/api';
 import '../AdminDashboard.css';
+import { useDialog } from '../../../components/ToastModalContext';
 
 const ClientsManagement = () => {
+  const { toastSuccess, toastError } = useDialog();
   const [clients, setClients] = useState([]);
   const [loading, setLoading] = useState(false);
   const [search, setSearch] = useState('');
@@ -53,12 +55,13 @@ const ClientsManagement = () => {
     if (!suspendUserId) return;
     try {
       await api.patch(`/admin/clients/${suspendUserId}/suspend`, { reason: suspendReason });
+      toastSuccess('Client suspended successfully');
       setSuspendUserId(null);
       setSuspendReason('');
       fetchClients();
     } catch (err) {
       console.error('Error suspending client:', err);
-      alert('Failed to suspend client');
+      toastError(err.response?.data?.message || 'Failed to suspend client');
     }
   };
 
@@ -71,11 +74,12 @@ const ClientsManagement = () => {
     if (!unsuspendUserId) return;
     try {
       await api.patch(`/admin/clients/${unsuspendUserId}/unsuspend`, {});
+      toastSuccess('Client unsuspended successfully');
       setUnsuspendUserId(null);
       fetchClients();
     } catch (err) {
       console.error('Error unsuspending client:', err);
-      alert('Failed to unsuspend client');
+      toastError(err.response?.data?.message || 'Failed to unsuspend client');
     }
   };
 
@@ -87,7 +91,7 @@ const ClientsManagement = () => {
       setClientDetails(res.data);
     } catch (err) {
       console.error('Error fetching client details:', err);
-      alert('Failed to load client details');
+      toastError('Failed to load client details');
     } finally {
       setDetailsLoading(false);
     }

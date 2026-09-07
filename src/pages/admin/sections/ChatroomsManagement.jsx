@@ -1,8 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import api from '../../../utils/api';
 import '../AdminDashboard.css';
+import { useDialog } from '../../../components/ToastModalContext';
 
 const ChatroomsManagement = ({ isModerator = false }) => {
+  const { toastSuccess, toastError } = useDialog();
   const user = JSON.parse(localStorage.getItem('user'));
   const apiPrefix = isModerator || user?.role === 'moderator' ? '/moderator' : '/admin';
   
@@ -52,7 +54,7 @@ const ChatroomsManagement = ({ isModerator = false }) => {
       const res = await api.post(`${apiPrefix}/chatrooms`, createFormData);
       
       if (res.status === 200 || res.status === 201) {
-        alert('Chatroom created successfully!');
+        toastSuccess('Chatroom created successfully!');
         setShowCreateModal(false);
         setCreateFormData({ name: '', description: '' });
         fetchChatrooms();
@@ -61,12 +63,12 @@ const ChatroomsManagement = ({ isModerator = false }) => {
       console.error('Chatroom creation error:', err.response?.data || err);
 
       if (err.response?.status === 200 || err.response?.status === 201) {
-        alert('Chatroom created successfully!');
+        toastSuccess('Chatroom created successfully!');
         setShowCreateModal(false);
         setCreateFormData({ name: '', description: '' });
         fetchChatrooms();
       } else {
-        alert(err.response?.data?.message || err.response?.data?.error || 'Failed to create chatroom');
+        toastError(err.response?.data?.message || err.response?.data?.error || 'Failed to create chatroom');
       }
     }
   };
@@ -83,11 +85,11 @@ const ChatroomsManagement = ({ isModerator = false }) => {
     e.preventDefault();
     try {
       await api.put(`${apiPrefix}/chatrooms/${editChatroomId}`, editFormData);
-      alert('Chatroom updated successfully!');
+      toastSuccess('Chatroom updated successfully!');
       setEditChatroomId(null);
       fetchChatrooms();
     } catch (err) {
-      alert(err.response?.data?.message || 'Failed to update chatroom');
+      toastError(err.response?.data?.message || 'Failed to update chatroom');
     }
   };
 
@@ -104,10 +106,11 @@ const ChatroomsManagement = ({ isModerator = false }) => {
     e.preventDefault();
     try {
       await api.patch(`${apiPrefix}/chatrooms/${toggleChatroomId}/toggle-status`);
+      toastSuccess(`Chatroom ${toggleAction}d successfully`);
       setToggleChatroomId(null);
       fetchChatrooms();
     } catch (err) {
-      alert(err.response?.data?.message || 'Failed to toggle status');
+      toastError(err.response?.data?.message || 'Failed to toggle status');
     }
   };
 

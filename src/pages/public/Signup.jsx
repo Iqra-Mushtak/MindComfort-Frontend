@@ -1,9 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useSearchParams, Link } from 'react-router-dom';
 import api from '../../utils/api';
+import { useDialog } from '../../components/ToastModalContext';
 import './Auth.css';
+import logoImg from '../../assets/logo.png';
 
 const Signup = () => {
+  const { toastSuccess, toastError } = useDialog();
   const [searchParams] = useSearchParams();
   const [role, setRole] = useState('client');
   const [formData, setFormData] = useState({ username: '', email: '', password: '' });
@@ -51,17 +54,30 @@ const Signup = () => {
     setError('');
 
     const usernameError = validateUsername(formData.username);
-    if (usernameError) return setError(usernameError);
+    if (usernameError) {
+      setError(usernameError);
+      toastError(usernameError);
+      return;
+    }
 
     const emailError = validateEmail(formData.email);
-    if (emailError) return setError(emailError);
+    if (emailError) {
+      setError(emailError);
+      toastError(emailError);
+      return;
+    }
 
     const passwordError = validatePassword(formData.password);
-    if (passwordError) return setError(passwordError);
+    if (passwordError) {
+      setError(passwordError);
+      toastError(passwordError);
+      return;
+    }
 
     setLoading(true);
     try {
       const response = await api.post('/auth/register', { ...formData, role });
+      toastSuccess('Account created! Please verify your email.');
       const encodedEmail = encodeURIComponent(formData.email);
       navigate(`/verify-otp?email=${encodedEmail}&role=${role}`, { 
         state: { email: formData.email, role, message: response.data.message } 
@@ -72,7 +88,9 @@ const Signup = () => {
         setMentorPendingError({ message: errorData.message, email: errorData.email });
         setError('');
       } else {
-        setError(err.response?.data?.message || 'An error occurred during signup.');
+        const errMsg = err.response?.data?.message || 'An error occurred during signup.';
+        setError(errMsg);
+        toastError(errMsg);
         setMentorPendingError(null);
       }
     } finally {
@@ -84,7 +102,7 @@ const Signup = () => {
     <div className="auth-wrapper">
       <div className="auth-hero-panel">
         <div className="auth-brand" onClick={() => navigate('/')}>
-          <img src="/src/assets/logo.png" alt="MindComfort Logo" />
+          <img src={logoImg} alt="MindComfort Logo" />
           <span>MindComfort</span>
         </div>
         <div className="auth-hero-content">

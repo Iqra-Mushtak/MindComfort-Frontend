@@ -2,8 +2,10 @@ import React, { useState, useEffect } from 'react';
 import api from '../../../utils/api';
 import '../AdminDashboard.css';
 import { useLocation, useNavigate } from 'react-router-dom';
+import { useDialog } from '../../../components/ToastModalContext';
 
 const ReportsManagement = ({ isModerator = false }) => {
+  const { toastSuccess, toastError, confirm } = useDialog();
   const location = useLocation();
   const navigate = useNavigate();
   const user = JSON.parse(localStorage.getItem('user'));
@@ -46,49 +48,79 @@ const ReportsManagement = ({ isModerator = false }) => {
   };
 
   const handleDeleteMessage = async (reportId) => {
-    if (window.confirm('Delete this message?')) {
+    const ok = await confirm({
+      title: 'Delete Message',
+      message: 'Are you sure you want to delete this reported message?',
+      confirmText: 'Delete',
+      isDanger: true
+    });
+
+    if (ok) {
       try {
         await api.patch(`${apiPrefix}/reports/${reportId}/delete-message`);
-        alert('Message deleted');
+        toastSuccess('Message deleted');
+        setSelectedReport(null);
         fetchReports();
       } catch (err) {
-        alert('Failed to delete message');
+        toastError(err.response?.data?.message || 'Failed to delete message');
       }
     }
   };
 
   const handleWarnUser = async (reportId) => {
-    if (window.confirm('Warn this user?')) {
+    const ok = await confirm({
+      title: 'Warn User',
+      message: 'Issue an official moderation warning to this user?',
+      confirmText: 'Issue Warning'
+    });
+
+    if (ok) {
       try {
         await api.patch(`${apiPrefix}/reports/${reportId}/warn-user`);
-        alert('User warned');
+        toastSuccess('User warned');
+        setSelectedReport(null);
         fetchReports();
       } catch (err) {
-        alert('Failed to warn user');
+        toastError(err.response?.data?.message || 'Failed to warn user');
       }
     }
   };
 
   const handleSuspendUser = async (reportId) => {
-    if (window.confirm('Suspend this user?')) {
+    const ok = await confirm({
+      title: 'Suspend User',
+      message: 'Are you sure you want to suspend this user account?',
+      confirmText: 'Suspend',
+      isDanger: true
+    });
+
+    if (ok) {
       try {
         await api.patch(`${apiPrefix}/reports/${reportId}/suspend-user`);
-        alert('User suspended');
+        toastSuccess('User suspended');
+        setSelectedReport(null);
         fetchReports();
       } catch (err) {
-        alert('Failed to suspend user');
+        toastError(err.response?.data?.message || 'Failed to suspend user');
       }
     }
   };
 
   const handleRejectReport = async (reportId) => {
-    if (window.confirm('Reject this report?')) {
+    const ok = await confirm({
+      title: 'Dismiss Report',
+      message: 'Are you sure you want to dismiss and reject this report?',
+      confirmText: 'Dismiss'
+    });
+
+    if (ok) {
       try {
         await api.patch(`${apiPrefix}/reports/${reportId}/reject`);
-        alert('Report rejected');
+        toastSuccess('Report rejected');
+        setSelectedReport(null);
         fetchReports();
       } catch (err) {
-        alert('Failed to reject report');
+        toastError(err.response?.data?.message || 'Failed to reject report');
       }
     }
   };

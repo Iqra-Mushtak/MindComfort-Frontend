@@ -3,8 +3,10 @@ import api from '../../../utils/api';
 import '../AdminDashboard.css';
 import io from 'socket.io-client';
 import AgoraRTC from 'agora-rtc-sdk-ng';
+import { useDialog } from '../../../components/ToastModalContext';
 
 const LivePodcast = () => {
+  const { toastSuccess, toastError, toastInfo, confirm, prompt } = useDialog();
   const [livePodcasts, setLivePodcasts] = useState([]);
   const [activePodcast, setActivePodcast] = useState(null);
   const [isJoined, setIsJoined] = useState(false);
@@ -146,7 +148,7 @@ const LivePodcast = () => {
       });
 
       newSocket.on('podcastEnded', (data) => {
-        alert(data?.message || 'The host has ended this live podcast session.');
+        toastInfo(data?.message || 'The host has ended this live podcast session.');
         handleLeaveSession();
         fetchLivePodcasts();
       });
@@ -160,9 +162,10 @@ const LivePodcast = () => {
       setComments(commentsRes.data.comments || []);
 
       setIsJoined(true);
+      toastSuccess('Connected to live podcast audio stream');
     } catch (err) {
       console.error('Failed to join stream:', err);
-      alert(err.response?.data?.message || err.message || 'Failed to connect to live stream.');
+      toastError(err.response?.data?.message || err.message || 'Failed to connect to live stream.');
     } finally {
       setConnecting(false);
     }
@@ -186,42 +189,65 @@ const LivePodcast = () => {
     setComments([]);
   };
 
-  const handleDeleteComment = (commentId, userId) => {
-    if (window.confirm('Delete this comment?')) {
-      if (socketRef.current) {
-        socketRef.current.emit('adminDeleteComment', {
-          commentId,
-          podcastId: activePodcast._id,
-          userId
-        });
-      }
+  const handleDeleteComment = async (commentId, userId) => {
+    const ok = await confirm({
+      title: 'Delete Comment',
+      message: 'Are you sure you want to permanently delete this comment?',
+      confirmText: 'Delete',
+      isDanger: true
+    });
+
+    if (ok && socketRef.current) {
+      socketRef.current.emit('adminDeleteComment', {
+        commentId,
+        podcastId: activePodcast._id,
+        userId
+      });
+      toastSuccess('Comment deleted');
     }
+    setOpenMenuId(null);
   };
 
-  const handleWarnUser = (userId, commentId, content) => {
-    const reason = window.prompt('Enter reason for warning:');
-    if (reason && socketRef.current) {
+  const handleWarnUser = async (userId, commentId, content) => {
+    const reason = await prompt({
+      title: 'Warn User',
+      message: 'Enter reason for warning this user:',
+      placeholder: 'Disrespectful comment in chat...',
+      confirmText: 'Send Warning'
+    });
+
+    if (reason && reason.trim() && socketRef.current) {
       socketRef.current.emit('adminWarnPodcastUser', {
         userId,
         commentId,
         podcastId: activePodcast._id,
-        reason,
+        reason: reason.trim(),
         content
       });
+      toastSuccess('Warning sent to user');
     }
+    setOpenMenuId(null);
   };
 
-  const handleSuspendUser = (userId, commentId, content) => {
-    const reason = window.prompt('Enter reason for suspension:');
-    if (reason && socketRef.current) {
+  const handleSuspendUser = async (userId, commentId, content) => {
+    const reason = await prompt({
+      title: 'Suspend User',
+      message: 'Enter reason for suspending this user:',
+      placeholder: 'Repeated guideline violations...',
+      confirmText: 'Suspend User'
+    });
+
+    if (reason && reason.trim() && socketRef.current) {
       socketRef.current.emit('adminSuspendPodcastUser', {
         userId,
         commentId,
         podcastId: activePodcast._id,
-        reason,
+        reason: reason.trim(),
         content
       });
+      toastSuccess('User suspended');
     }
+    setOpenMenuId(null);
   };
 
   const formatHMS = (totalSeconds) => {

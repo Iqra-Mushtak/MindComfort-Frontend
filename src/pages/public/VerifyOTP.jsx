@@ -1,9 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import api from '../../utils/api';
+import { useDialog } from '../../components/ToastModalContext';
 import './Auth.css';
+import logoImg from '../../assets/logo.png';
 
 const VerifyOTP = () => {
+  const { toastSuccess, toastError, toastInfo } = useDialog();
   const navigate = useNavigate();
   const location = useLocation();
   
@@ -57,7 +60,9 @@ const VerifyOTP = () => {
     setLoading(true);
     try {
       const response = await api.post('/auth/verifyRegister-otp', { email, otp: normalizedOtp });
-      setSuccessMsg(response.data.message || 'Verified successfully. Redirecting...');
+      const successText = response.data.message || 'Verified successfully. Redirecting...';
+      setSuccessMsg(successText);
+      toastSuccess('Email verified successfully!');
       setTimeout(() => {
         if (response.data.role === 'mentor') {
           navigate('/mentor-application', {
@@ -70,10 +75,12 @@ const VerifyOTP = () => {
         } else {
           navigate('/login');
         }
-      }, 2000);
+      }, 1500);
     } catch (err) {
       const apiMessage = err.response?.data?.message || err.response?.data?.error;
-      setError(apiMessage || err.message || 'Verification failed. Please try again.');
+      const errMsg = apiMessage || err.message || 'Verification failed. Please try again.';
+      setError(errMsg);
+      toastError(errMsg);
     } finally {
       setLoading(false);
     }
@@ -85,17 +92,23 @@ const VerifyOTP = () => {
     setResendLoading(true);
 
     if (!email) {
-      setError('Missing email address. Please restart signup.');
+      const errMsg = 'Missing email address. Please restart signup.';
+      setError(errMsg);
+      toastError(errMsg);
       setResendLoading(false);
       return;
     }
 
     try {
       await api.post('/auth/resend-otp', { email });
-      setSuccessMsg('A new verification code has been sent to your email.');
+      const msg = 'A new verification code has been sent to your email.';
+      setSuccessMsg(msg);
+      toastInfo(msg);
       setTimer(60); 
     } catch (err) {
-      setError(err.response?.data?.message || 'Failed to resend code. Please try again later.');
+      const errMsg = err.response?.data?.message || 'Failed to resend code. Please try again later.';
+      setError(errMsg);
+      toastError(errMsg);
     } finally {
       setResendLoading(false);
     }
@@ -105,7 +118,7 @@ const VerifyOTP = () => {
     <div className="auth-wrapper">
       <div className="auth-hero-panel">
         <div className="auth-brand" onClick={() => navigate('/')}>
-          <img src="/src/assets/logo.png" alt="MindComfort Logo" />
+          <img src={logoImg} alt="MindComfort Logo" />
           <span>MindComfort</span>
         </div>
         

@@ -1,8 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import api from '../../../utils/api';
 import '../AdminDashboard.css';
+import { useDialog } from '../../../components/ToastModalContext';
 
 const ModeratorsManagement = () => {
+  const { toastSuccess, toastError } = useDialog();
   const [moderators, setModerators] = useState([]);
   const [loading, setLoading] = useState(false);
   const [search, setSearch] = useState('');
@@ -50,12 +52,13 @@ const ModeratorsManagement = () => {
     if (!suspendUserId) return;
     try {
       await api.patch(`/admin/moderators/${suspendUserId}/suspend`, { reason: suspendReason });
+      toastSuccess('Moderator suspended successfully');
       setSuspendUserId(null);
       setSuspendReason('');
       fetchModerators();
     } catch (err) {
       console.error('Error suspending moderator:', err);
-      alert('Failed to suspend moderator');
+      toastError(err.response?.data?.message || 'Failed to suspend moderator');
     }
   };
 
@@ -68,11 +71,12 @@ const ModeratorsManagement = () => {
     if (!unsuspendUserId) return;
     try {
       await api.patch(`/admin/moderators/${unsuspendUserId}/unsuspend`, {});
+      toastSuccess('Moderator unsuspended successfully');
       setUnsuspendUserId(null);
       fetchModerators();
     } catch (err) {
       console.error('Error unsuspending moderator:', err);
-      alert('Failed to unsuspend moderator');
+      toastError(err.response?.data?.message || 'Failed to unsuspend moderator');
     }
   };
 
@@ -80,12 +84,12 @@ const ModeratorsManagement = () => {
     e.preventDefault();
     try {
       await api.post('/admin/moderators', newModerator);
-      alert('Moderator created successfully!');
+      toastSuccess('Moderator created successfully!');
       setNewModerator({ username: '', email: '', password: '' });
       setShowCreateForm(false);
       fetchModerators();
     } catch (err) {
-      alert(err.response?.data?.message || 'Failed to create moderator');
+      toastError(err.response?.data?.message || 'Failed to create moderator');
     }
   };
 

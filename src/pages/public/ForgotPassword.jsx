@@ -1,9 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import api from '../../utils/api';
+import { useDialog } from '../../components/ToastModalContext';
 import './Auth.css';
+import logoImg from '../../assets/logo.png';
 
 const ForgotPassword = () => {
+  const { toastSuccess, toastError, toastInfo } = useDialog();
   const navigate = useNavigate();
   const [step, setStep] = useState(1); 
 
@@ -27,17 +30,20 @@ const ForgotPassword = () => {
     }
   }, [timer]);
 
-  // STEP 1: Send Email
   const handleSendCode = async (e) => {
     e.preventDefault();
     setError('');
     setLoading(true);
     try {
       await api.post('/auth/forgot-password', { email });
-      setSuccessMsg('A reset code has been sent to your email.');
+      const msg = 'A reset code has been sent to your email.';
+      setSuccessMsg(msg);
+      toastInfo(msg);
       setStep(2); 
     } catch (err) {
-      setError(err.response?.data?.message || 'Failed to send code.');
+      const errMsg = err.response?.data?.message || 'Failed to send code.';
+      setError(errMsg);
+      toastError(errMsg);
     } finally {
       setLoading(false);
     }
@@ -51,6 +57,7 @@ const ForgotPassword = () => {
 
     if (otp.length !== 6) {
       setError('Please enter the full 6-digit code.');
+      toastError('Please enter the full 6-digit code.');
       return;
     }
 
@@ -61,10 +68,14 @@ const ForgotPassword = () => {
         otp: String(otp) 
       });
       setResetToken(response.data.resetToken);
-      setSuccessMsg('Code verified! Please set your new password.');
+      const msg = 'Code verified! Please set your new password.';
+      setSuccessMsg(msg);
+      toastSuccess(msg);
       setStep(3); 
     } catch (err) {
-      setError(err.response?.data?.message || 'Invalid code.');
+      const errMsg = err.response?.data?.message || 'Invalid code.';
+      setError(errMsg);
+      toastError(errMsg);
     } finally {
       setLoading(false);
     }
@@ -76,10 +87,14 @@ const ForgotPassword = () => {
     setLoading(true);
     try {
       await api.post('/auth/resend-reset-otp', { email });
-      setSuccessMsg('A new code has been sent.');
+      const msg = 'A new code has been sent to your email.';
+      setSuccessMsg(msg);
+      toastInfo(msg);
       setTimer(60);
     } catch (err) {
-      setError('Failed to resend code.');
+      const errMsg = 'Failed to resend code.';
+      setError(errMsg);
+      toastError(errMsg);
     } finally {
       setLoading(false);
     }
@@ -114,10 +129,12 @@ const ForgotPassword = () => {
     setLoading(true);
     try {
       await api.post('/auth/reset-password', { resetToken, newPassword, confirmPassword });
-      alert('Password updated successfully! Please login.');
+      toastSuccess('Password updated successfully! Please login.');
       navigate('/login');
     } catch (err) {
-      setError(err.response?.data?.message || 'Failed to reset password.');
+      const errMsg = err.response?.data?.message || 'Failed to reset password.';
+      setError(errMsg);
+      toastError(errMsg);
     } finally {
       setLoading(false);
     }
@@ -127,7 +144,7 @@ const ForgotPassword = () => {
     <div className="auth-wrapper">
       <div className="auth-hero-panel">
         <div className="auth-brand" onClick={() => navigate('/')}>
-          <img src="/src/assets/logo.png" alt="MindComfort Logo" />
+          <img src={logoImg} alt="MindComfort Logo" />
           <span>MindComfort</span>
         </div>
         <div className="auth-hero-content">

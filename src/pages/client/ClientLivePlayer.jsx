@@ -6,8 +6,10 @@ import api from '../../utils/api';
 import './ClientLivePlayer.css';
 import logoImg from '../../assets/logo.png';
 import NotificationBell from '../../components/NotificationBell';
+import { useDialog } from '../../components/ToastModalContext';
 
 const ClientLivePlayer = () => {
+  const { toastInfo, toastError } = useDialog();
   const { id } = useParams();
   const navigate = useNavigate();
   const [user, setUser] = useState(null);
@@ -99,7 +101,7 @@ const ClientLivePlayer = () => {
       socketInstance.on('connect', () => socketInstance.emit('joinPodcastRoom', id));
 
       socketInstance.on('podcastEnded', (data) => {
-        alert(data?.message || 'The host has ended this live podcast session.');
+        toastInfo(data?.message || 'The host has ended this live podcast session.');
         if (agoraClient) {
           agoraClient.leave();
         }
@@ -112,7 +114,7 @@ const ClientLivePlayer = () => {
     } catch (err) {
       console.error('CRITICAL CLIENT JOIN ERROR:', err);
       const serverMessage = err.response?.data?.message || err.message || 'Failed to join live session.';
-      alert(`Join Stream Error: ${serverMessage}`);
+      toastError(`Join Stream Error: ${serverMessage}`);
       navigate('/client/podcasts');
     }
   };

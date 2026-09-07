@@ -2,8 +2,10 @@ import React, { useState, useEffect } from 'react';
 import api from '../../../utils/api';
 import '../AdminDashboard.css';
 import { useLocation } from 'react-router-dom';
+import { useDialog } from '../../../components/ToastModalContext';
 
 const PodcastsManagement = ({ isModerator = false }) => {
+  const { toastSuccess, toastError, prompt } = useDialog();
   const location = useLocation();
   const user = JSON.parse(localStorage.getItem('user'));
   const apiPrefix = isModerator || user?.role === 'moderator' ? '/moderator' : '/admin';
@@ -96,10 +98,10 @@ const PodcastsManagement = ({ isModerator = false }) => {
       setShowApproveConfirm(false);
       setPendingActionId(null);
       fetchPendingPodcasts();
-      alert('Podcast approved!');
+      toastSuccess('Podcast approved!');
     } catch (err) {
       console.error('Error approving podcast:', err);
-      alert('Failed to approve podcast');
+      toastError(err.response?.data?.message || 'Failed to approve podcast');
     }
   };
 
@@ -110,19 +112,25 @@ const PodcastsManagement = ({ isModerator = false }) => {
 
   const handleRejectConfirm = async () => {
     setShowRejectConfirm(false);
-    const reason = window.prompt('Enter rejection reason:');
-    if (reason) {
+    const reason = await prompt({
+      title: 'Reject Podcast',
+      message: 'Please provide a reason for rejecting this podcast:',
+      placeholder: 'Audio quality guidelines not met...',
+      confirmText: 'Reject'
+    });
+
+    if (reason && reason.trim()) {
       try {
-        await api.patch(`${apiPrefix}/podcasts/${pendingActionId}/reject`, { reason });
+        await api.patch(`${apiPrefix}/podcasts/${pendingActionId}/reject`, { reason: reason.trim() });
         setPendingActionId(null);
         fetchPendingPodcasts();
-        alert('Podcast rejected');
+        toastSuccess('Podcast rejected');
       } catch (err) {
         console.error('Error rejecting podcast:', err);
-        alert('Failed to reject podcast');
+        toastError(err.response?.data?.message || 'Failed to reject podcast');
       }
     }
-    setShowRejectConfirm(false);
+    setPendingActionId(null);
   };
 
   const handleDeleteClick = () => {
@@ -135,10 +143,10 @@ const PodcastsManagement = ({ isModerator = false }) => {
       setSelectedPodcast(null);
       setShowDeleteConfirm(false);
       fetchPodcasts();
-      alert('Podcast recording deleted successfully');
+      toastSuccess('Podcast recording deleted successfully');
     } catch (err) {
       console.error('Error deleting podcast:', err);
-      alert('Failed to delete podcast');
+      toastError(err.response?.data?.message || 'Failed to delete podcast');
     }
   };
 

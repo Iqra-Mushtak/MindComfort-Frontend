@@ -4,8 +4,10 @@ import api from '../../../utils/api';
 import './CreatePodcast.css';
 import logoImg from '../../../assets/logo.png';
 import NotificationBell from '../../../components/NotificationBell';
+import { useDialog } from '../../../components/ToastModalContext';
 
 const CreatePodcast = () => {
+  const { toastSuccess, toastError } = useDialog();
   const navigate = useNavigate();
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(false);
@@ -171,10 +173,12 @@ const CreatePodcast = () => {
       }
 
       await api.post('/podcasts', payload);
-      alert('Podcast session created successfully and is pending admin approval!');
+      toastSuccess('Podcast session created successfully and is pending admin approval!');
       navigate('/mentor/dashboard');
     } catch (err) {
-      setError(err.response?.data?.message || err.message || 'Failed to create podcast session.');
+      const errMsg = err.response?.data?.message || err.message || 'Failed to create podcast session.';
+      setError(errMsg);
+      toastError(errMsg);
     } finally {
       setLoading(false);
     }

@@ -1315,7 +1315,7 @@ html::-webkit-scrollbar, body::-webkit-scrollbar, #root::-webkit-scrollbar,
 }
 
 .form-group textarea {
-  resize: vertical;
+  resize: none;
   min-height: 80px;
 }
 
@@ -1471,7 +1471,7 @@ html::-webkit-scrollbar, body::-webkit-scrollbar, #root::-webkit-scrollbar,
   border-radius: 4px;
   font-size: 0.95rem;
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-  resize: vertical;
+  resize: none;
   color: #212529;
 }
 
@@ -3935,7 +3935,7 @@ html::-webkit-scrollbar, body::-webkit-scrollbar, #root::-webkit-scrollbar,
 
 .modal-content form .form-group textarea {
   min-height: 70px;
-  resize: vertical;
+  resize: none;
 }
 
 .modal-content form .form-grid {

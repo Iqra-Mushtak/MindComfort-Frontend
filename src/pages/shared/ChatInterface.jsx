@@ -5,8 +5,10 @@ import api from '../../utils/api';
 import './ChatInterface.css';
 import logoImg from '../../assets/logo.png';
 import NotificationBell from '../../components/NotificationBell';
+import { useDialog } from '../../components/ToastModalContext';
 
 const ChatInterface = () => {
+  const { toastSuccess, toastError, toastInfo } = useDialog();
   const { id } = useParams();
   const navigate = useNavigate();
   const location = useLocation();
@@ -183,7 +185,7 @@ const ChatInterface = () => {
     });
 
     socketInstance.on('messageError', (errorMessage) => {
-      alert(errorMessage);
+      toastError(errorMessage);
       if (errorMessage.includes('limit')) {
         setMessageCount(15);
         setRateLimitMsg('Rate limit reached. Please wait before sending more messages.');
@@ -351,7 +353,7 @@ const ChatInterface = () => {
     
     if (selectedReason === 'other') {
       if (!reportReason.trim()) {
-        alert('Please provide a reason for reporting this message.');
+        toastError('Please provide a reason for reporting this message.');
         return;
       }
       finalReason = `Other: ${reportReason.trim()}`;
@@ -362,10 +364,10 @@ const ChatInterface = () => {
         messageId: reportMessageId, 
         reason: finalReason 
       });
-      alert('Message reported successfully.');
+      toastSuccess('Message reported successfully.');
       closeReportModal();
     } catch (err) {
-      alert(err?.response?.data?.message || 'Failed to report message.');
+      toastError(err?.response?.data?.message || 'Failed to report message.');
     }
   };
 

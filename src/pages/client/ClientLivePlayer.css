@@ -249,7 +249,7 @@
   padding: 0.9rem 1.1rem;
   font-size: 0.95rem;
   outline: none;
-  resize: vertical;
+  resize: none;
   min-height: 85px;
   box-sizing: border-box;
   font-family: inherit;
