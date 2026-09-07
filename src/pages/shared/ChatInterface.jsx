@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useRef } from 'react';
-import { useParams, useNavigate, Link } from 'react-router-dom';
+import { useParams, useNavigate, Link, useLocation } from 'react-router-dom';
 import { io } from 'socket.io-client';
 import api from '../../utils/api';
 import './ChatInterface.css';
@@ -9,6 +9,7 @@ import NotificationBell from '../../components/NotificationBell';
 const ChatInterface = () => {
   const { id } = useParams();
   const navigate = useNavigate();
+  const location = useLocation();
   const [user, setUser] = useState(null);
   const [chatroom, setChatroom] = useState(null);
   const [messages, setMessages] = useState([]);
@@ -308,6 +309,28 @@ const ChatInterface = () => {
       }, 2000);
     }
   };
+
+  useEffect(() => {
+  const params = new URLSearchParams(location.search);
+  const targetMessageId = params.get('message');
+
+  if (!targetMessageId || messages.length === 0) return;
+
+  const messageElement = document.getElementById(`msg-${targetMessageId}`);
+
+  if (messageElement) {
+    messageElement.scrollIntoView({
+      behavior: 'smooth',
+      block: 'center'
+    });
+
+    messageElement.classList.add('highlight-message');
+
+    setTimeout(() => {
+      messageElement.classList.remove('highlight-message');
+    }, 2000);
+  }
+}, [location.search, messages]);
 
     const handleReportClick = (messageId) => {
     setReportMessageId(messageId);

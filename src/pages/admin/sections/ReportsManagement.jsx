@@ -1,10 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import api from '../../../utils/api';
 import '../AdminDashboard.css';
-import { useLocation } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 
 const ReportsManagement = ({ isModerator = false }) => {
   const location = useLocation();
+  const navigate = useNavigate();
   const user = JSON.parse(localStorage.getItem('user'));
   const apiPrefix = isModerator || user?.role === 'moderator' ? '/moderator' : '/admin';
   
@@ -221,10 +222,33 @@ const ReportsManagement = ({ isModerator = false }) => {
                       : selectedReport.reason || 'Not specified'}
                   </span>
                 </div>
-                <div className="detail-row">
-                  <label>Reported Content</label>
-                  <span className="reported-message">{getReportedContent(selectedReport)}</span>
+                <div className="detail-row reported-content-row">
+                  <div className="reported-content-label">
+                    <label>Reported Content</label>
+
+                    <button
+                      type="button"
+                      className="go-to-chat-button"
+                      onClick={() => {
+                        const chatroomId = selectedReport.messageId?.chatroomId;
+                        const messageId = selectedReport.messageId?._id;
+
+                        if (chatroomId && messageId) {
+                          setSelectedReport(null);
+                          navigate(`/chatroom/${chatroomId}?message=${messageId}`);
+                        }
+                      }}
+                      disabled={!selectedReport.messageId?.chatroomId || !selectedReport.messageId?._id}
+                    >
+                      Go to Chat
+                    </button>
+                  </div>
+
+                  <span className="reported-message">
+                    {getReportedContent(selectedReport)}
+                  </span>
                 </div>
+
                 <div className="detail-row">
                   <label>Reported On</label>
                   <span>{new Date(selectedReport.createdAt).toLocaleString()}</span>

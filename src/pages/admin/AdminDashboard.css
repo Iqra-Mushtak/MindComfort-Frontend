@@ -190,11 +190,11 @@ html::-webkit-scrollbar, body::-webkit-scrollbar, #root::-webkit-scrollbar,
   padding: 0 30px !important;
   height: 68px !important;
   min-height: 68px !important;
-  line-height: 68px;
+  line-height: normal;
   box-sizing: border-box !important;
   display: flex !important;
   align-items: center !important;
-  border-bottom: 1px solid #e9ecef !important; 
+  border-bottom: 1px solid #e9ecef !important;
   position: sticky !important;
   top: 0 !important;
   z-index: 90 !important;
@@ -246,6 +246,14 @@ html::-webkit-scrollbar, body::-webkit-scrollbar, #root::-webkit-scrollbar,
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.15);
   transform: none;
   pointer-events: none;
+}
+
+.admin-dashboard-container .notification-dropdown {
+  line-height: normal !important;
+}
+
+.admin-dashboard-container .notification-time {
+  line-height: 1.2 !important;
 }
 
 .admin-dashboard-container .mc-badge {
@@ -4347,4 +4355,47 @@ html::-webkit-scrollbar, body::-webkit-scrollbar, #root::-webkit-scrollbar,
   .apm-comments-pane {
     height: 400px;
   }
+}
+
+.reported-content-row {
+  align-items: flex-start;
+}
+
+.reported-content-label {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-shrink: 0;
+}
+
+.reported-content-label label {
+  margin: 0;
+}
+
+.go-to-chat-button {
+  padding: 4px 10px;
+  border: 1px solid #dee2e6;
+  border-radius: 5px;
+  background: #ffffff;
+  color: #007bff;
+  font-size: 0.78rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.go-to-chat-button:hover:not(:disabled) {
+  background: #f8f9fa;
+  border-color: #007bff;
+}
+
+.go-to-chat-button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.reported-content-row .reported-message {
+  margin-top: 0 !important;
+  text-align: right;
+  word-break: break-word;
 }

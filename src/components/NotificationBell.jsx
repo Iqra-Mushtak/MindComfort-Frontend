@@ -1,4 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useNotifications } from './NotificationContext';
 import './NotificationBell.css';
 
@@ -6,6 +7,7 @@ const NotificationBell = () => {
   const { notifications, unreadCount, markAllAsRead } = useNotifications();
   const [isOpen, setIsOpen] = useState(false);
   const dropdownRef = useRef(null);
+  const navigate = useNavigate();
 
   useEffect(() => {
     const handleClickOutside = (e) => {
@@ -89,9 +91,26 @@ const NotificationBell = () => {
                   <div className="notification-icon">
                     {getNotificationIcon(item.type)}
                   </div>
+
                   <div className="notification-content">
                     <p className="notification-message">{item.message}</p>
-                    <span className="notification-time">{formatTime(item.createdAt)}</span>
+
+                    {item.type === 'message_reported' && item.link && (
+                      <button
+                        type="button"
+                        className="notification-chat-link"
+                        onClick={() => {
+                          setIsOpen(false);
+                          navigate(item.link);
+                        }}
+                      >
+                        Go to Chat
+                      </button>
+                    )}
+
+                    <span className="notification-time">
+                      {formatTime(item.createdAt)}
+                    </span>
                   </div>
                 </div>
               ))

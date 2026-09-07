@@ -126,6 +126,23 @@
   word-break: break-word;
 }
 
+.notification-chat-link {
+  display: inline-block;
+  margin: 2px 0 4px;
+  padding: 0;
+  border: none;
+  background: none;
+  color: #007bff;
+  font-size: 0.78rem;
+  font-weight: 600;
+  cursor: pointer;
+  text-decoration: none;
+}
+
+.notification-chat-link:hover {
+  text-decoration: underline;
+}
+
 .notification-time {
   font-size: 0.72rem;
   color: #6c757d;
