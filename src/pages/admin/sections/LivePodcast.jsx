@@ -22,6 +22,17 @@ const LivePodcast = () => {
 
   const commentsEndRef = useRef(null);
   const socketRef = useRef(null);
+  const menuRef = useRef(null);
+
+  useEffect(() => {
+    const handleOutsideClick = (e) => {
+      if (openMenuId && menuRef.current && !menuRef.current.contains(e.target)) {
+        setOpenMenuId(null);
+      }
+    };
+    document.addEventListener('mousedown', handleOutsideClick);
+    return () => document.removeEventListener('mousedown', handleOutsideClick);
+  }, [openMenuId]);
 
   useEffect(() => {
     document.title = "Live Podcast Monitor | MindComfort";
@@ -364,17 +375,20 @@ const LivePodcast = () => {
                             </span>
                           </div>
 
-                          <div className="apm-action-anchor">
+                          <div className="apm-action-anchor" ref={openMenuId === msg._id ? menuRef : null}>
                             <button
                               className="apm-btn-dots"
-                              onClick={() => setOpenMenuId(openMenuId === msg._id ? null : msg._id)}
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                setOpenMenuId(openMenuId === msg._id ? null : msg._id);
+                              }}
                               title="Actions"
                             >
                               <i className="bi bi-three-dots-vertical"></i>
                             </button>
 
                             {openMenuId === msg._id && (
-                              <div className="apm-menu-popover">
+                              <div className="apm-menu-popover" onClick={(e) => e.stopPropagation()}>
                                 <button
                                   className="apm-menu-opt delete"
                                   onClick={() => handleDeleteComment(msg._id, msg.user?._id)}

@@ -225,23 +225,6 @@ const ReportsManagement = ({ isModerator = false }) => {
                 <div className="detail-row reported-content-row">
                   <div className="reported-content-label">
                     <label>Reported Content</label>
-
-                    <button
-                      type="button"
-                      className="go-to-chat-button"
-                      onClick={() => {
-                        const chatroomId = selectedReport.messageId?.chatroomId;
-                        const messageId = selectedReport.messageId?._id;
-
-                        if (chatroomId && messageId) {
-                          setSelectedReport(null);
-                          navigate(`/chatroom/${chatroomId}?message=${messageId}`);
-                        }
-                      }}
-                      disabled={!selectedReport.messageId?.chatroomId || !selectedReport.messageId?._id}
-                    >
-                      Go to Chat
-                    </button>
                   </div>
 
                   <span className="reported-message">

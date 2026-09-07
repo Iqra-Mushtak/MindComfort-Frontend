@@ -73,20 +73,18 @@ const PaymentSuccess = () => {
 
     if (paymentStatus === 'loading' || paymentStatus === 'pending') {
         return (
-            <div className="dashboard-container">
-                <main className="mc-main-content payment-container">
-                    <div className="payment-loading">
-                        <div className="payment-loading-icon">
-                            <i className="bi bi-hourglass-split"></i>
-                        </div>
-                        <h2>Processing Payment</h2>
-                        <p>
-                            {paymentStatus === 'pending' 
-                                ? 'Your payment is being processed. Please wait...' 
-                                : 'Verifying your payment...'}
-                        </p>
+            <div className="payment-container">
+                <div className="payment-loading">
+                    <div className="payment-loading-icon">
+                        <i className="bi bi-hourglass-split"></i>
                     </div>
-                </main>
+                    <h2>Processing Payment</h2>
+                    <p>
+                        {paymentStatus === 'pending' 
+                            ? 'Your payment is being processed. Please wait...' 
+                            : 'Verifying your payment...'}
+                    </p>
+                </div>
             </div>
         );
     }
@@ -100,9 +98,8 @@ const PaymentSuccess = () => {
         const { payment, subscription } = subscriptionDetails;
         const isPermanentAccess = subscription && subscription.endDate === null;
         return (
-            <div className="dashboard-container">
-                <main className="mc-main-content payment-container">
-                    <div className="payment-content">
+            <div className="payment-container">
+                <div className="payment-content">
                         <div className="payment-success-icon">
                             <i className="bi bi-check-circle-fill"></i>
                         </div>
@@ -167,7 +164,6 @@ const PaymentSuccess = () => {
                             </button>
                         </div>
                     </div>
-                </main>
             </div>
         );
     }

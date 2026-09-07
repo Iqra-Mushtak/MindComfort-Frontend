@@ -91,26 +91,9 @@ const NotificationBell = () => {
                   <div className="notification-icon">
                     {getNotificationIcon(item.type)}
                   </div>
-
                   <div className="notification-content">
                     <p className="notification-message">{item.message}</p>
-
-                    {item.type === 'message_reported' && item.link && (
-                      <button
-                        type="button"
-                        className="notification-chat-link"
-                        onClick={() => {
-                          setIsOpen(false);
-                          navigate(item.link);
-                        }}
-                      >
-                        Go to Chat
-                      </button>
-                    )}
-
-                    <span className="notification-time">
-                      {formatTime(item.createdAt)}
-                    </span>
+                    <span className="notification-time">{formatTime(item.createdAt)}</span>
                   </div>
                 </div>
               ))

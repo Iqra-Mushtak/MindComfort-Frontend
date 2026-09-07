@@ -4,6 +4,10 @@
   align-items: center;
   min-height: 100vh;
   width: 100%;
+  margin: 0 !important;
+  padding: 20px;
+  background-color: #dcf1ef;
+  box-sizing: border-box;
 }
 
 .payment-content {

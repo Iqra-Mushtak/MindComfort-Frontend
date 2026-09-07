@@ -4302,6 +4302,7 @@ html::-webkit-scrollbar, body::-webkit-scrollbar, #root::-webkit-scrollbar,
 
 .apm-action-anchor {
   position: relative;
+  display: inline-flex;
 }
 
 .apm-btn-dots {
@@ -4311,17 +4312,22 @@ html::-webkit-scrollbar, body::-webkit-scrollbar, #root::-webkit-scrollbar,
   cursor: pointer;
   padding: 2px;
   font-size: 0.95rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .apm-menu-popover {
   position: absolute;
-  top: 100%;
-  right: 0;
-  background: #ffffff;
+  top: 0;
+  left: 100%;
+  margin-left: 6px;
+  background-color: #ffffff !important;
+  opacity: 1 !important;
   border: 1px solid #dee2e6;
   border-radius: 8px;
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
-  z-index: 50;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
+  z-index: 9999 !important;
   min-width: 140px;
   overflow: hidden;
 }
