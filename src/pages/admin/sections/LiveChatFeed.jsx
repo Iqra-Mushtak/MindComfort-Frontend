@@ -165,14 +165,14 @@ const LiveChatFeed = () => {
     setFormInput('');
   };
 
-  const handleWarnUser = (userId, messageId) => {
-    setFormData({ messageId, userId });
+  const handleWarnUser = (userId, messageId, content) => {
+    setFormData({ messageId, userId, content });
     setActiveForm('warn');
     setFormInput('');
   };
 
-  const handleSuspendUser = (userId, messageId) => {
-    setFormData({ messageId, userId });
+  const handleSuspendUser = (userId, messageId, content) => {
+    setFormData({ messageId, userId, content });
     setActiveForm('suspend');
     setFormInput('');
   };
@@ -199,7 +199,8 @@ const LiveChatFeed = () => {
           userId: formData.userId,
           messageId: formData.messageId,
           chatroomId: selectedChatroom,
-          reason: formInput
+          reason: formInput,
+          content: formData.content
         });
       }
       closeForm();
@@ -211,7 +212,8 @@ const LiveChatFeed = () => {
           userId: formData.userId,
           messageId: formData.messageId,
           chatroomId: selectedChatroom,
-          reason: formInput
+          reason: formInput,
+          content: formData.content
         });
       }
       closeForm();
@@ -350,8 +352,8 @@ const LiveChatFeed = () => {
                                 {openMenuId === msg._id && (
                                   <div className="admin-action-menu" onClick={(e) => e.stopPropagation()}>
                                     <button className="admin-menu-item delete" onClick={() => handleDeleteMessage(msg._id, msg.senderId?._id)}>Delete Message</button>
-                                    <button className="admin-menu-item warn" onClick={() => handleWarnUser(msg.senderId?._id, msg._id)}>Warn User</button>
-                                    <button className="admin-menu-item suspend" onClick={() => handleSuspendUser(msg.senderId?._id, msg._id)}>Suspend User</button>
+                                    <button className="admin-menu-item warn" onClick={() => handleWarnUser(msg.senderId?._id, msg._id, msg.content)}>Warn User</button>
+                                    <button className="admin-menu-item suspend" onClick={() => handleSuspendUser(msg.senderId?._id, msg._id, msg.content)}>Suspend User</button>
                                   </div>
                                 )}
                               </div>

@@ -198,26 +198,28 @@ const LivePodcast = () => {
     }
   };
 
-  const handleWarnUser = (userId, commentId) => {
+  const handleWarnUser = (userId, commentId, content) => {
     const reason = window.prompt('Enter reason for warning:');
     if (reason && socketRef.current) {
       socketRef.current.emit('adminWarnPodcastUser', {
         userId,
         commentId,
         podcastId: activePodcast._id,
-        reason
+        reason,
+        content
       });
     }
   };
 
-  const handleSuspendUser = (userId, commentId) => {
+  const handleSuspendUser = (userId, commentId, content) => {
     const reason = window.prompt('Enter reason for suspension:');
     if (reason && socketRef.current) {
       socketRef.current.emit('adminSuspendPodcastUser', {
         userId,
         commentId,
         podcastId: activePodcast._id,
-        reason
+        reason,
+        content
       });
     }
   };
@@ -397,13 +399,13 @@ const LivePodcast = () => {
                                 </button>
                                 <button
                                   className="apm-menu-opt warn"
-                                  onClick={() => handleWarnUser(msg.user?._id, msg._id)}
+                                  onClick={() => handleWarnUser(msg.user?._id, msg._id, msg.content)}
                                 >
                                   Warn User
                                 </button>
                                 <button
                                   className="apm-menu-opt suspend"
-                                  onClick={() => handleSuspendUser(msg.user?._id, msg._id)}
+                                  onClick={() => handleSuspendUser(msg.user?._id, msg._id, msg.content)}
                                 >
                                   Suspend User
                                 </button>

@@ -122,8 +122,9 @@
   margin: 0 0 4px 0;
   font-size: 0.85rem;
   color: #212529;
-  line-height: 1.35;
+  line-height: 1.4;
   word-break: break-word;
+  white-space: normal;
 }
 
 .notification-chat-link {
