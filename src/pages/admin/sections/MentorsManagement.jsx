@@ -25,6 +25,7 @@ const MentorsManagement = () => {
 
   const [selectedApplication, setSelectedApplication] = useState(null);
   const [showFullCoverLetter, setShowFullCoverLetter] = useState(false);
+  const [viewingDocUrl, setViewingDocUrl] = useState(null);
 
   useEffect(() => {
     document.title = "Mentors Management | MindComfort";
@@ -231,9 +232,9 @@ const MentorsManagement = () => {
                       <h4>{mentor.username}</h4>
                       <p title={mentor.email}>{mentor.email}</p>
                       <small>
-                        Application: <strong>
-                          {mentor.status === 'not_submitted' || !mentor.status
-                            ? 'Null'
+                        Application: <strong style={{ color: mentor.status === 'approved' ? '#28a745' : mentor.status === 'pending' ? '#ffc107' : '#6c757d' }}>
+                          {!mentor.status || mentor.status === 'not_submitted'
+                            ? 'Not Submitted'
                             : mentor.status.charAt(0).toUpperCase() + mentor.status.slice(1)}
                         </strong>
                       </small>
@@ -314,7 +315,7 @@ const MentorsManagement = () => {
                 <div className="profile-details-grid">
                   <div className="detail-row">
                     <label>Username</label>
-                    <span>{selectedApplication.fullName}</span>
+                    <span>{mentorDetails.mentor?.username || mentorDetails.profile?.fullName || 'N/A'}</span>
                   </div>
                   <div className="detail-item">
                     <label>Email</label>
@@ -409,7 +410,7 @@ const MentorsManagement = () => {
                   </div>
                   <div className="detail-row">
                     <label>Username</label>
-                    <span>{selectedApplication.fullName}</span>
+                    <span>{selectedApplication.mentorId?.username || selectedApplication.fullName || 'N/A'}</span>
                   </div>
                   <div className="detail-row">
                     <label>Applied On</label>
@@ -457,15 +458,19 @@ const MentorsManagement = () => {
                       </small>
                     </label>
                       {selectedApplication.documents?.document ? (
-                        <a 
-                          href={`${api.defaults.baseURL || ''}/admin/mentors/document-proxy?key=${encodeURIComponent(selectedApplication.documents.document)}&token=${localStorage.getItem('token')}`}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="document-link"
-                          style={{ wordBreak: 'break-all' }}
+                        <button
+                          type="button"
+                          className="btn btn-sm btn-outline-primary mt-1"
+                          onClick={() => {
+                            const baseUrl = api.defaults.baseURL || 'http://13.60.72.235:5000/api';
+                            const token = localStorage.getItem('token');
+                            const proxyUrl = `${baseUrl}/admin/document-stream?key=${encodeURIComponent(selectedApplication.documents.document)}&token=${token}`;
+                            setViewingDocUrl(proxyUrl);
+                          }}
                         >
-                          View Required Documents ({getFileName(selectedApplication.documents.document)})
-                        </a>
+                          <i className="bi bi-file-earmark-pdf-fill me-1"></i>
+                          View Document ({getFileName(selectedApplication.documents.document)})
+                        </button>
                       ) : (
                         <span className="text-muted">Not uploaded</span>
                       )}
@@ -555,6 +560,39 @@ const MentorsManagement = () => {
                   <button type="submit" className="btn-unsuspend">Confirm Unsuspend</button>
                 </div>
               </form>
+            </div>
+          </div>
+        </div>
+      )}
+      {viewingDocUrl && (
+        <div className="modal-overlay" onClick={() => setViewingDocUrl(null)}>
+          <div 
+            className="modal-content" 
+            style={{ maxWidth: '900px', width: '90%', height: '85vh', display: 'flex', flexDirection: 'column' }} 
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="modal-header d-flex justify-content-between align-items-center">
+              <h4 className="m-0"><i className="bi bi-file-earmark-text me-2"></i>Mentor Document Viewer</h4>
+              <button className="modal-close" onClick={() => setViewingDocUrl(null)}>×</button>
+            </div>
+            <div className="modal-body p-0" style={{ flex: 1, minHeight: 0 }}>
+              <iframe
+                src={viewingDocUrl}
+                title="Mentor Document"
+                style={{ width: '100%', height: '100%', border: 'none' }}
+              />
+            </div>
+            <div className="modal-actions p-2 border-top">
+              <a 
+                href={viewingDocUrl} 
+                download 
+                className="btn btn-sm btn-outline-secondary me-2"
+              >
+                <i className="bi bi-download me-1"></i> Download
+              </a>
+              <button className="btn btn-sm btn-secondary" onClick={() => setViewingDocUrl(null)}>
+                Close
+              </button>
             </div>
           </div>
         </div>

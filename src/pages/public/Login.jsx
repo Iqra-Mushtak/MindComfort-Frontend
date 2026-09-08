@@ -32,7 +32,7 @@ const Login = () => {
       localStorage.setItem('user', JSON.stringify(response.data.user));
       window.dispatchEvent(new Event('auth-changed'));
       
-      toastSuccess(`Welcome back, ${response.data.user.username || 'User'}!`);
+      // toastSuccess(`Welcome back, ${response.data.user.username || 'User'}!`);
 
       const userRole = response.data.user.role;
       if (userRole === 'mentor') {
@@ -81,7 +81,7 @@ const Login = () => {
           </div>
 
           <div className="mb-4">
-            <h2 className="auth-header-title mb-1">Welcome Back</h2>
+            <h2 className="auth-header-title mb-1">Welcome Back</h2> 
             <p className="auth-header-sub">Enter your credentials to access your account.</p>
           </div>
 

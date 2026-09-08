@@ -356,8 +356,8 @@ const QuickViewCard = ({ title, linkText, items, onViewAll, onItemClick }) => {
           <p className="empty-state">No pending items.</p>
         ) : (
           safeItems.map((item, idx) => {
-            const itemTitle = item?.title ?? item?.name ?? item?.reason ?? 'New item';
-            const itemSubtitle = item?.speaker ?? item?.fullName ?? item?.reportedBy ?? item?.username ?? 'Unknown';
+            const itemTitle = item?.title || item?.name || item?.reason || 'New item';
+            const itemSubtitle = item?.subtitle || item?.speaker || item?.fullName || item?.username || item?.email || '';
 
             return (
               <div 
