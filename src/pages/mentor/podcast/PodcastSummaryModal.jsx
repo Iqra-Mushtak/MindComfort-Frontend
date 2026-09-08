@@ -68,24 +68,11 @@ const PodcastSummaryModal = ({ podcast, onClose }) => {
               </div>
             )}
 
-            {/* Recording - Only for Past Podcasts */}
             {podcast.status === 'ended' && (
-              podcast.hasRecording ? (
-                <div className="recording-section">
-                  <i className="bi bi-play-circle"></i>
-                  <h6>Podcast Recording</h6>
-                  <p>Click to start playing the session recording.</p>
-                  <button className="btn">
-                    <i className="bi bi-play-fill me-2"></i> Play Recording
-                  </button>
-                </div>
-              ) : (
-                <div className="no-recording-section">
-                  <i className="bi bi-file-earmark-text"></i>
-                  <h6>No Recording Available</h6>
-                  <p>This session was not recorded.</p>
-                </div>
-              )
+              <div className="alert alert-secondary mb-0">
+                <i className="bi bi-check-circle me-2"></i>
+                This live broadcast session has completed.
+              </div>
             )}
 
             {/* Pending Message */}

@@ -130,16 +130,6 @@ const ClientPodcasts = () => {
     setPurchaseError('');
   };
 
-  const handlePlayRecording = async (podcastId) => {
-    try {
-      const res = await api.get(`/podcasts/${podcastId}/recording`);
-      window.open(res.data.recordingUrl, '_blank');
-    } catch (err) {
-      console.error('Error loading recording:', err);
-      setError(err.response?.data?.message || 'Failed to load recording');
-    }
-  };
-
   const handleJoinLive = async (podcastId) => {
     try {
       await api.get(`/podcasts/${podcastId}/join-stream`);
@@ -345,148 +335,67 @@ const ClientPodcasts = () => {
             )}
 
             {activeTab === 'library' && (
-              <>
-                <div className="library-subtabs">
-                  <button 
-                    className={`subtab ${libraryView === 'upcoming' ? 'active' : ''}`}
-                    onClick={() => setLibraryView('upcoming')}
-                  >
-                    Upcoming ({library.upcoming.length})
-                  </button>
-                  <button 
-                    className={`subtab ${libraryView === 'recordings' ? 'active' : ''}`}
-                    onClick={() => setLibraryView('recordings')}
-                  >
-                    Recordings ({library.past.length})
-                  </button>
-                </div>
-
-                {libraryView === 'upcoming' && (
-                  <div className="podcasts-grid">
-                    {library.upcoming.length === 0 ? (
-                      <div className="empty-state">
-                        <p>You haven't purchased any upcoming podcasts yet.</p>
-                        <button className="btn-browse" onClick={() => setActiveTab('discover')}>
-                          Browse Podcasts
-                        </button>
-                      </div>
-                    ) : (
-                      library.upcoming.map(podcast => (
-                        <div key={podcast._id} className="podcast-card">
-                          <div className="podcast-card-visual">
-                            <i className="bi bi-mic-fill"></i>
-                            {podcast.streamStatus === 'live' && (
-                              <span className="live-badge">
-                                <span className="live-dot"></span><i className="bi bi-circle-fill me-1" style={{ fontSize: '7px' }}></i> LIVE
-                              </span>
-                            )}
-                          </div>
-                          <div className="podcast-card-body">
-                            <h4>{podcast.title}</h4>
-                            <p className="podcast-speaker">
-                              <i className="bi bi-person-fill"></i> {podcast.speaker?.fullName || podcast.speaker?.username}
-                            </p>
-                            <div className="podcast-desc-container">
-                              <p className={`podcast-desc ${expandedPodcastIds.has(podcast._id) ? 'expanded' : ''}`}>
-                                {podcast.description}
-                              </p>
-                              {podcast.description && podcast.description.length > 80 && (
-                                <button
-                                  type="button"
-                                  className="btn-read-toggle"
-                                  onClick={() => toggleExpand(podcast._id)}
-                                >
-                                  {expandedPodcastIds.has(podcast._id) ? 'Read less' : 'Read more'}
-                                </button>
-                              )}
-                            </div>
-                            <div className="podcast-meta">
-                              <span><i className="bi bi-calendar3"></i> {formatDate(podcast.startTime)}</span>
-                              <span><i className="bi bi-clock"></i> {formatTime(podcast.startTime)}</span>
-                            </div>
-                            <div className="podcast-card-footer">
-                              {podcast.streamStatus === 'live' ? (
-                                <button 
-                                  className="btn-join-live"
-                                  onClick={() => handleJoinLive(podcast._id)}
-                                >
-                                  <i className="bi bi-broadcast"></i> Join Live
-                                </button>
-                              ) : (
-                                <span className="scheduled-badge">
-                                  <i className="bi bi-hourglass-split"></i> Scheduled
-                                </span>
-                              )}
-                            </div>
-                          </div>
-                        </div>
-                      ))
-                    )}
+              <div className="podcasts-grid">
+                {(!library.upcoming || library.upcoming.length === 0) ? (
+                  <div className="empty-state">
+                    <p>You haven't enrolled in any upcoming live podcasts yet.</p>
+                    <button className="btn-browse" onClick={() => setActiveTab('discover')}>
+                      Browse Podcasts
+                    </button>
                   </div>
-                )}
-
-                {libraryView === 'recordings' && (
-                  <div className="podcasts-grid">
-                    {library.past.length === 0 ? (
-                      <div className="empty-state">
-                        <p>No past podcasts in your library yet.</p>
+                ) : (
+                  library.upcoming.map(podcast => (
+                    <div key={podcast._id} className="podcast-card">
+                      <div className="podcast-card-visual">
+                        <i className="bi bi-mic-fill"></i>
+                        {podcast.streamStatus === 'live' && (
+                          <span className="live-badge">
+                            <span className="live-dot"></span><i className="bi bi-circle-fill me-1" style={{ fontSize: '7px' }}></i> LIVE
+                          </span>
+                        )}
                       </div>
-                    ) : (
-                      library.past.map(podcast => (
-                        <div key={podcast._id} className="podcast-card past-podcast">
-                          <div className="podcast-card-visual past-visual">
-                            <i className="bi bi-play-circle-fill"></i>
-                            {podcast.hasRecording ? (
-                              <span className="recording-badge">
-                                <i className="bi bi-check-circle-fill"></i> Recording Available
-                              </span>
-                            ) : (
-                              <span className="no-recording-badge">
-                                <i className="bi bi-x-circle"></i> No Recording
-                              </span>
-                            )}
-                          </div>
-                          <div className="podcast-card-body">
-                            <h4>{podcast.title}</h4>
-                            <p className="podcast-speaker">
-                              <i className="bi bi-person-fill"></i> {podcast.speaker?.fullName || podcast.speaker?.username}
-                            </p>
-                            <div className="podcast-desc-container">
-                              <p className="podcast-desc">{podcast.description}</p>
-                              {podcast.description && podcast.description.length > 80 && (
-                                <button
-                                  type="button"
-                                  className="btn-read-toggle"
-                                  onClick={() => toggleExpand(podcast._id)}
-                                >
-                                  {expandedPodcastIds.has(podcast._id) ? 'Read less' : 'Read more'}
-                                </button>
-                              )}
-                            </div>
-                            <div className="podcast-meta">
-                              <span><i className="bi bi-calendar3"></i> {formatDate(podcast.endTime)}</span>
-                            </div>
-                            <div className="podcast-card-footer">
-                              {podcast.hasRecording ? (
-                                <button 
-                                  className="btn-play-recording"
-                                  onClick={() => handlePlayRecording(podcast._id)}
-                                >
-                                  <i className="bi bi-play-fill"></i> Play Recording
-                                </button>
-                              ) : (
-                                <span className="no-recording-note">
-                                  <i className="bi bi-info-circle"></i> Recording not available
-                                </span>
-                              )}
-                            </div>
-                          </div>
+                      <div className="podcast-card-body">
+                        <h4>{podcast.title}</h4>
+                        <p className="podcast-speaker">
+                          <i className="bi bi-person-fill"></i> {podcast.speaker?.fullName || podcast.speaker?.username}
+                        </p>
+                        <div className="podcast-desc-container">
+                          <p className={`podcast-desc ${expandedPodcastIds.has(podcast._id) ? 'expanded' : ''}`}>
+                            {podcast.description}
+                          </p>
+                          {podcast.description && podcast.description.length > 80 && (
+                            <button
+                              type="button"
+                              className="btn-read-toggle"
+                              onClick={() => toggleExpand(podcast._id)}
+                            >
+                              {expandedPodcastIds.has(podcast._id) ? 'Read less' : 'Read more'}
+                            </button>
+                          )}
                         </div>
-                      ))
-                    )}
-                  </div>
+                        <div className="podcast-meta">
+                          <span><i className="bi bi-calendar3"></i> {formatDate(podcast.startTime)}</span>
+                          <span><i className="bi bi-clock"></i> {formatTime(podcast.startTime)}</span>
+                        </div>
+                        <div className="podcast-card-footer">
+                          {podcast.streamStatus === 'live' ? (
+                            <button 
+                              className="btn-join-live"
+                              onClick={() => handleJoinLive(podcast._id)}
+                            >
+                              <i className="bi bi-broadcast"></i> Join Live
+                            </button>
+                          ) : (
+                            <span className="scheduled-badge">
+                              <i className="bi bi-hourglass-split"></i> Scheduled
+                            </span>
+                          )}
+                        </div>
+                      </div>
+                    </div>
+                  ))
                 )}
-              </>
+              </div>
             )}
           </>
         )}

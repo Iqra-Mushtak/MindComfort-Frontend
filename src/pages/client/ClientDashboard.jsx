@@ -149,13 +149,13 @@ const ClientDashboard = () => {
             </div>
           </Link>
 
-          <Link to="/client/podcasts?tab=library&view=upcoming" className="mc-dash-card">
+          <Link to="/client/podcasts?tab=library" className="mc-dash-card">
             <div className="mc-card-visual visual-recordings">
-              <i className="bi bi-play-circle-fill"></i>
+              <i className="bi bi-collection-play-fill"></i>
             </div>
             <div className="mc-card-body">
               <h4>Purchased Podcasts</h4>
-              <p>Access your live and recorded podcast library anytime.</p>
+              <p>Access your scheduled and joined live podcast sessions.</p>
             </div>
           </Link>
         </div>

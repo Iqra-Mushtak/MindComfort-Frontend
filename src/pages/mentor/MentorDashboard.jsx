@@ -142,13 +142,13 @@ const MentorDashboard = () => {
             </div>
           </Link>
 
-          <Link to="/mentor/my-podcasts" className="mc-dash-card">
+          <Link to="/mentor/podcasts" className="mc-dash-card">
             <div className="mc-card-visual visual-recordings">
-              <i className="bi bi-play-circle-fill"></i>
+              <i className="bi bi-broadcast"></i>
             </div>
             <div className="mc-card-body">
               <h4>My Podcasts</h4>
-              <p>Manage your recorded podcast episodes.</p>
+              <p>View your scheduled and completed live sessions.</p>
             </div>
           </Link>
         </div>

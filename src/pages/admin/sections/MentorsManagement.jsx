@@ -315,7 +315,7 @@ const MentorsManagement = () => {
                 <div className="profile-details-grid">
                   <div className="detail-row">
                     <label>Username</label>
-                    <span>{mentorDetails.mentor?.username || mentorDetails.profile?.fullName || 'N/A'}</span>
+                    <span>{mentorDetails?.mentor?.username || mentorDetails?.profile?.fullName || 'N/A'}</span>
                   </div>
                   <div className="detail-item">
                     <label>Email</label>
@@ -410,7 +410,7 @@ const MentorsManagement = () => {
                   </div>
                   <div className="detail-row">
                     <label>Username</label>
-                    <span>{selectedApplication.mentorId?.username || selectedApplication.fullName || 'N/A'}</span>
+                    <span>{selectedApplication?.mentorId?.username || selectedApplication?.fullName || 'N/A'}</span>
                   </div>
                   <div className="detail-row">
                     <label>Applied On</label>

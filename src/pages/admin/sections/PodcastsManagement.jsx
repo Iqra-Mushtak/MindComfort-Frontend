@@ -133,24 +133,6 @@ const PodcastsManagement = ({ isModerator = false }) => {
     setPendingActionId(null);
   };
 
-  const handleDeleteClick = () => {
-    setShowDeleteConfirm(true);
-  };
-
-  const handleDeleteConfirm = async () => {
-    try {
-      await api.delete(`${apiPrefix}/podcasts/${selectedPodcast._id}`);
-      setSelectedPodcast(null);
-      setShowDeleteConfirm(false);
-      fetchPodcasts();
-      toastSuccess('Podcast recording deleted successfully');
-    } catch (err) {
-      console.error('Error deleting podcast:', err);
-      toastError(err.response?.data?.message || 'Failed to delete podcast');
-    }
-  };
-
-  const handleDeleteCancel = () => setShowDeleteConfirm(false);
   const handleApproveCancel = () => { setShowApproveConfirm(false); setPendingActionId(null); };
   const handleRejectCancel = () => { setShowRejectConfirm(false); setPendingActionId(null); };
 
@@ -390,29 +372,6 @@ const PodcastsManagement = ({ isModerator = false }) => {
                   )}
                 </div>
               </div>
-
-              {selectedPodcast.streamStatus === 'ended' && (
-                <div className="delete-recording-wrapper">
-                  <button className="btn-delete" onClick={handleDeleteClick}>
-                    Delete Recording
-                  </button>
-                </div>
-              )}
-            </div>
-          </div>
-        </div>
-      )}
-
-      {showDeleteConfirm && selectedPodcast && (
-        <div className="modal-overlay" onClick={handleDeleteCancel}>
-          <div className="modal-content confirm-modal" onClick={(e) => e.stopPropagation()}>
-            <h3 className="confirm-title">Delete Recording?</h3>
-            <p className="confirm-text">
-              Are you sure you want to delete this recording? This cannot be undone.
-            </p>
-            <div className="confirm-actions">
-              <button className="btn-cancel" onClick={handleDeleteCancel}>Cancel</button>
-              <button className="btn-delete" onClick={handleDeleteConfirm}>Delete</button>
             </div>
           </div>
         </div>

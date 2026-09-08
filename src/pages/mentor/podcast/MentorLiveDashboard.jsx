@@ -170,7 +170,7 @@ const MentorLiveDashboard = () => {
     try {
       await api.put(`/podcasts/${id}/end-stream`);
       destroyGlobalStream();
-      toastInfo('Time is up! Your live podcast duration has completed.');
+      toastInfo('Live broadcast has ended successfully.');
       navigate('/mentor/podcasts');
     } catch (err) {
       console.error('Auto end stream error:', err);
