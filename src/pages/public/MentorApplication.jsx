@@ -1,23 +1,52 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import api from '../../utils/api';
 import { useDialog } from '../../components/ToastModalContext';
+import logoImg from '../../assets/logo.png';
 import './Auth.css';
+import './MentorApplication.css';
 
 const MAX_COVER_LETTER_WORDS = 4000;
 
 const getWordCount = (text = '') => text.trim().split(/\s+/).filter(Boolean).length;
 
+const QUALIFICATION_OPTIONS = ['Masters in Psychology', 'ADCP'];
+
+const STEPS = [
+  { key: 'profile', title: 'About You', desc: 'Background & expertise' },
+  { key: 'documents', title: 'Documents', desc: 'Proof & cover letter' },
+  { key: 'preview', title: 'Review & Submit', desc: 'Confirm your details' },
+];
+
+const formatFileSize = (bytes) => {
+  if (!bytes && bytes !== 0) return '';
+  if (bytes < 1024) return `${bytes} B`;
+  if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(1)} KB`;
+  return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
+};
+
+const fileIconFor = (name = '') => {
+  const ext = name.split('.').pop()?.toLowerCase();
+  if (ext === 'pdf') return 'bi-file-earmark-pdf-fill';
+  if (['png', 'jpg', 'jpeg'].includes(ext)) return 'bi-file-earmark-image-fill';
+  if (['doc', 'docx'].includes(ext)) return 'bi-file-earmark-word-fill';
+  return 'bi-file-earmark-fill';
+};
+
 const MentorApplication = () => {
   const { toastSuccess, toastError } = useDialog();
   const navigate = useNavigate();
   const location = useLocation();
-  
+
   const email = location.state?.email;
   const token = location.state?.token;
   const userId = location.state?.userId;
   const storedToken = localStorage.getItem('token');
   const storedUser = localStorage.getItem('user');
+
+  const [step, setStep] = useState(0);
+  const [dragOver, setDragOver] = useState(false);
+  const fileInputRef = useRef(null);
 
   const [formData, setFormData] = useState({
     fullName: '',
@@ -31,11 +60,10 @@ const MentorApplication = () => {
     },
     declaration: false
   });
-  
+
   const [error, setError] = useState('');
   const [successMsg, setSuccessMsg] = useState('');
   const [loading, setLoading] = useState(false);
-  const [showPreview, setShowPreview] = useState(false);
   const [isSubmitted, setIsSubmitted] = useState(false);
 
   useEffect(() => {
@@ -49,7 +77,7 @@ const MentorApplication = () => {
       }
     })() : null;
     const isLoggedInMentor = storedToken && loggedInUser?.role === 'mentor';
-    
+
     if (!hasStateData && !isLoggedInMentor) {
       navigate('/signup?role=mentor');
     }
@@ -64,13 +92,46 @@ const MentorApplication = () => {
     setError('');
   };
 
-  const handleFileChange = (e) => {
-    const { name, files } = e.target;
+  const toggleQualification = (value) => {
+    setFormData(prev => {
+      const has = prev.qualification.includes(value);
+      return {
+        ...prev,
+        qualification: has
+          ? prev.qualification.filter(q => q !== value)
+          : [...prev.qualification, value]
+      };
+    });
+    setError('');
+  };
+
+  const setDocumentFile = (file) => {
+    if (!file) return;
     setFormData(prev => ({
       ...prev,
-      documents: { ...prev.documents, [name]: files[0] }
+      documents: { ...prev.documents, mentorDocument: file }
     }));
     setError('');
+  };
+
+  const handleFileChange = (e) => {
+    const file = e.target.files?.[0];
+    setDocumentFile(file);
+  };
+
+  const handleDrop = (e) => {
+    e.preventDefault();
+    setDragOver(false);
+    const file = e.dataTransfer.files?.[0];
+    setDocumentFile(file);
+  };
+
+  const removeFile = () => {
+    setFormData(prev => ({
+      ...prev,
+      documents: { ...prev.documents, mentorDocument: null }
+    }));
+    if (fileInputRef.current) fileInputRef.current.value = '';
   };
 
   const handleDocumentTextChange = (e) => {
@@ -82,39 +143,62 @@ const MentorApplication = () => {
     setError('');
   };
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
+  const coverLetterWordCount = getWordCount(formData.documents.coverLetterText);
+  const coverLetterPct = Math.min(100, (coverLetterWordCount / MAX_COVER_LETTER_WORDS) * 100);
+  const coverLetterState = coverLetterWordCount > MAX_COVER_LETTER_WORDS
+    ? 'danger'
+    : coverLetterPct > 85 ? 'warn' : '';
+
+  const validateStep = (targetStep) => {
+    if (targetStep === 0) {
+      if (!formData.fullName.trim()) {
+        return 'Please enter your full name.';
+      }
+      if (formData.qualification.length === 0 && !formData.qualificationOther.trim()) {
+        return 'Please select or specify at least one qualification.';
+      }
+      if (!formData.experience.trim()) {
+        return 'Please describe your relevant experience.';
+      }
+      if (!formData.expertise.trim()) {
+        return 'Please list your areas of expertise.';
+      }
+    }
+    if (targetStep === 1) {
+      if (!formData.documents.mentorDocument) {
+        return 'Please upload the required document file before proceeding.';
+      }
+      if (coverLetterWordCount > MAX_COVER_LETTER_WORDS) {
+        return `Cover letter should not exceed ${MAX_COVER_LETTER_WORDS} words.`;
+      }
+      if (!formData.declaration) {
+        return 'You must agree to the declaration to proceed.';
+      }
+    }
+    return '';
+  };
+
+  const goNext = () => {
+    const msg = validateStep(step);
+    if (msg) {
+      setError(msg);
+      toastError(msg);
+      return;
+    }
     setError('');
-    setSuccessMsg('');
+    setStep(s => Math.min(s + 1, STEPS.length - 1));
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
 
-    if (!formData.documents.mentorDocument) {
-      const msg = 'Please upload the required document file before proceeding.';
-      setError(msg);
-      toastError(msg);
-      return;
-    }
-
-    if (!formData.declaration) {
-      const msg = 'You must agree to the declaration to proceed.';
-      setError(msg);
-      toastError(msg);
-      return;
-    }
-
-    const coverLetterWordCount = getWordCount(formData.documents.coverLetterText);
-    if (coverLetterWordCount > MAX_COVER_LETTER_WORDS) {
-      const msg = `Cover letter should not exceed ${MAX_COVER_LETTER_WORDS} words.`;
-      setError(msg);
-      toastError(msg);
-      return;
-    }
-
-    setShowPreview(true);
+  const goBack = (targetStep) => {
+    setError('');
+    setStep(typeof targetStep === 'number' ? targetStep : (s) => Math.max(s - 1, 0));
+    window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
   const submitForm = async () => {
-    setShowPreview(false);
     setLoading(true);
+    setError('');
     try {
       const authToken = token || storedToken;
       api.defaults.headers.common['Authorization'] = `Bearer ${authToken}`;
@@ -136,7 +220,6 @@ const MentorApplication = () => {
 
       setSuccessMsg(response.data.message);
       toastSuccess('Application submitted successfully!');
-      setShowPreview(false);
       setIsSubmitted(true);
       localStorage.removeItem('token');
       localStorage.removeItem('user');
@@ -150,259 +233,369 @@ const MentorApplication = () => {
     }
   };
 
-  const renderedContent = isSubmitted ? (
-    <div className="text-center py-4">
-      <div className="mb-3 text-success">
-        <i className="bi bi-check-circle-fill fs-1"></i>
-      </div>
-      <h4 className="fw-bold mb-2" style={{ color: 'var(--mc-primary)' }}>
-        Application Submitted Successfully
-      </h4>
-      <p className="text-muted mb-4">
-        {successMsg || 'Your application has been received and is now pending admin review.'}
-      </p>
-      <button className="btn btn-mc-primary" onClick={() => navigate('/login')}>
-        Go to Login
-      </button>
-    </div>
-  ) : showPreview ? (
-    <div>
-      <h4 className="mb-3">Preview Application</h4>
-      <div className="border rounded-4 p-3 mb-3 bg-light">
-        <div className="d-flex justify-content-between align-items-center mb-2">
-          <strong>Full Name</strong>
-          <button className="btn btn-outline-secondary btn-sm" onClick={() => setShowPreview(false)}>
-            <i className="bi bi-pencil-square me-1"></i>Edit
-          </button>
-        </div>
-        <div>{formData.fullName || 'Not provided'}</div>
-      </div>
-      <div className="border rounded-4 p-3 mb-3 bg-light">
-        <div className="d-flex justify-content-between align-items-center mb-2">
-          <strong>Qualifications</strong>
-          <button className="btn btn-outline-secondary btn-sm" onClick={() => setShowPreview(false)}>
-            <i className="bi bi-pencil-square me-1"></i>Edit
-          </button>
-        </div>
-        <div>{[formData.qualification.join(', '), formData.qualificationOther].filter(Boolean).join(', ') || 'Not provided'}</div>
-      </div>
-      <div className="border rounded-4 p-3 mb-3 bg-light">
-        <div className="d-flex justify-content-between align-items-center mb-2">
-          <strong>Experience</strong>
-          <button className="btn btn-outline-secondary btn-sm" onClick={() => setShowPreview(false)}>
-            <i className="bi bi-pencil-square me-1"></i>Edit
-          </button>
-        </div>
-        <div>{formData.experience || 'Not provided'}</div>
-      </div>
-      <div className="border rounded-4 p-3 mb-3 bg-light">
-        <div className="d-flex justify-content-between align-items-center mb-2">
-          <strong>Expertise</strong>
-          <button className="btn btn-outline-secondary btn-sm" onClick={() => setShowPreview(false)}>
-            <i className="bi bi-pencil-square me-1"></i>Edit
-          </button>
-        </div>
-        <div>{formData.expertise || 'Not provided'}</div>
-      </div>
-      <div className="border rounded-4 p-3 mb-3 bg-light">
-        <div className="d-flex justify-content-between align-items-center mb-2">
-          <strong>Documents & Cover Letter</strong>
-          <button className="btn btn-outline-secondary btn-sm" onClick={() => setShowPreview(false)}>
-            <i className="bi bi-pencil-square me-1"></i>Edit
-          </button>
-        </div>
-        <ul className="mb-0 ps-3">
-          <li>Required documents: {formData.documents.mentorDocument?.name || 'Not provided'}</li>
-          <li>Cover Letter: {formData.documents.coverLetterText ? `${formData.documents.coverLetterText.slice(0, 120)}${formData.documents.coverLetterText.length > 120 ? '...' : ''}` : 'Not provided'}</li>
-        </ul>
-      </div>
-
-      <div className="d-flex gap-2 mt-3">
-        <button className="btn btn-outline-secondary" onClick={() => setShowPreview(false)}>
-          Back to Edit
-        </button>
-        <button className="btn btn-mc-primary" onClick={submitForm} disabled={loading}>
-          {loading ? 'Submitting...' : 'Confirm & Submit'}
-        </button>
-      </div>
-    </div>
-  ) : (
-    <form onSubmit={handleSubmit}>
-      <div className="mb-3">
-        <label className="form-label small fw-semibold">Full Name</label>
-        <input
-          type="text"
-          className="form-control mc-input"
-          name="fullName"
-          value={formData.fullName}
-          onChange={handleChange}
-          required
-          placeholder="Enter your full name"
-        />
-      </div>
-
-      <div className="mb-3">
-        <label className="form-label small fw-semibold">Qualification</label>
-        <div className="form-check">
-          <input
-            className="form-check-input"
-            type="checkbox"
-            value="Masters in Psychology"
-            id="q1"
-            checked={formData.qualification.includes('Masters in Psychology')}
-            onChange={(e) => {
-              const checked = e.target.checked;
-              setFormData((prev) => ({
-                ...prev,
-                qualification: checked
-                  ? [...prev.qualification, e.target.value]
-                  : prev.qualification.filter((q) => q !== e.target.value),
-              }));
-            }}
-          />
-          <label className="form-check-label small" htmlFor="q1">
-            Masters in Psychology
-          </label>
-        </div>
-        <div className="form-check">
-          <input
-            className="form-check-input"
-            type="checkbox"
-            value="ADCP"
-            id="q2"
-            checked={formData.qualification.includes('ADCP')}
-            onChange={(e) => {
-              const checked = e.target.checked;
-              setFormData((prev) => ({
-                ...prev,
-                qualification: checked
-                  ? [...prev.qualification, e.target.value]
-                  : prev.qualification.filter((q) => q !== e.target.value),
-              }));
-            }}
-          />
-          <label className="form-check-label small" htmlFor="q2">
-            ADCP
-          </label>
-        </div>
-        <label className="form-label small mt-2">Other qualifications</label>
-        <input
-          type="text"
-          className="form-control mc-input"
-          name="qualificationOther"
-          value={formData.qualificationOther}
-          onChange={handleChange}
-          placeholder="Enter another qualification"
-        />
-      </div>
-
-      <div className="mb-3">
-        <label className="form-label small fw-semibold">Experience</label>
-        <textarea
-          className="form-control mc-input"
-          name="experience"
-          value={formData.experience}
-          onChange={handleChange}
-          required
-          rows="3"
-          placeholder="Describe your relevant experience in mental health support"
-        />
-      </div>
-
-      <div className="mb-3">
-        <label className="form-label small fw-semibold">Areas of Expertise</label>
-        <input
-          type="text"
-          className="form-control mc-input"
-          name="expertise"
-          value={formData.expertise}
-          onChange={handleChange}
-          required
-          placeholder="e.g., Anxiety, Depression, Trauma, Relationships"
-        />
-        <div className="form-text small text-muted">Separate multiple areas with commas</div>
-      </div>
-
-      <div className="mb-3">
-        <label className="form-label small fw-semibold">Required Documents (single file - PDF preferred)</label>
-        <div className="mb-2">
-          <label className="form-label small">CNIC, attested education, experience, and photo (required)</label>
-          <input type="file" accept=".pdf,.png,.jpg,.jpeg,.doc,.docx" name="mentorDocument" onChange={handleFileChange} required />
-        </div>
-        <div className="mb-2">
-          <label className="form-label small">Cover Letter (optional)</label>
-          <textarea
-            className="form-control mc-input"
-            name="coverLetterText"
-            value={formData.documents.coverLetterText}
-            onChange={handleDocumentTextChange}
-            rows="8"
-            placeholder="Write your cover letter here. Maximum 4000 words."
-          />
-          <div className="form-text small text-muted">
-            Maximum {MAX_COVER_LETTER_WORDS} words.
-          </div>
-        </div>
-      </div>
-
-      <div className="mb-4">
-        <div className="form-check">
-          <input
-            type="checkbox"
-            className="form-check-input"
-            name="declaration"
-            id="declaration"
-            checked={formData.declaration}
-            onChange={handleChange}
-            required
-          />
-          <label className="form-check-label small" htmlFor="declaration">
-            I declare that all information provided is accurate and I agree to the MindComfort mentor code of conduct and ethical guidelines.
-          </label>
-        </div>
-      </div>
-
-      <button type="submit" className="btn btn-mc-primary w-100 mb-3" disabled={loading}>
-        {loading ? 'Submitting...' : 'Submit Application'}
-      </button>
-    </form>
-  );
+  const expertiseList = formData.expertise
+    ? formData.expertise.split(',').map(s => s.trim()).filter(Boolean)
+    : [];
 
   return (
-    <div className="auth-page">
-      <div className="container">
-        <div className="row justify-content-center">
-          <div className="col-12 col-lg-8">
-            <div className="mc-card p-4 p-md-5 auth-card" style={{ maxWidth: '700px' }}>
-              <div className="text-start mb-3">
-                <button
-                  onClick={() => navigate('/')}
-                  className="btn btn-link text-decoration-none p-0"
-                  style={{ color: 'var(--mc-primary)' }}
-                >
-                  <i className="bi bi-arrow-left me-2"></i>Back to Home
+    <div className="mapp-wrapper">
+      <aside className="mapp-hero">
+        <div>
+          <div className="mapp-brand" onClick={() => navigate('/')}>
+            <img src={logoImg} alt="MindComfort Logo" />
+            <span>MindComfort</span>
+          </div>
+          <div className="mapp-hero-copy">
+            <h1>Become a MindComfort mentor.</h1>
+            <p>
+              Tell us about your background so our team can verify your credentials
+              and welcome you into a safe, professional support community.
+            </p>
+          </div>
+
+          {!isSubmitted && (
+            <ul className="mapp-steps">
+              {STEPS.map((s, idx) => (
+                <li key={s.key} className={`mapp-step ${idx === step ? 'active' : ''} ${idx < step ? 'done' : ''}`}>
+                  <div className="mapp-step-badge">
+                    {idx < step ? <i className="bi bi-check-lg"></i> : idx + 1}
+                  </div>
+                  <div className="mapp-step-text">
+                    <div className="mapp-step-title">{s.title}</div>
+                    <div className="mapp-step-desc">{s.desc}</div>
+                  </div>
+                </li>
+              ))}
+            </ul>
+          )}
+        </div>
+
+        <div className="mapp-hero-footer">
+          &copy; 2026 MindComfort. All rights reserved.
+        </div>
+      </aside>
+
+      <main className="mapp-form-panel">
+        <div className="mapp-form-container">
+          <div className="mapp-topbar">
+            <button onClick={() => navigate('/')} className="btn-back-home">
+              Back to Home
+            </button>
+          </div>
+
+          {!isSubmitted && (
+            <div className="mapp-mobile-steps">
+              {STEPS.map((s, idx) => (
+                <div key={s.key} className={`dot ${idx === step ? 'active' : ''} ${idx < step ? 'done' : ''}`}></div>
+              ))}
+            </div>
+          )}
+
+          {error && (
+            <div className="alert alert-danger py-2 small mb-3" style={{ borderRadius: '12px' }}>
+              <i className="bi bi-exclamation-circle-fill me-2"></i>{error}
+            </div>
+          )}
+
+          <div className="mapp-card">
+            {isSubmitted ? (
+              <div className="mapp-success">
+                <div className="mapp-success-icon">
+                  <i className="bi bi-check-lg"></i>
+                </div>
+                <h4>Application Submitted Successfully</h4>
+                <p>
+                  {successMsg || 'Your application has been received and is now pending admin review. You will receive an email once it\'s processed.'}
+                </p>
+                <button className="btn btn-mc-primary" onClick={() => navigate('/login')}>
+                  Go to Login
                 </button>
               </div>
-
-              <h2 className="fw-bold mb-2 text-center" style={{ color: 'var(--mc-primary)' }}>
-                Mentor Application
-              </h2>
-
-              {error && (
-                <div className="alert alert-danger py-2 small mb-3" style={{ borderRadius: '12px' }}>
-                  {error}
+            ) : step === 0 ? (
+              <>
+                <div className="mapp-card-head">
+                  <span className="mapp-card-eyebrow">Step 1 of 3</span>
+                  <h2>Tell us about yourself</h2>
                 </div>
-              )}
 
-              {renderedContent}
+                <div className="mapp-field-group">
+                  <label className="mapp-label">Full Name</label>
+                  <input
+                    type="text"
+                    className="form-control mc-input"
+                    name="fullName"
+                    value={formData.fullName}
+                    onChange={handleChange}
+                    placeholder="Enter your full name"
+                  />
+                </div>
 
-              <p className="small text-muted text-center mb-0">
-                Your application will be reviewed by our admin team. You will receive an email once it's processed.
-              </p>
-            </div>
+                <div className="mapp-field-group">
+                  <label className="mapp-label">Qualification</label>
+                  <div className="mapp-chip-grid">
+                    {QUALIFICATION_OPTIONS.map(opt => {
+                      const selected = formData.qualification.includes(opt);
+                      return (
+                        <div
+                          key={opt}
+                          className={`mapp-chip ${selected ? 'selected' : ''}`}
+                          onClick={() => toggleQualification(opt)}
+                          role="checkbox"
+                          aria-checked={selected}
+                        >
+                          <span className="mapp-chip-check"><i className="bi bi-check-lg"></i></span>
+                          <span>{opt}</span>
+                        </div>
+                      );
+                    })}
+                  </div>
+                  <input
+                    type="text"
+                    className="form-control mc-input mt-2"
+                    name="qualificationOther"
+                    value={formData.qualificationOther}
+                    onChange={handleChange}
+                    placeholder="Other qualification (optional)"
+                  />
+                </div>
+
+                <div className="mapp-field-group">
+                  <label className="mapp-label">Experience</label>
+                  <textarea
+                    className="form-control mc-input"
+                    name="experience"
+                    value={formData.experience}
+                    onChange={handleChange}
+                    rows="4"
+                    placeholder="Describe your relevant experience in mental health support"
+                  />
+                </div>
+
+                <div className="mapp-field-group">
+                  <label className="mapp-label">Areas of Expertise</label>
+                  <input
+                    type="text"
+                    className="form-control mc-input"
+                    name="expertise"
+                    value={formData.expertise}
+                    onChange={handleChange}
+                    placeholder="e.g., Anxiety, Depression, Trauma, Relationships"
+                  />
+                  <div className="mapp-hint">Separate multiple areas with commas.</div>
+                  {expertiseList.length > 0 && (
+                    <div className="mapp-preview-tags mt-2">
+                      {expertiseList.map((tag, idx) => (
+                        <span className="mapp-tag" key={`${tag}-${idx}`}>{tag}</span>
+                      ))}
+                    </div>
+                  )}
+                </div>
+
+                <div className="mapp-nav-row">
+                  <button className="btn btn-mc-primary w-100" onClick={goNext}>
+                    Continue
+                  </button>
+                </div>
+              </>
+            ) : step === 1 ? (
+              <>
+                <div className="mapp-card-head">
+                  <span className="mapp-card-eyebrow">Step 2 of 3</span>
+                  <h2>Documents & cover letter</h2>
+                  <p>Upload your verification documents and share why you'd like to mentor.</p>
+                </div>
+
+                <div className="mapp-field-group">
+                  <label className="mapp-label"><i className="bi bi-paperclip"></i> Required Documents</label>
+                  <div className="mapp-hint mb-2" style={{ marginTop: '-4px' }}>
+                    CNIC, attested education, experience, and photo - combined into a single PDF preferred.
+                  </div>
+
+                  {formData.documents.mentorDocument ? (
+                    <div className="mapp-file-chip">
+                      <div className="file-ic">
+                        <i className={`bi ${fileIconFor(formData.documents.mentorDocument.name)}`}></i>
+                      </div>
+                      <div className="file-meta">
+                        <div className="file-name">{formData.documents.mentorDocument.name}</div>
+                        <div className="file-size">{formatFileSize(formData.documents.mentorDocument.size)}</div>
+                      </div>
+                      <button type="button" className="file-remove" onClick={removeFile} title="Remove file">
+                        <i className="bi bi-x-lg"></i>
+                      </button>
+                    </div>
+                  ) : (
+                    <div
+                      className={`mapp-dropzone ${dragOver ? 'drag-over' : ''}`}
+                      onDragOver={(e) => { e.preventDefault(); setDragOver(true); }}
+                      onDragLeave={() => setDragOver(false)}
+                      onDrop={handleDrop}
+                    >
+                      <input
+                        ref={fileInputRef}
+                        type="file"
+                        accept=".pdf,.png,.jpg,.jpeg,.doc,.docx"
+                        name="mentorDocument"
+                        onChange={handleFileChange}
+                      />
+                      <div className="mapp-dropzone-icon">
+                        <i className="bi bi-cloud-arrow-up-fill"></i>
+                      </div>
+                      <div className="mapp-dropzone-title">Click to upload or drag & drop</div>
+                      <div className="mapp-dropzone-sub">PDF, PNG, JPG, DOC or DOCX</div>
+                    </div>
+                  )}
+                </div>
+
+                <div className="mapp-field-group">
+                  <label className="mapp-label">Cover Letter <span className="mapp-hint" style={{ marginTop: 0 }}>&nbsp;(optional)</span></label>
+                  <textarea
+                    className="form-control mc-input"
+                    name="coverLetterText"
+                    value={formData.documents.coverLetterText}
+                    onChange={handleDocumentTextChange}
+                    rows="7"
+                    placeholder="Write your cover letter here — tell us why you'd like to mentor on MindComfort."
+                  />
+                  <div className="mapp-counter-row">
+                    <div className="mapp-counter-bar">
+                      <div className={`mapp-counter-fill ${coverLetterState}`} style={{ width: `${coverLetterPct}%` }}></div>
+                    </div>
+                    <div className="mapp-counter-text">{coverLetterWordCount.toLocaleString()} / {MAX_COVER_LETTER_WORDS.toLocaleString()} words</div>
+                  </div>
+                </div>
+
+                <div className="mapp-field-group mb-0">
+                  <div className="mapp-declaration">
+                    <input
+                      type="checkbox"
+                      name="declaration"
+                      id="declaration"
+                      checked={formData.declaration}
+                      onChange={handleChange}
+                    />
+                    <label htmlFor="declaration">
+                      I declare that all information provided is accurate.
+                    </label>
+                  </div>
+                </div>
+
+                <div className="mapp-nav-row">
+                  <button className="mapp-btn-outline" onClick={() => goBack(0)}>
+                    Back
+                  </button>
+                  <button className="btn btn-mc-primary flex-fill" onClick={goNext}>
+                    Review Application
+                  </button>
+                </div>
+              </>
+            ) : (
+              <>
+                <div className="mapp-card-head">
+                  <span className="mapp-card-eyebrow">Step 3 of 3</span>
+                  <h2>Review your application</h2>
+                  <p>Take a moment to confirm everything looks right before submitting.</p>
+                </div>
+
+                <div className="mapp-preview-section">
+                  <div className="mapp-preview-head">
+                    <div className="head-left">
+                      <div className="head-icon"><i className="bi bi-person-fill"></i></div>
+                      <h5>Personal Information</h5>
+                    </div>
+                    <button className="mapp-edit-btn" onClick={() => goBack(0)}>
+                      <i className="bi bi-pencil-fill"></i> Edit
+                    </button>
+                  </div>
+                  <div className="mapp-preview-row">
+                    <span className="k">Full Name</span>
+                    <span>{formData.fullName || <span className="mapp-preview-empty">Not provided</span>}</span>
+                  </div>
+                </div>
+
+                <div className="mapp-preview-section">
+                  <div className="mapp-preview-head">
+                    <div className="head-left">
+                      <div className="head-icon"><i className="bi bi-mortarboard-fill"></i></div>
+                      <h5>Professional Background</h5>
+                    </div>
+                    <button className="mapp-edit-btn" onClick={() => goBack(0)}>
+                      <i className="bi bi-pencil-fill"></i> Edit
+                    </button>
+                  </div>
+                  <div className="mapp-preview-row">
+                    <span className="k">Qualification</span>
+                    {[...formData.qualification, formData.qualificationOther].filter(Boolean).length > 0 ? (
+                      <div className="mapp-preview-tags">
+                        {[...formData.qualification, formData.qualificationOther].filter(Boolean).map((q, idx) => (
+                          <span className="mapp-tag" key={`${q}-${idx}`}>{q}</span>
+                        ))}
+                      </div>
+                    ) : <span className="mapp-preview-empty">Not provided</span>}
+                  </div>
+                  <div className="mapp-preview-row">
+                    <span className="k">Experience</span>
+                    <span>{formData.experience || <span className="mapp-preview-empty">Not provided</span>}</span>
+                  </div>
+                  <div className="mapp-preview-row">
+                    <span className="k">Expertise</span>
+                    {expertiseList.length > 0 ? (
+                      <div className="mapp-preview-tags">
+                        {expertiseList.map((tag, idx) => (
+                          <span className="mapp-tag" key={`${tag}-${idx}`}>{tag}</span>
+                        ))}
+                      </div>
+                    ) : <span className="mapp-preview-empty">Not provided</span>}
+                  </div>
+                </div>
+
+                <div className="mapp-preview-section">
+                  <div className="mapp-preview-head">
+                    <div className="head-left">
+                      <div className="head-icon"><i className="bi bi-file-earmark-text-fill"></i></div>
+                      <h5>Documents & Cover Letter</h5>
+                    </div>
+                    <button className="mapp-edit-btn" onClick={() => goBack(1)}>
+                      <i className="bi bi-pencil-fill"></i> Edit
+                    </button>
+                  </div>
+                  {formData.documents.mentorDocument ? (
+                    <div className="mapp-file-chip" style={{ marginBottom: formData.documents.coverLetterText ? '14px' : 0 }}>
+                      <div className="file-ic">
+                        <i className={`bi ${fileIconFor(formData.documents.mentorDocument.name)}`}></i>
+                      </div>
+                      <div className="file-meta">
+                        <div className="file-name">{formData.documents.mentorDocument.name}</div>
+                        <div className="file-size">{formatFileSize(formData.documents.mentorDocument.size)}</div>
+                      </div>
+                    </div>
+                  ) : (
+                    <div className="mapp-preview-row"><span className="mapp-preview-empty">No document uploaded</span></div>
+                  )}
+                  {formData.documents.coverLetterText && (
+                    <div className="mapp-cover-preview">{formData.documents.coverLetterText}</div>
+                  )}
+                </div>
+
+                <div className="mapp-nav-row">
+                  <button className="mapp-btn-outline" onClick={() => goBack(1)} disabled={loading}>
+                    Back
+                  </button>
+                  <button className="btn btn-mc-primary flex-fill" onClick={submitForm} disabled={loading}>
+                    {loading ? 'Submitting...' : <>Confirm & Submit</>}
+                  </button>
+                </div>
+              </>
+            )}
           </div>
+
+          {!isSubmitted && (
+            <p className="small text-muted text-center mt-3 mb-0">
+              Your application will be reviewed by our admin team. You will receive an email once it's processed.
+            </p>
+          )}
         </div>
-      </div>
+      </main>
     </div>
   );
 };

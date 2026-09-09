@@ -464,7 +464,7 @@ const MentorsManagement = () => {
                           onClick={() => {
                             const baseUrl = api.defaults.baseURL || 'http://13.60.72.235:5000/api';
                             const token = localStorage.getItem('token');
-                            const proxyUrl = `${baseUrl}/admin/document-stream?key=${encodeURIComponent(selectedApplication.documents.document)}&token=${token}`;
+                            const proxyUrl = `${baseUrl}/admin/mentors/document-proxy?key=${encodeURIComponent(selectedApplication.documents.document)}&token=${token}`;
                             setViewingDocUrl(proxyUrl);
                           }}
                         >
