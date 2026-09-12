@@ -84,7 +84,7 @@ const ChatroomsManagement = ({ isModerator = false }) => {
   const handleEditSubmit = async (e) => {
     e.preventDefault();
     try {
-      await api.put(`${apiPrefix}/chatrooms/${editChatroomId}`, editFormData);
+      await api.patch(`${apiPrefix}/chatrooms/${editChatroomId}`, editFormData);
       toastSuccess('Chatroom updated successfully!');
       setEditChatroomId(null);
       fetchChatrooms();
