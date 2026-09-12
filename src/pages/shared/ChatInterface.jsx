@@ -516,10 +516,7 @@ const ChatInterface = () => {
                     <React.Fragment key={msg._id || index}>
                       
                       {showDateSeparator && (
-                        <div 
-                          className={`date-separator ${!showTopDate && isLastMessageOfDay(msg, index) ? 'date-separator-hidden' : ''}`}
-                          data-date-separator
-                        >
+                        <div className="date-separator">
                           {getDateLabel(msg.createdAt)}
                         </div>
                       )}
