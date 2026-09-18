@@ -3,6 +3,7 @@ import { useNavigate, Link } from 'react-router-dom';
 import './ClientDashboard.css';
 import logoImg from '../../assets/logo.png'; 
 import NotificationBell from '../../components/NotificationBell';
+import ChatbotWidget from "../../components/ChatbotWidget";
 
 const ClientDashboard = () => {
   const navigate = useNavigate();
@@ -179,6 +180,7 @@ const ClientDashboard = () => {
           </div>
         </div>
       )}
+      <ChatbotWidget />
     </div>
   );
 };
