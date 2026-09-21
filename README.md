@@ -2,7 +2,8 @@
 
 MindComfort is a web-based single-page application built to provide an anonymous and affordable space for mental well-being and catharsis. This repository contains the client-side user interfaces, real-time chat views, live audio listener/broadcaster screens, and role-based administrative dashboards.
 
-* **Live Application URL**: http://13.60.72.235
+* **Live Application URL**: https://mindcomfort-frontend.onrender.com
+* **Live API URL**: https://mindcomfort.onrender.com
 * **Backend Repository**: https://github.com/Iqra-Mushtak/MindComfort.git
 
 ---
@@ -66,27 +67,26 @@ MindComfort is a web-based single-page application built to provide an anonymous
 
 Create a .env file in the root directory and define the following variables:
 
-    VITE_API_URL=http://13.60.72.235:5000/api
-    VITE_SOCKET_URL=http://13.60.72.235:5000
+    VITE_API_URL=https://mindcomfort.onrender.com/api
+    VITE_SOCKET_URL=https://mindcomfort.onrender.com
 
 ---
 
-## Deployment (AWS EC2)
+## Deployment (Render)
 
-The frontend is built into static production assets and served through an Nginx container managed by Docker Compose on AWS EC2.
+The frontend is deployed as a Static Site on Render, serving optimized production builds.
 
-1. SSH into the server:
-    ssh -i your-key.pem ubuntu@13.60.72.235
+1. Connect GitHub repository to Render.
 
-2. Clone the repository:
-    git clone https://github.com/Iqra-Mushtak/Mindcomfort-Frontend.git
-    cd Mindcomfort-Frontend
+2. Create a new Static Site.
 
-3. Build and launch services:
-    docker compose up -d --build
+3. Configure the build settings:
+    Build Command: npm install && npm run build
+    Publish Directory: dist
 
-4. Check running containers:
-    docker ps
+4. Add the Environment Variables listed above in the Render dashboard.
+
+5. Deploy the site.
 
 ---
 
