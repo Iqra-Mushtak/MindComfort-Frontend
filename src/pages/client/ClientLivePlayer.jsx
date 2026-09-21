@@ -95,7 +95,7 @@ const ClientLivePlayer = () => {
       });
       setAgoraClient(client);
 
-      const socketInstance = io(import.meta.env.VITE_SOCKET_URL || 'http://13.60.72.235:5000', {
+      const socketInstance = io(import.meta.env.VITE_SOCKET_URL || 'https://mindcomfort.onrender.com', {
         auth: { token: localStorage.getItem('token') }
       });
       socketInstance.on('connect', () => socketInstance.emit('joinPodcastRoom', id));

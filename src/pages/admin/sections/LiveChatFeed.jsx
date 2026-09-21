@@ -28,7 +28,7 @@ const LiveChatFeed = () => {
   useEffect(() => {
     if (selectedChatroom && !socketRef.current) {
       const token = localStorage.getItem('token');
-      const apiUrl = import.meta.env.VITE_API_URL || 'http://13.60.72.235:5000';
+      const apiUrl = import.meta.env.VITE_API_URL || 'https://mindcomfort.onrender.com';
       const newSocket = io(apiUrl, {
         auth: { token },
         transports: ['websocket', 'polling']

@@ -46,7 +46,7 @@ export const NotificationProvider = ({ children }) => {
 
       fetchNotifications();
 
-      const apiUrl = (import.meta.env.VITE_API_URL || 'http://13.60.72.235:5000/api').replace(/\/api\/?$/, '');
+      const apiUrl = (import.meta.env.VITE_API_URL || 'https://mindcomfort.onrender.com').replace(/\/api\/?$/, '');
       socket = io(apiUrl, {
         auth: { token },
         transports: ['websocket', 'polling']

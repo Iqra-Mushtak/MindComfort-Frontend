@@ -115,7 +115,7 @@ const ChatInterface = () => {
     
     syncUserState();
 
-    const apiBaseUrl = import.meta.env.VITE_API_URL || 'http://13.60.72.235:5000/api';
+    const apiBaseUrl = import.meta.env.VITE_API_URL || 'https://mindcomfort.onrender.com';
     const socketUrl = import.meta.env.VITE_SOCKET_URL || apiBaseUrl.replace(/\/api$/, '');
 
     const socketInstance = io(socketUrl, {

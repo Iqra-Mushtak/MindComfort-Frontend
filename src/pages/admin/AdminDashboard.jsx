@@ -73,7 +73,7 @@ const AdminDashboard = () => {
     return () => clearInterval(refreshInterval);
   }, [navigate]);
 
-  useEffect(() => {
+  useEffect(() => {c
     window.onNavigateToMentors = () => setActiveSection('mentors');
     window.onNavigateToPodcasts = () => setActiveSection('podcasts');
     window.onNavigateToReports = () => setActiveSection('reports');

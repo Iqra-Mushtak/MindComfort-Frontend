@@ -116,7 +116,7 @@ const MentorLiveDashboard = () => {
       });
       await client.publish([micTrack]);
 
-      const socketInstance = io(import.meta.env.VITE_SOCKET_URL || 'http://13.60.72.235:5000', {
+      const socketInstance = io(import.meta.env.VITE_SOCKET_URL || 'https://mindcomfort.onrender.com', {
         auth: { token: tokenStr }
       });
 
