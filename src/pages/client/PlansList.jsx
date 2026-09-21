@@ -5,6 +5,7 @@ import './PlansList.css';
 import logoImg from '../../assets/logo.png';
 import PurchaseModal from './PurchaseModal';
 import NotificationBell from '../../components/NotificationBell';
+import api from '../../utils/api';
 
 const PlansList = () => {
     const navigate = useNavigate();
@@ -14,6 +15,7 @@ const PlansList = () => {
     const [error, setError] = useState(null);
     const [loadError, setLoadError] = useState(false);
     const [selectedPlanId, setSelectedPlanId] = useState(null);
+    const [selectedPlanName, setSelectedPlanName] = useState(null);
     const [purchasing, setPurchasing] = useState(false);
     const [user, setUser] = useState(null);
     const [isPurchaseModalOpen, setIsPurchaseModalOpen] = useState(false);
@@ -37,74 +39,54 @@ const PlansList = () => {
     }, [navigate, token]);
 
     const fetchPlans = async () => {
-        try {
-            setLoading(true);
-            setLoadError(false);
-            const response = await fetch('https://mindcomfort.onrender.com/api/plans/available', {
-                method: 'GET',
-                headers: {
-                    'Authorization': `Bearer ${token}`,
-                    'Content-Type': 'application/json'
-                }
-            });
-
-            if (!response.ok) {
-                throw new Error('Failed to fetch plans');
-            }
-
-            const data = await response.json();
-            setPlans(data.plans || []);
-            setError(null);
-        } catch (err) {
-            console.error('Error fetching plans:', err);
-            setLoadError(true);
-        } finally {
-            setLoading(false);
-        }
-    };
+    try {
+        setLoading(true);
+        setLoadError(false);
+        const response = await api.get('/plans/available');
+        setPlans(response.data.plans || []);
+        setError(null);
+    } catch (err) {
+        console.error('Error fetching plans:', err);
+        setLoadError(true);
+    } finally {
+        setLoading(false);
+    }
+};
 
     const handleSubscribe = (plan) => {
-        setSelectedPlan(plan);
+        setSelectedPlanId(plan._id);
+        setSelectedPlanName(plan.name);
         setPurchaseError('');
         setIsPurchaseModalOpen(true);
     };
 
     const handleConfirmPurchase = async () => {
-        if (!selectedPlan) return;
-        setIsPurchasing(true);
-        setPurchaseError('');
-        try {
-            const response = await fetch('https://mindcomfort.onrender.com/subscriptions/purchase', {
-                method: 'POST',
-                headers: {
-                    'Authorization': `Bearer ${token}`,
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({ planId: selectedPlan._id })
-            });
-            if (!response.ok) {
-                const errorData = await response.json();
-                throw new Error(errorData.message || 'Failed to create subscription');
+    if (!selectedPlan) return;
+    setIsPurchasing(true);
+    setPurchaseError('');
+    try {
+        const response = await api.post('/subscriptions/purchase', { 
+            planId: selectedPlan._id 
+        });
+        
+        const data = response.data;
+        if (data.checkoutUrl) {
+            localStorage.setItem('paymentId', data.paymentId);
+            if (data.sessionId) {
+                localStorage.setItem('stripeSessionId', data.sessionId);
             }
-            const data = await response.json();
-            
-            if (data.checkoutUrl) {
-                localStorage.setItem('paymentId', data.paymentId);
-                if (data.sessionId) {
-                    localStorage.setItem('stripeSessionId', data.sessionId);
-                }
-                console.log('Redirecting to Stripe Checkout:', data.checkoutUrl);
-                window.location.href = data.checkoutUrl;
-            } else {
-                throw new Error('No checkout URL received');
-            }
-        } catch (err) {
-            console.error('Purchase error:', err);
-            setPurchaseError(err.message || 'Failed to process purchase. Please try again.');
-        } finally {
-            setIsPurchasing(false);
+            console.log('Redirecting to Stripe Checkout:', data.checkoutUrl);
+            window.location.href = data.checkoutUrl;
+        } else {
+            throw new Error('No checkout URL received');
         }
-    };
+    } catch (err) {
+        console.error('Purchase error:', err);
+        setPurchaseError(err.response?.data?.message || err.message || 'Failed to process purchase. Please try again.');
+    } finally {
+        setIsPurchasing(false);
+    }
+};
 
     const handleCancelPurchase = () => {
         setIsPurchaseModalOpen(false);
