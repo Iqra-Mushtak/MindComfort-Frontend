@@ -4,7 +4,19 @@
     <meta charset="UTF-8" />
     <link rel="icon" type="image/png" href="/src/assets/logo.png" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta http-equiv="Content-Security-Policy" content="default-src * 'unsafe-inline' 'unsafe-eval' data: blob:; script-src * 'unsafe-inline' 'unsafe-eval' blob:; connect-src * 'unsafe-inline' blob: data:;" />
+    <meta 
+      http-equiv="Content-Security-Policy" 
+      content="
+        default-src 'self' https://mindcomfort.onrender.com https://*.render.com;
+        script-src 'self' 'unsafe-inline' 'unsafe-eval' https://*.agora.io https://*.sd-rtn.com https://js.stripe.com;
+        connect-src 'self' https://mindcomfort.onrender.com wss://mindcomfort.onrender.com https://*.agora.io wss://*.agora.io https://*.sd-rtn.com wss://*.sd-rtn.com https://api.stripe.com;
+        style-src 'self' 'unsafe-inline' https://fonts.googleapis.com;
+        font-src 'self' https://fonts.gstatic.com data:;
+        img-src 'self' data: blob: https:;
+        media-src 'self' blob: data: https:;
+        frame-src 'self' https://js.stripe.com;
+      "
+    />    
     <title>MindComfort - Anonymous Mental Well-being & Catharsis</title>
   </head>
   <body>
