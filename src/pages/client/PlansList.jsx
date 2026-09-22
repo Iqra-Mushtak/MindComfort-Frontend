@@ -24,7 +24,6 @@ const PlansList = () => {
     const [isPurchasing, setIsPurchasing] = useState(false);
     const [sidebarOpen, setSidebarOpen] = useState(false);
     const [showLogoutModal, setShowLogoutModal] = useState(false);
-
     const token = localStorage.getItem('token');
     const userData = JSON.parse(localStorage.getItem('user') || '{}');
 
@@ -39,54 +38,52 @@ const PlansList = () => {
     }, [navigate, token]);
 
     const fetchPlans = async () => {
-    try {
-        setLoading(true);
-        setLoadError(false);
-        const response = await api.get('/plans/available');
-        setPlans(response.data.plans || []);
-        setError(null);
-    } catch (err) {
-        console.error('Error fetching plans:', err);
-        setLoadError(true);
-    } finally {
-        setLoading(false);
-    }
-};
+        try {
+            setLoading(true);
+            setLoadError(false);
+            const response = await api.get('/plans/available');
+            setPlans(response.data.plans || []);
+            setError(null);
+        } catch (err) {
+            console.error('Error fetching plans:', err);
+            setLoadError(true);
+        } finally {
+            setLoading(false);
+        }
+    };
 
     const handleSubscribe = (plan) => {
-        setSelectedPlanId(plan._id);
-        setSelectedPlanName(plan.name);
+        setSelectedPlan(plan);
         setPurchaseError('');
         setIsPurchaseModalOpen(true);
     };
 
     const handleConfirmPurchase = async () => {
-    if (!selectedPlan) return;
-    setIsPurchasing(true);
-    setPurchaseError('');
-    try {
-        const response = await api.post('/subscriptions/purchase', { 
-            planId: selectedPlan._id 
-        });
-        
-        const data = response.data;
-        if (data.checkoutUrl) {
-            localStorage.setItem('paymentId', data.paymentId);
-            if (data.sessionId) {
-                localStorage.setItem('stripeSessionId', data.sessionId);
+        if (!selectedPlan) return;
+        setIsPurchasing(true);
+        setPurchaseError('');
+        try {
+            const response = await api.post('/subscriptions/purchase', { 
+                planId: selectedPlan._id 
+            });
+            const data = response.data;
+            if (data.checkoutUrl) {
+                localStorage.setItem('paymentId', data.paymentId);
+                if (data.sessionId) {
+                    localStorage.setItem('stripeSessionId', data.sessionId);
+                }
+                console.log('Redirecting to Stripe Checkout:', data.checkoutUrl);
+                window.location.href = data.checkoutUrl;
+            } else {
+                throw new Error('No checkout URL received');
             }
-            console.log('Redirecting to Stripe Checkout:', data.checkoutUrl);
-            window.location.href = data.checkoutUrl;
-        } else {
-            throw new Error('No checkout URL received');
+        } catch (err) {
+            console.error('Purchase error:', err);
+            setPurchaseError(err.response?.data?.message || err.message || 'Failed to process purchase. Please try again.');
+        } finally {
+            setIsPurchasing(false);
         }
-    } catch (err) {
-        console.error('Purchase error:', err);
-        setPurchaseError(err.response?.data?.message || err.message || 'Failed to process purchase. Please try again.');
-    } finally {
-        setIsPurchasing(false);
-    }
-};
+    };
 
     const handleCancelPurchase = () => {
         setIsPurchaseModalOpen(false);
@@ -110,14 +107,12 @@ const PlansList = () => {
 
     if (!user) return null;
 
-   return (
+    return (
         <div className="dashboard-container">
-            {/* Mobile Dark Overlay */}
             {sidebarOpen && (
                 <div className="mc-sidebar-overlay" onClick={() => setSidebarOpen(false)}></div>
             )}
-
-            {/* Slide-out Sidebar */}
+            
             <aside className={`mc-sidebar ${sidebarOpen ? 'open' : ''}`}>
                 <Link to="/client/profile" style={{ textDecoration: 'none' }}>
                     <div className="mc-user-info-top">
@@ -130,7 +125,6 @@ const PlansList = () => {
                         </div>
                     </div>
                 </Link>
-
                 <ul className="mc-nav-menu">
                     <li className="mc-nav-item">
                         <Link to="/client/dashboard" className="mc-nav-link">
@@ -158,14 +152,12 @@ const PlansList = () => {
                         </Link>
                     </li>
                 </ul>
-
                 <div className="mc-sidebar-footer">
                     <button className="mc-logout-btn" onClick={handleLogoutClick}>
                         <i className="bi bi-box-arrow-right"></i> Log Out
                     </button>
                 </div>
             </aside>
-
             <main className="mc-main-content">
                 <div className="mc-main-header">
                     <button 
@@ -175,7 +167,6 @@ const PlansList = () => {
                     >
                         <i className={`bi ${sidebarOpen ? 'bi-x-lg' : 'bi-list'}`}></i>
                     </button>
-
                     <div className="plans-header-spacer"></div>
                     <div className="plans-header-controls">
                         <NotificationBell />
@@ -185,27 +176,22 @@ const PlansList = () => {
                         </Link>
                     </div>
                 </div>
-
                 {/* Welcome Header */}
                 <div className="plans-page-header">
                     <h2>Subscription Plans</h2>
                     <p>Choose the perfect plan to unlock premium features and content.</p>
                 </div>
-
                 {loading && (
                     <div className="plans-loading">
                         <p>Loading plans...</p>
                     </div>
                 )}
-
                 {!loading && loadError && (
                     <p className="error-text">Failed to load plans. Please try again.</p>
                 )}
-
                 {!loading && !loadError && plans.length === 0 && (
                     <p className="empty-state-text">No subscription plans available at the moment.</p>
                 )}
-
                 {!loading && !error && plans.length > 0 && (
                     <div className="plans-grid">
                         {plans.map((plan) => (
@@ -214,7 +200,6 @@ const PlansList = () => {
                                 <p className="plan-card-description">
                                     {plan.description}
                                 </p>
-
                                 <div className="plan-card-pricing">
                                     <p className="plan-price">
                                         {plan.currency} {plan.price.toFixed(2)}
@@ -223,7 +208,6 @@ const PlansList = () => {
                                         for {plan.durationMonths} month{plan.durationMonths > 1 ? 's' : ''}
                                     </p>
                                 </div>
-
                                 {plan.features && plan.features.length > 0 && (
                                     <div className="plan-features">
                                         <p className="plan-features-title">
@@ -239,7 +223,6 @@ const PlansList = () => {
                                         </ul>
                                     </div>
                                 )}
-
                                 <button
                                     onClick={() => handleSubscribe(plan)}
                                     disabled={purchasing && selectedPlanId === plan._id}
@@ -252,7 +235,6 @@ const PlansList = () => {
                     </div>
                 )}
             </main>
-
             <PurchaseModal
                 isOpen={isPurchaseModalOpen}
                 item={selectedPlan}
@@ -263,7 +245,6 @@ const PlansList = () => {
                 error={purchaseError}
                 onClearError={() => setPurchaseError('')}
             />
-
             {showLogoutModal && (
                 <div className="mc-modal-overlay">
                     <div className="mc-logout-modal-card">
