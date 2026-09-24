@@ -2,17 +2,37 @@ import React, { useState, useRef, useEffect } from "react";
 import api from "../utils/api";
 import "./ChatbotWidget.css";
 
+const CHATBOT_STORAGE_KEY = "mindcomfort_chatbot_history";
+
+const INITIAL_WELCOME_MESSAGE = {
+  sender: "bot",
+  text: "Hello! I am your MindComfort Coping Companion. How are you feeling today?",
+};
+
 export default function ChatbotWidget() {
   const [isOpen, setIsOpen] = useState(false);
-  const [messages, setMessages] = useState([
-    {
-      sender: "bot",
-      text: "Hello! I am your MindComfort Coping Companion. How are you feeling today?",
-    },
-  ]);
+
+  const [messages, setMessages] = useState(() => {
+    try {
+      const storedHistory = localStorage.getItem(CHATBOT_STORAGE_KEY);
+      return storedHistory ? JSON.parse(storedHistory) : [INITIAL_WELCOME_MESSAGE];
+    } catch (err) {
+      console.error("Error reading chatbot localStorage:", err);
+      return [INITIAL_WELCOME_MESSAGE];
+    }
+  });
+
   const [input, setInput] = useState("");
   const [loading, setLoading] = useState(false);
   const chatEndRef = useRef(null);
+
+  useEffect(() => {
+    try {
+      localStorage.setItem(CHATBOT_STORAGE_KEY, JSON.stringify(messages));
+    } catch (err) {
+      console.error("Error saving chatbot localStorage:", err);
+    }
+  }, [messages]);
 
   const scrollToBottom = (behavior = "smooth") => {
     chatEndRef.current?.scrollIntoView({ behavior });
@@ -32,21 +52,26 @@ export default function ChatbotWidget() {
     }
   }, [messages, loading]);
 
+  const handleClearChat = () => {
+    localStorage.removeItem(CHATBOT_STORAGE_KEY);
+    setMessages([INITIAL_WELCOME_MESSAGE]);
+  };
+
   const handleSend = async (e) => {
     e.preventDefault();
     if (!input.trim() || loading) return;
 
     const userMessage = input.trim();
     const updatedMessages = [...messages, { sender: "user", text: userMessage }];
-    
+
     setMessages(updatedMessages);
     setInput("");
     setLoading(true);
 
     try {
-      const res = await api.post("/chatbot/message", { 
+      const res = await api.post("/chatbot/message", {
         messages: updatedMessages,
-        prompt: userMessage 
+        prompt: userMessage,
       });
       setMessages((prev) => [...prev, { sender: "bot", text: res.data.reply }]);
     } catch (err) {
@@ -83,13 +108,24 @@ export default function ChatbotWidget() {
                 <div className="chatbot-subtitle">CBT Support & Platform Guide</div>
               </div>
             </div>
-            <button
-              onClick={() => setIsOpen(false)}
-              className="chatbot-close-btn"
-              aria-label="Close"
-            >
-              <i className="bi bi-x-lg"></i>
-            </button>
+            <div className="chatbot-header-actions">
+              <button
+                type="button"
+                onClick={handleClearChat}
+                className="chatbot-clear-btn"
+                title="Clear Chat History"
+              >
+                Clear Chat
+              </button>
+              <button
+                type="button"
+                onClick={() => setIsOpen(false)}
+                className="chatbot-close-btn"
+                aria-label="Close"
+              >
+                <i className="bi bi-x-lg"></i>
+              </button>
+            </div>
           </div>
 
           <div className="chatbot-messages-body">

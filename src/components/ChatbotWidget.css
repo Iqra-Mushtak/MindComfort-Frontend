@@ -60,6 +60,32 @@
   color: #c9e4e1;
 }
 
+.chatbot-header-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.chatbot-clear-btn {
+  background-color: rgba(255, 255, 255, 0.16);
+  border: 1px solid rgba(255, 255, 255, 0.28);
+  color: #ffffff;
+  font-size: 11px;
+  font-weight: 500;
+  padding: 3px 8px;
+  border-radius: 6px;
+  cursor: pointer;
+  white-space: nowrap;
+  flex-shrink: 0;     
+  transition: background-color 0.2s ease, color 0.2s ease;
+}
+
+.chatbot-clear-btn:hover {
+  background-color: #d9534f;
+  border-color: #d9534f;
+  color: #ffffff;
+}
+
 .chatbot-close-btn {
   background: transparent;
   border: none;
