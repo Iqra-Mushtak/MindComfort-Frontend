@@ -16,6 +16,7 @@ const PodcastsManagement = ({ isModerator = false }) => {
   const [podcasts, setPodcasts] = useState([]);
   const [pendingPodcasts, setPendingPodcasts] = useState([]);
   const [loading, setLoading] = useState(false);
+  const [actionLoading, setActionLoading] = useState(false);
   const [search, setSearch] = useState('');
   const [type, setType] = useState('all');
   const [page, setPage] = useState(1);
@@ -93,15 +94,20 @@ const PodcastsManagement = ({ isModerator = false }) => {
   };
 
   const handleApproveConfirm = async () => {
+    if (actionLoading || !pendingActionId) return;
     try {
+      setActionLoading(true);
       await api.patch(`${apiPrefix}/podcasts/${pendingActionId}/approve`, {});
       setShowApproveConfirm(false);
+      setSelectedPodcast(null);
       setPendingActionId(null);
-      fetchPendingPodcasts();
       toastSuccess('Podcast approved!');
+      await fetchPendingPodcasts();
     } catch (err) {
       console.error('Error approving podcast:', err);
       toastError(err.response?.data?.message || 'Failed to approve podcast');
+    } finally {
+      setActionLoading(false);
     }
   };
 
@@ -111,6 +117,7 @@ const PodcastsManagement = ({ isModerator = false }) => {
   };
 
   const handleRejectConfirm = async () => {
+    if (actionLoading || !pendingActionId) return;
     setShowRejectConfirm(false);
     const reason = await prompt({
       title: 'Reject Podcast',
@@ -121,20 +128,34 @@ const PodcastsManagement = ({ isModerator = false }) => {
 
     if (reason && reason.trim()) {
       try {
+        setActionLoading(true);
         await api.patch(`${apiPrefix}/podcasts/${pendingActionId}/reject`, { reason: reason.trim() });
         setPendingActionId(null);
-        fetchPendingPodcasts();
+        setSelectedPodcast(null);
         toastSuccess('Podcast rejected');
+        await fetchPendingPodcasts();
       } catch (err) {
         console.error('Error rejecting podcast:', err);
         toastError(err.response?.data?.message || 'Failed to reject podcast');
+      } finally {
+        setActionLoading(false);
       }
+    } else {
+      setPendingActionId(null);
     }
-    setPendingActionId(null);
   };
 
-  const handleApproveCancel = () => { setShowApproveConfirm(false); setPendingActionId(null); };
-  const handleRejectCancel = () => { setShowRejectConfirm(false); setPendingActionId(null); };
+  const handleApproveCancel = () => { 
+    if (actionLoading) return;
+    setShowApproveConfirm(false); 
+    setPendingActionId(null); 
+  };
+  
+  const handleRejectCancel = () => { 
+    if (actionLoading) return;
+    setShowRejectConfirm(false); 
+    setPendingActionId(null); 
+  };
 
   const togglePodcastExpand = (podcastId) => {
     setExpandedPodcasts(prev => ({
@@ -292,8 +313,12 @@ const PodcastsManagement = ({ isModerator = false }) => {
                   <small className="submitted-date">Submitted: {new Date(podcast.createdAt).toLocaleDateString()}</small>
                 </div>
                 <div className="podcast-actions">
-                  <button className="btn-approve" onClick={() => handleApproveClick(podcast._id)}>Approve</button>
-                  <button className="btn-reject" onClick={() => handleRejectClick(podcast._id)}>Reject</button>
+                  <button className="btn-approve" disabled={actionLoading} onClick={() => handleApproveClick(podcast._id)}>
+                    Approve
+                  </button>
+                  <button className="btn-reject" disabled={actionLoading} onClick={() => handleRejectClick(podcast._id)}>
+                    Reject
+                  </button>
                 </div>
               </div>
             ))
@@ -385,8 +410,10 @@ const PodcastsManagement = ({ isModerator = false }) => {
               Are you sure you want to approve this podcast? It will be published and visible to users.
             </p>
             <div className="confirm-actions">
-              <button className="btn-cancel" onClick={handleApproveCancel}>Cancel</button>
-              <button className="btn-approve" onClick={handleApproveConfirm}>Approve</button>
+              <button className="btn-cancel" disabled={actionLoading} onClick={handleApproveCancel}>Cancel</button>
+              <button className="btn-approve" disabled={actionLoading} onClick={handleApproveConfirm}>
+                {actionLoading ? 'Approving...' : 'Approve'}
+              </button>
             </div>
           </div>
         </div>
@@ -400,8 +427,10 @@ const PodcastsManagement = ({ isModerator = false }) => {
               Are you sure you want to reject this podcast? The speaker will be notified.
             </p>
             <div className="confirm-actions">
-              <button className="btn-cancel" onClick={handleRejectCancel}>Cancel</button>
-              <button className="btn-reject" onClick={handleRejectConfirm}>Reject</button>
+              <button className="btn-cancel" disabled={actionLoading} onClick={handleRejectCancel}>Cancel</button>
+              <button className="btn-reject" disabled={actionLoading} onClick={handleRejectConfirm}>
+                Reject
+              </button>
             </div>
           </div>
         </div>

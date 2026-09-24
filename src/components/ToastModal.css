@@ -11,38 +11,67 @@
 
 .mc-toast {
   pointer-events: auto;
-  min-width: 260px;
+  min-width: 280px;
   max-width: 380px;
   padding: 12px 16px;
-  border-radius: 8px;
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
+  border-radius: 10px;
+  background: #ffffff;
+  color: #1e293b;
+  border: 1px solid #e2e8f0;
+  border-left: 4px solid #0e3839;
+  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.08), 0 8px 10px -6px rgba(0, 0, 0, 0.04);
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: 12px;
   font-size: 0.9rem;
-  color: #ffffff;
-  animation: mcSlideIn 0.25s ease-out;
+  font-weight: 500;
+  animation: mcSlideIn 0.25s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
-.mc-toast-success { background: #28a745; }
-.mc-toast-error { background: #dc3545; }
-.mc-toast-info { background: #00343d; }
+.mc-toast-success {
+  background: #ffffff;
+  border-left-color: #2b736b;
+}
+
+.mc-toast-error {
+  background: #ffffff;
+  border-left-color: #e11d48;
+}
+
+.mc-toast-info {
+  background: #ffffff;
+  border-left-color: #0e3839;
+}
+
+.mc-toast-message {
+  flex: 1;
+  line-height: 1.4;
+  color: #1e293b;
+}
 
 .mc-toast-close {
   background: none;
   border: none;
-  color: #ffffff;
+  color: #94a3b8;
   font-size: 1.2rem;
   cursor: pointer;
   line-height: 1;
-  padding: 0;
+  padding: 2px 4px;
+  border-radius: 4px;
+  transition: color 0.15s ease, background 0.15s ease;
+}
+
+.mc-toast-close:hover {
+  color: #1e293b;
+  background-color: #f1f5f9;
 }
 
 .mc-dialog-overlay {
   position: fixed;
   inset: 0;
-  background: rgba(0, 0, 0, 0.5);
+  background: rgba(15, 23, 42, 0.45);
+  backdrop-filter: blur(2px);
   z-index: 9998;
   display: flex;
   align-items: center;
@@ -55,15 +84,16 @@
   width: 90%;
   max-width: 440px;
   border-radius: 12px;
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.05);
   overflow: hidden;
   display: flex;
   flex-direction: column;
+  border: 1px solid #e2e8f0;
 }
 
 .mc-dialog-header {
   padding: 16px 20px;
-  border-bottom: 1px solid #e9ecef;
+  border-bottom: 1px solid #f1f5f9;
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -72,7 +102,8 @@
 .mc-dialog-header h4 {
   margin: 0;
   font-size: 1.05rem;
-  color: #212529;
+  font-weight: 600;
+  color: #0f172a;
 }
 
 .mc-dialog-close {
@@ -80,31 +111,47 @@
   border: none;
   font-size: 1.3rem;
   cursor: pointer;
-  color: #6c757d;
+  color: #94a3b8;
+  transition: color 0.15s ease;
+}
+
+.mc-dialog-close:hover {
+  color: #0f172a;
 }
 
 .mc-dialog-body {
   padding: 20px;
   font-size: 0.95rem;
-  color: #495057;
+  color: #475569;
+  line-height: 1.5;
 }
 
 .mc-dialog-input {
   width: 100%;
-  padding: 10px;
-  margin-top: 10px;
-  border: 1px solid #ced4da;
-  border-radius: 6px;
+  padding: 10px 12px;
+  margin-top: 12px;
+  border: 1px solid #cbd5e1;
+  border-radius: 8px;
   font-family: inherit;
   font-size: 0.9rem;
+  color: #1e293b;
+  background-color: #f8fafc;
   resize: none;
   box-sizing: border-box;
+  outline: none;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.mc-dialog-input:focus {
+  border-color: #2b736b;
+  box-shadow: 0 0 0 3px rgba(43, 115, 107, 0.15);
+  background-color: #ffffff;
 }
 
 .mc-dialog-footer {
   padding: 14px 20px;
-  background: #f8f9fa;
-  border-top: 1px solid #e9ecef;
+  background: #f8fafc;
+  border-top: 1px solid #f1f5f9;
   display: flex;
   justify-content: flex-end;
   gap: 10px;
@@ -117,24 +164,29 @@
   font-weight: 600;
   cursor: pointer;
   font-size: 0.85rem;
+  transition: opacity 0.15s ease, transform 0.1s ease;
+}
+
+.mc-dialog-btn:hover {
+  opacity: 0.92;
 }
 
 .mc-dialog-btn.cancel {
-  background: #e9ecef;
-  color: #495057;
+  background: #e2e8f0;
+  color: #334155;
 }
 
 .mc-dialog-btn.confirm {
-  background: #00343d;
+  background: linear-gradient(135deg, #2b736b, #0e3839);
   color: #ffffff;
 }
 
 .mc-dialog-btn.confirm.danger {
-  background: #dc3545;
+  background: #dc2626;
 }
 
 @keyframes mcSlideIn {
-  from { transform: translateX(50px); opacity: 0; }
+  from { transform: translateX(40px); opacity: 0; }
   to { transform: translateX(0); opacity: 1; }
 }
 

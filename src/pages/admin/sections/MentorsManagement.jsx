@@ -8,6 +8,7 @@ const MentorsManagement = () => {
   const [mentors, setMentors] = useState([]);
   const [applications, setApplications] = useState([]);
   const [loading, setLoading] = useState(false);
+  const [isProcessing, setIsProcessing] = useState(false);
   const [search, setSearch] = useState('');
   const [status, setStatus] = useState('all');
   const [tab, setTab] = useState('mentors');
@@ -112,6 +113,8 @@ const MentorsManagement = () => {
   };
 
   const handleApprove = async (applicationId) => {
+    if (isProcessing) return;
+
     const ok = await confirm({
       title: 'Approve Application',
       message: 'Are you sure you want to approve this mentor application?',
@@ -120,18 +123,23 @@ const MentorsManagement = () => {
 
     if (ok) {
       try {
+        setIsProcessing(true);
         await api.patch(`/admin/applications/${applicationId}/approve`, {});
-        fetchApplications();
         toastSuccess('Mentor approved successfully!');
         setSelectedApplication(null);
+        await fetchApplications();
       } catch (err) {
         console.error('Error approving application:', err);
         toastError(err.response?.data?.message || 'Failed to approve application');
+      } finally {
+        setIsProcessing(false);
       }
     }
   };
 
   const handleReject = async (applicationId) => {
+    if (isProcessing) return;
+
     const reason = await prompt({
       title: 'Reject Application',
       message: 'Please provide a reason for rejection:',
@@ -141,13 +149,16 @@ const MentorsManagement = () => {
 
     if (reason && reason.trim()) {
       try {
+        setIsProcessing(true);
         await api.patch(`/admin/applications/${applicationId}/reject`, { reason: reason.trim() });
-        fetchApplications();
         toastSuccess('Application rejected');
         setSelectedApplication(null);
+        await fetchApplications();
       } catch (err) {
         console.error('Error rejecting application:', err);
         toastError(err.response?.data?.message || 'Failed to reject application');
+      } finally {
+        setIsProcessing(false);
       }
     }
   };
@@ -283,8 +294,12 @@ const MentorsManagement = () => {
                   </div>
                   <div className="app-actions">
                     <button className="btn-view" onClick={() => setSelectedApplication(app)}>View Details</button>
-                    <button className="btn-approve" onClick={() => handleApprove(app._id)}>Approve</button>
-                    <button className="btn-reject" onClick={() => handleReject(app._id)}>Reject</button>
+                    <button className="btn-approve" disabled={isProcessing} onClick={() => handleApprove(app._id)}>
+                      {isProcessing ? 'Approving...' : 'Approve'}
+                    </button>
+                    <button className="btn-reject" disabled={isProcessing} onClick={() => handleReject(app._id)}>
+                      Reject
+                    </button>
                   </div>
                 </div>
               ))
@@ -504,10 +519,10 @@ const MentorsManagement = () => {
 
               <div className="modal-actions">
                 <button className="btn-cancel" onClick={closeApplicationModal}>Close</button>
-                <button className="btn-approve" onClick={() => handleApprove(selectedApplication._id)}>
-                  Approve
+                <button className="btn-approve" disabled={isProcessing} onClick={() => handleApprove(selectedApplication._id)}>
+                  {isProcessing ? 'Approving...' : 'Approve'}
                 </button>
-                <button className="btn-reject" onClick={() => handleReject(selectedApplication._id)}>
+                <button className="btn-reject" disabled={isProcessing} onClick={() => handleReject(selectedApplication._id)}>
                   Reject
                 </button>
               </div>
