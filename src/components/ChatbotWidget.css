@@ -210,3 +210,39 @@
   opacity: 0.45;
   cursor: not-allowed;
 }
+
+@media (max-width: 480px) {
+  .chatbot-wrapper {
+    bottom: 12px;
+    right: 12px;
+    left: 12px;
+  }
+
+  .chatbot-window {
+    width: 100%;
+    max-width: 100%;
+    height: 75vh;
+    max-height: 520px;
+    border-radius: 12px;
+  }
+
+  .chatbot-header {
+    padding: 10px 12px;
+  }
+
+  .chatbot-title {
+    font-size: 13px;
+  }
+
+  .chatbot-subtitle {
+    font-size: 10px;
+  }
+
+  .chatbot-messages-body {
+    padding: 10px;
+  }
+
+  .chatbot-footer-form {
+    padding: 8px 10px;
+  }
+}
