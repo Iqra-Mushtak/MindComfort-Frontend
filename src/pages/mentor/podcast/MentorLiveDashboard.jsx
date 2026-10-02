@@ -30,31 +30,34 @@ const MentorLiveDashboard = () => {
   const [isDescExpanded, setIsDescExpanded] = useState(false);
 
   useEffect(() => {
-    document.title = "Mentor Live Broadcast | MindComfort";
-    const storedUser = JSON.parse(localStorage.getItem('user'));
-    if (!storedUser) {
-      navigate('/login');
-      return;
-    }
-    setUser(storedUser);
-
-    fetchPodcastDetails();
-    initOrAttachStream();
-
-    return () => {
-      if (timerIntervalRef.current) clearInterval(timerIntervalRef.current);
-    };
-  }, [id]);
-
-  const fetchPodcastDetails = async () => {
-    try {
-      const res = await api.get(`/podcasts/${id}`);
-      const data = res.data.data || res.data.podcast;
-      setPodcast(data);
-    } catch (err) {
-      console.error('Failed to load podcast info:', err);
+  document.title = "Mentor Live Broadcast | MindComfort";
+  const storedUser = JSON.parse(localStorage.getItem('user'));
+  if (!storedUser) {
+    navigate('/login');
+    return;
+  }
+  setUser(storedUser);
+  fetchPodcastDetails();
+  initOrAttachStream();
+  
+  return () => {
+    if (timerIntervalRef.current) clearInterval(timerIntervalRef.current);
+    if (window.__mentorStream) {
+      const { micTrack, client, socket } = window.__mentorStream;
+      if (micTrack) {
+        micTrack.stop();
+        micTrack.close();
+      }
+      if (client) {
+        client.leave();
+      }
+      if (socket) {
+        socket.disconnect();
+      }
+      window.__mentorStream = null;
     }
   };
+}, [id]);
 
   useEffect(() => {
     if (!podcast) return;
@@ -85,61 +88,74 @@ const MentorLiveDashboard = () => {
   }, [podcast, isEndingStream]);
 
   const initOrAttachStream = async () => {
-    try {
-      setLoading(true);
-
-      if (window.__mentorStream && window.__mentorStream.podcastId === id) {
-        setIsMuted(!window.__mentorStream.micTrack.enabled);
-        attachSocketListeners(window.__mentorStream.socket);
-        setLoading(false);
-        return;
+  try {
+    setLoading(true);
+    
+    if (window.__mentorStream) {
+      try {
+        const { micTrack, client, socket } = window.__mentorStream;
+        if (micTrack) {
+          micTrack.stop();
+          micTrack.close();
+        }
+        if (client) {
+          await client.leave();
+        }
+        if (socket) {
+          socket.disconnect();
+        }
+        window.__mentorStream = null;
+      } catch (cleanupErr) {
+        console.warn("Error cleaning up previous stream:", cleanupErr);
       }
-
-      const tokenStr = localStorage.getItem('token');
-      const res = await api.put(
-        `/podcasts/${id}/start-stream`,
-        {},
-        { headers: { Authorization: `Bearer ${tokenStr}` } }
-      );
-
-      const { token, channelName, appId } = res.data;
-      const targetAppId = appId || import.meta.env.VITE_AGORA_APP_ID;
-
-      const client = AgoraRTC.createClient({ mode: 'rtc', codec: 'vp8' });
-      await client.join(targetAppId, channelName, token, 100);
-
-      const micTrack = await AgoraRTC.createMicrophoneAudioTrack({
-        AEC: true,
-        ANS: true,
-        AGC: true,
-        encoderConfig: 'high_quality_stereo',
-      });
-      await client.publish([micTrack]);
-
-      const socketInstance = io(import.meta.env.VITE_SOCKET_URL || 'https://mindcomfort.onrender.com', {
-        auth: { token: tokenStr }
-      });
-
-      socketInstance.on('connect', () => {
-        socketInstance.emit('joinPodcastRoom', id);
-      });
-
-      attachSocketListeners(socketInstance);
-
-      window.__mentorStream = {
-        podcastId: id,
-        client,
-        micTrack,
-        socket: socketInstance
-      };
-
-      setLoading(false);
-    } catch (err) {
-      console.error('Mentor start stream error:', err);
-      setError(err.response?.data?.message || err.message || 'Failed to initialize broadcast.');
-      setLoading(false);
     }
-  };
+
+    const tokenStr = localStorage.getItem('token');
+    const res = await api.put(
+      `/podcasts/${id}/start-stream`,
+      {},
+      { headers: { Authorization: `Bearer ${tokenStr}` } }
+    );
+    const { token, channelName, appId } = res.data;
+    const targetAppId = appId || import.meta.env.VITE_AGORA_APP_ID;
+    
+    const client = AgoraRTC.createClient({ mode: 'rtc', codec: 'vp8' });
+    
+    await client.join(targetAppId, channelName, token, 100);
+    
+    const micTrack = await AgoraRTC.createMicrophoneAudioTrack({
+      AEC: true,
+      ANS: true,
+      AGC: true,
+      encoderConfig: 'high_quality_stereo',
+    });
+    
+    await client.publish([micTrack]);
+    
+    const socketInstance = io(import.meta.env.VITE_SOCKET_URL || 'https://mindcomfort.onrender.com', {
+      auth: { token: tokenStr }
+    });
+    
+    socketInstance.on('connect', () => {
+      socketInstance.emit('joinPodcastRoom', id);
+    });
+    
+    attachSocketListeners(socketInstance);
+    
+    window.__mentorStream = {
+      podcastId: id,
+      client,
+      micTrack,
+      socket: socketInstance
+    };
+    
+    setLoading(false);
+  } catch (err) {
+    console.error('Mentor start stream error:', err);
+    setError(err.response?.data?.message || err.message || 'Failed to initialize broadcast.');
+    setLoading(false);
+  }
+};
 
   const attachSocketListeners = (socketInst) => {
     if (!socketInst) return;
@@ -180,27 +196,28 @@ const MentorLiveDashboard = () => {
   };
 
   const handleEndStream = async () => {
-    if (isEndingStream) return;
-    const ok = await confirm({
-      title: 'End Broadcast',
-      message: 'Are you sure you want to end this live broadcast for all attendees?',
-      confirmText: 'End Stream',
-      isDanger: true
-    });
-
-    if (ok) {
-      try {
-        setIsEndingStream(true);
-        await api.put(`/podcasts/${id}/end-stream`);
-        destroyGlobalStream();
-        navigate('/mentor/podcasts');
-      } catch (err) {
-        console.error(err);
-        toastError('Failed to end stream.');
-        setIsEndingStream(false);
-      }
+  if (isEndingStream) return;
+  const ok = await confirm({
+    title: 'End Broadcast',
+    message: 'Are you sure you want to end this live broadcast for all attendees?',
+    confirmText: 'End Stream',
+    isDanger: true
+  });
+  
+  if (ok) {
+    try {
+      setIsEndingStream(true);
+      await api.put(`/podcasts/${id}/end-stream`);
+      destroyGlobalStream();
+      toastInfo('Live broadcast ended successfully.');
+      navigate('/mentor/podcasts');
+    } catch (err) {
+      console.error(err);
+      toastError('Failed to end stream.');
+      setIsEndingStream(false);
     }
-  };
+  }
+};
 
   const destroyGlobalStream = () => {
     if (window.__mentorStream) {
