@@ -29,6 +29,16 @@ const MentorLiveDashboard = () => {
 
   const [isDescExpanded, setIsDescExpanded] = useState(false);
 
+  const fetchPodcastDetails = async () => {
+  try {
+    const res = await api.get(`/podcasts/${id}`);
+    const data = res.data.data || res.data.podcast;
+    setPodcast(data);
+  } catch (err) {
+    console.error('Failed to load podcast info:', err);
+  }
+};
+
   useEffect(() => {
   document.title = "Mentor Live Broadcast | MindComfort";
   const storedUser = JSON.parse(localStorage.getItem('user'));
