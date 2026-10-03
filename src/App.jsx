@@ -25,7 +25,7 @@ import MentorLiveDashboard from './pages/mentor/podcast/MentorLiveDashboard';
 import ClientLivePlayer from './pages/client/ClientLivePlayer';
 import AdminDashboard from './pages/admin/AdminDashboard';
 import ModeratorDashboard from './pages/moderator/ModeratorDashboard';
-import AdminManualTransactions from './pages/admin/AdminManualTransactions';
+import AdminManualTransactions from './pages/admin/sections/AdminManualTransactions';
 
 function App() {
   return (
