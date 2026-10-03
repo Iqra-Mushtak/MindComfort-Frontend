@@ -39,7 +39,7 @@ const AdminManualTransactions = () => {
       setMessage(`Transaction ${status} successfully!`);
       fetchTransactions(); 
     } catch (err) {
-      setMessage('Action failed. Try again.');
+      setMessage(err.response?.data?.message || 'Action failed. Try again.');
     }
   };
 
