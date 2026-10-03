@@ -37,8 +37,13 @@ const PlansList = () => {
         }
         setUser(userData);
         fetchPlans();
-        fetchTransactionStatuses();
     }, [navigate, token]);
+
+    useEffect(() => {
+        if (plans.length > 0) {
+            fetchTransactionStatuses();
+        }
+    }, [plans]);
 
     const fetchPlans = async () => {
         try {
@@ -61,19 +66,25 @@ const PlansList = () => {
                 api.get('/manual-transactions/mine'),
                 api.get('/subscriptions/status')
             ]);
+            const activeTypes = subscriptionsResponse.data.subscriptions
+                .filter((subscription) => subscription.status === 'active')
+                .map((subscription) => subscription.type);
+            const pendingTypes = transactionsResponse.data
+                .filter((transaction) => transaction.status === 'pending' && transaction.planId?.type)
+                .map((transaction) => transaction.planId.type);
+            const overlaps = (firstType, secondType) => {
+                const firstFeatures = firstType === 'both' ? ['chat', 'podcast'] : [firstType];
+                const secondFeatures = secondType === 'both' ? ['chat', 'podcast'] : [secondType];
+                return firstFeatures.some((feature) => secondFeatures.includes(feature));
+            };
             const statuses = {};
-            transactionsResponse.data.forEach((transaction) => {
-                if (!statuses[transaction.planId] || transaction.status === 'approved') {
-                    statuses[transaction.planId] = transaction.status;
+            plans.forEach((plan) => {
+                if (activeTypes.some((type) => overlaps(type, plan.type))) {
+                    statuses[plan._id] = 'active';
+                } else if (pendingTypes.some((type) => overlaps(type, plan.type))) {
+                    statuses[plan._id] = 'pending';
                 }
             });
-            subscriptionsResponse.data.subscriptions
-                .filter((subscription) => subscription.planId)
-                .forEach((subscription) => {
-                    if (subscription.status === 'active') {
-                        statuses[subscription.planId] = 'active';
-                    }
-                });
             setTransactionStatuses(statuses);
         } catch (err) {
             console.error('Error fetching purchase statuses:', err);
