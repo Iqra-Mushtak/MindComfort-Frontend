@@ -95,6 +95,11 @@ const AdminManualTransactions = () => {
 
                 <div className="ai-data-box">
                   <h5><i className="bi bi-robot me-2"></i>AI Extracted Data</h5>
+                  {t.aiExtractionError && (
+                    <p className="text-danger small">
+                      Extraction failed: {t.aiExtractionError}
+                    </p>
+                  )}
                   <ul>
                     <li><strong>Bank:</strong> {t.aiExtractedData?.bankName || 'Not detected'}</li>
                     <li><strong>Amount:</strong> {t.aiExtractedData?.amount || '0'} PKR</li>
