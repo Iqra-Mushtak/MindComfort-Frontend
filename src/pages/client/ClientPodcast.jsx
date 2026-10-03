@@ -124,6 +124,32 @@ const ClientPodcasts = () => {
     }
   };
 
+  const handleManualUpload = async (file, itemId) => {
+    if (!file) {
+      setPurchaseError('Please select a receipt file.');
+      return;
+    }
+    setIsPurchasing(true);
+    setPurchaseError('');
+    try {
+      const formData = new FormData();
+      formData.append('receipt', file);
+      formData.append('planId', itemId); 
+
+      const response = await api.post('/manual-transactions/submit', formData, {
+        headers: { 'Content-Type': 'multipart/form-data' }
+      });
+      
+      alert('Receipt uploaded successfully! AI is scanning it. Admin will approve shortly.');
+      handleCancelPurchase();
+    } catch (err) {
+      console.error('Manual upload error:', err);
+      setPurchaseError(err.response?.data?.message || 'Failed to upload receipt');
+    } finally {
+      setIsPurchasing(false);
+    }
+  };
+
   const handleCancelPurchase = () => {
     setIsPurchaseModalOpen(false);
     setSelectedPodcast(null);
@@ -422,6 +448,7 @@ const isPurchaseLocked = (startTime) => {
         isLoading={isPurchasing}
         error={purchaseError}
         onClearError={() => setPurchaseError('')}
+        onManualUpload={handleManualUpload}
       />
 
       {showLogoutModal && (

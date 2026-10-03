@@ -16,10 +16,12 @@
   border-radius: 16px;
   width: 90%;
   max-width: 500px;
+  max-height: 90vh; 
   box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
   display: flex;
   flex-direction: column;
   position: relative;
+  overflow: hidden;
 }
 
 .purchase-modal-close {
@@ -42,6 +44,8 @@
 .purchase-modal-content {
   padding: 2rem;
   border-bottom: 1px solid #eee;
+  overflow-y: auto; 
+  flex: 1;
 }
 
 .purchase-modal-content h3 {
@@ -246,6 +250,8 @@
   gap: 1rem;
   padding: 1.5rem 2rem;
   justify-content: flex-end;
+  background: white; 
+  flex-shrink: 0;
 }
 
 .btn-cancel,

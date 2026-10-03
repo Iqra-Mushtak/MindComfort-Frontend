@@ -16,6 +16,7 @@ import SubscriptionsManagement from './sections/SubscriptionsManagement';
 import AdminProfile from './sections/AdminProfile';
 import LiveChatFeed from './sections/LiveChatFeed';
 import LivePodcast from './sections/LivePodcast';
+import AdminManualTransactions from './sections/AdminManualTransactions';
 
 const AdminDashboard = () => {
   const navigate = useNavigate();
@@ -121,6 +122,8 @@ const AdminDashboard = () => {
         return <LiveChatFeed />;
       case 'live-podcast':
         return <LivePodcast />;
+      case 'manual-transactions':
+        return <AdminManualTransactions />;
       default:
         return <DashboardOverview stats={stats} onRefresh={fetchAdminStats} />;
     }
@@ -204,10 +207,10 @@ const AdminDashboard = () => {
               <i className="bi bi-credit-card-fill"></i> Subscriptions
             </button>
           </li>
-          <li className="mc-nav-item">
-            <Link to="/admin/manual-transactions" className="mc-nav-link">
+          <li className={`mc-nav-item ${activeSection === 'manual-transactions' ? 'active' : ''}`}>
+            <button className="mc-nav-link" onClick={() => { setActiveSection('manual-transactions'); setSidebarOpen(false); }}>
               <i className="bi bi-bank"></i> Manual Transfers
-            </Link>
+            </button>
           </li>
         </ul>
 
