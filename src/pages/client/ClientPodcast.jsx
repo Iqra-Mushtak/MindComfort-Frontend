@@ -159,6 +159,14 @@ const ClientPodcasts = () => {
     });
   };
 
+const isPurchaseLocked = (startTime) => {
+  if (!startTime) return false;
+  const startMs = new Date(startTime).getTime();
+  const nowMs = Date.now();
+  const thirtyMinutesInMs = 30 * 60 * 1000;
+  return (startMs - nowMs) <= thirtyMinutesInMs && startMs > nowMs;
+};
+
   const handleLogoutClick = () => {
     setShowLogoutModal(true);
   };
@@ -317,6 +325,10 @@ const ClientPodcasts = () => {
                           {podcast.isPurchased ? (
                             <button className="btn-purchased" disabled>
                               <i className="bi bi-check-lg"></i> In Library
+                            </button>
+                          ) : isPurchaseLocked(podcast.startTime) ? (
+                            <button className="btn-purchased" disabled style={{ backgroundColor: '#6c757d', cursor: 'not-allowed' }}>
+                              <i className="bi bi-clock"></i> Purchase Closed
                             </button>
                           ) : (
                             <button 
