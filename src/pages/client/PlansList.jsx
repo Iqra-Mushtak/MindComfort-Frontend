@@ -90,6 +90,10 @@ const PlansList = () => {
             setPurchaseError('Please select a receipt file.');
             return;
         }
+        if (!planId) {
+            setPurchaseError('The selected plan could not be identified. Please close and reopen the purchase window.');
+            return;
+        }
 
         setIsPurchasing(true);
         setPurchaseError('');

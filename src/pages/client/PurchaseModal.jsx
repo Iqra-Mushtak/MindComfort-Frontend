@@ -195,7 +195,7 @@ const PurchaseModal = ({
             className="btn-confirm" 
             onClick={() => {
               if (paymentMethod === 'manual') {
-                if (onManualUpload) onManualUpload(selectedFile, item._id);
+                if (onManualUpload) onManualUpload(selectedFile, item._id || item.id);
               } else {
                 onConfirm();
               }

@@ -129,6 +129,10 @@ const ClientPodcasts = () => {
       setPurchaseError('Please select a receipt file.');
       return;
     }
+    if (!itemId) {
+      setPurchaseError('The selected item could not be identified. Please close and reopen the purchase window.');
+      return;
+    }
     setIsPurchasing(true);
     setPurchaseError('');
     try {
@@ -136,9 +140,7 @@ const ClientPodcasts = () => {
       formData.append('receipt', file);
       formData.append('planId', itemId); 
 
-      const response = await api.post('/manual-transactions/submit', formData, {
-        headers: { 'Content-Type': 'multipart/form-data' }
-      });
+      await api.post('/manual-transactions/submit', formData);
       
       alert('Receipt uploaded successfully! AI is scanning it. Admin will approve shortly.');
       handleCancelPurchase();
