@@ -21,6 +21,8 @@ const PlansList = () => {
     const [isPurchaseModalOpen, setIsPurchaseModalOpen] = useState(false);
     const [selectedPlan, setSelectedPlan] = useState(null);
     const [purchaseError, setPurchaseError] = useState('');
+    const [uploadSuccess, setUploadSuccess] = useState('');
+    const [transactionStatuses, setTransactionStatuses] = useState({});
     const [isPurchasing, setIsPurchasing] = useState(false);
     const [sidebarOpen, setSidebarOpen] = useState(false);
     const [showLogoutModal, setShowLogoutModal] = useState(false);
@@ -35,6 +37,7 @@ const PlansList = () => {
         }
         setUser(userData);
         fetchPlans();
+        fetchTransactionStatuses();
     }, [navigate, token]);
 
     const fetchPlans = async () => {
@@ -52,9 +55,35 @@ const PlansList = () => {
         }
     };
 
+    const fetchTransactionStatuses = async () => {
+        try {
+            const [transactionsResponse, subscriptionsResponse] = await Promise.all([
+                api.get('/manual-transactions/mine'),
+                api.get('/subscriptions/status')
+            ]);
+            const statuses = {};
+            transactionsResponse.data.forEach((transaction) => {
+                if (!statuses[transaction.planId] || transaction.status === 'approved') {
+                    statuses[transaction.planId] = transaction.status;
+                }
+            });
+            subscriptionsResponse.data.subscriptions
+                .filter((subscription) => subscription.planId)
+                .forEach((subscription) => {
+                    if (subscription.status === 'active') {
+                        statuses[subscription.planId] = 'active';
+                    }
+                });
+            setTransactionStatuses(statuses);
+        } catch (err) {
+            console.error('Error fetching purchase statuses:', err);
+        }
+    };
+
     const handleSubscribe = (plan) => {
         setSelectedPlan(plan);
         setPurchaseError('');
+        setUploadSuccess('');
         setIsPurchaseModalOpen(true);
     };
 
@@ -103,7 +132,8 @@ const PlansList = () => {
             formData.append('planId', planId);
 
             await api.post('/manual-transactions/submit', formData);
-            alert('Receipt uploaded successfully! AI is scanning it. Admin will approve shortly.');
+            setTransactionStatuses((current) => ({ ...current, [planId]: 'pending' }));
+            setUploadSuccess('Receipt uploaded successfully. It is being reviewed by an administrator.');
             handleCancelPurchase();
         } catch (err) {
             console.error('Manual upload error:', err);
@@ -209,6 +239,12 @@ const PlansList = () => {
                     <h2>Subscription Plans</h2>
                     <p>Choose the perfect plan to unlock premium features and content.</p>
                 </div>
+                {uploadSuccess && (
+                    <div className="alert alert-success d-flex align-items-center" role="status">
+                        <i className="bi bi-check-circle-fill me-2"></i>
+                        {uploadSuccess}
+                    </div>
+                )}
                 {loading && (
                     <div className="plans-loading">
                         <p>Loading plans...</p>
@@ -253,10 +289,16 @@ const PlansList = () => {
                                 )}
                                 <button
                                     onClick={() => handleSubscribe(plan)}
-                                    disabled={purchasing && selectedPlanId === plan._id}
+                                    disabled={Boolean(transactionStatuses[plan._id]) || (purchasing && selectedPlanId === plan._id)}
                                     className="plan-subscribe-btn"
                                 >
-                                    {purchasing && selectedPlanId === plan._id ? 'Processing...' : 'Subscribe Now'}
+                                    {transactionStatuses[plan._id] === 'active'
+                                        ? 'Active'
+                                        : transactionStatuses[plan._id] === 'pending' || transactionStatuses[plan._id] === 'approved'
+                                            ? 'Submitted - Awaiting Approval'
+                                            : purchasing && selectedPlanId === plan._id
+                                                ? 'Processing...'
+                                                : 'Subscribe Now'}
                                 </button>
                             </div>
                         ))}

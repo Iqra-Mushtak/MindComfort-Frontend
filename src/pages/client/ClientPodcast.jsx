@@ -20,6 +20,7 @@ const ClientPodcasts = () => {
   const [isPurchaseModalOpen, setIsPurchaseModalOpen] = useState(false);
   const [selectedPodcast, setSelectedPodcast] = useState(null);
   const [purchaseError, setPurchaseError] = useState('');
+  const [uploadSuccess, setUploadSuccess] = useState('');
   const [isPurchasing, setIsPurchasing] = useState(false);
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [showLogoutModal, setShowLogoutModal] = useState(false);
@@ -96,6 +97,7 @@ const ClientPodcasts = () => {
   const handlePurchase = (podcast) => {
     setSelectedPodcast(podcast);
     setPurchaseError('');
+    setUploadSuccess('');
     setIsPurchaseModalOpen(true);
   };
 
@@ -141,8 +143,7 @@ const ClientPodcasts = () => {
       formData.append('planId', itemId); 
 
       await api.post('/manual-transactions/submit', formData);
-      
-      alert('Receipt uploaded successfully! AI is scanning it. Admin will approve shortly.');
+      setUploadSuccess('Receipt uploaded successfully. It is being reviewed by an administrator.');
       handleCancelPurchase();
     } catch (err) {
       console.error('Manual upload error:', err);
@@ -284,6 +285,12 @@ const isPurchaseLocked = (startTime) => {
           <h2>Podcasts</h2>
           <p>Discover live sessions and access your purchased content</p>
         </div>
+        {uploadSuccess && (
+          <div className="alert alert-success d-flex align-items-center" role="status">
+            <i className="bi bi-check-circle-fill me-2"></i>
+            {uploadSuccess}
+          </div>
+        )}
 
         <div className="podcasts-tabs">
           <button 
