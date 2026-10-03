@@ -47,7 +47,7 @@ const AdminManualTransactions = () => {
 
   return (
     <div className="admin-manual-container">
-      <h2><i className="bi bi-bank me-2"></i>Manual Bank Transfers</h2>
+      <h2>Manual Bank Transfers</h2>
       <p className="text-muted">Review AI-extracted receipt data and activate subscriptions.</p>
 
       {message && <div className="alert alert-info">{message}</div>}
@@ -94,7 +94,7 @@ const AdminManualTransactions = () => {
                 </div>
 
                 <div className="ai-data-box">
-                  <h5><i className="bi bi-robot me-2"></i>AI Extracted Data</h5>
+                  <h5>AI Extracted Data</h5>
                   {t.aiExtractionError && (
                     <p className="text-danger small">
                       Extraction failed: {t.aiExtractionError}
