@@ -85,6 +85,30 @@ const PlansList = () => {
         }
     };
 
+    const handleManualUpload = async (file, planId) => {
+        if (!file) {
+            setPurchaseError('Please select a receipt file.');
+            return;
+        }
+
+        setIsPurchasing(true);
+        setPurchaseError('');
+        try {
+            const formData = new FormData();
+            formData.append('receipt', file);
+            formData.append('planId', planId);
+
+            await api.post('/manual-transactions/submit', formData);
+            alert('Receipt uploaded successfully! AI is scanning it. Admin will approve shortly.');
+            handleCancelPurchase();
+        } catch (err) {
+            console.error('Manual upload error:', err);
+            setPurchaseError(err.response?.data?.message || 'Failed to upload receipt');
+        } finally {
+            setIsPurchasing(false);
+        }
+    };
+
     const handleCancelPurchase = () => {
         setIsPurchaseModalOpen(false);
         setSelectedPlan(null);
@@ -244,6 +268,7 @@ const PlansList = () => {
                 isLoading={isPurchasing}
                 error={purchaseError}
                 onClearError={() => setPurchaseError('')}
+                onManualUpload={handleManualUpload}
             />
             {showLogoutModal && (
                 <div className="mc-modal-overlay">
