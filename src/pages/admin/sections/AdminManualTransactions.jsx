@@ -2,6 +2,15 @@ import React, { useEffect, useState } from 'react';
 import api from "../../../utils/api";
 import './AdminManualTransactions.css';
 
+const apiBaseUrl = import.meta.env.VITE_API_URL || 'https://mindcomfort.onrender.com/api';
+const backendBaseUrl = apiBaseUrl.replace(/\/api\/?$/, '');
+
+const getReceiptUrl = (receiptUrl) => {
+  if (!receiptUrl) return '';
+  if (/^https?:\/\//i.test(receiptUrl)) return receiptUrl;
+  return `${backendBaseUrl}${receiptUrl.startsWith('/') ? '' : '/'}${receiptUrl}`;
+};
+
 const AdminManualTransactions = () => {
   const [transactions, setTransactions] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -55,12 +64,22 @@ const AdminManualTransactions = () => {
               
               <div className="receipt-section">
                 <h5>Receipt</h5>
-                <img 
-                  src={t.receiptImage || t.receiptUrl} 
-                  alt="Bank Receipt" 
-                  className="receipt-img"
-                  onError={(e) => { e.target.src = 'https://via.placeholder.com/300x400?text=No+Image'; }}
-                />
+                {/\.(pdf)$/i.test(t.receiptImage || t.receiptUrl || '') ? (
+                  <a
+                    href={getReceiptUrl(t.receiptImage || t.receiptUrl)}
+                    target="_blank"
+                    rel="noreferrer"
+                  >
+                    Open receipt PDF
+                  </a>
+                ) : (
+                  <img
+                    src={getReceiptUrl(t.receiptImage || t.receiptUrl)}
+                    alt="Bank Receipt"
+                    className="receipt-img"
+                    onError={(e) => { e.target.src = 'https://via.placeholder.com/300x400?text=No+Image'; }}
+                  />
+                )}
               </div>
 
               <div className="details-section">
