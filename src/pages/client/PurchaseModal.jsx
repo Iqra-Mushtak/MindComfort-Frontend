@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import './PurchaseModal.css';
 
 const PurchaseModal = ({ 
@@ -9,8 +9,12 @@ const PurchaseModal = ({
   onCancel, 
   isLoading, 
   error,
-  onClearError
+  onClearError,
+  onManualUpload 
 }) => {
+  const [paymentMethod, setPaymentMethod] = useState('stripe');
+  const [selectedFile, setSelectedFile] = useState(null);
+
   useEffect(() => {
     if (error) {
       const timer = setTimeout(() => {
@@ -117,6 +121,39 @@ const PurchaseModal = ({
                 )}
               </div>
 
+              <div className="payment-method-selector">
+                <button 
+                  type="button"
+                  className={`payment-method-btn ${paymentMethod === 'stripe' ? 'active' : ''}`}
+                  onClick={() => setPaymentMethod('stripe')}
+                >
+                  <i className="bi bi-credit-card"></i> Card (Stripe)
+                </button>
+                <button 
+                  type="button"
+                  className={`payment-method-btn ${paymentMethod === 'manual' ? 'active' : ''}`}
+                  onClick={() => setPaymentMethod('manual')}
+                >
+                  <i className="bi bi-bank"></i> Manual Transfer
+                </button>
+              </div>
+
+              {paymentMethod === 'manual' && (
+                <div className="manual-transfer-box">
+                  <h6>Bank Details:</h6>
+                  <p><strong>Bank:</strong> Sadapay</p>
+                  <p><strong>Account No:</strong> 03001460822</p>
+                  <p><strong>IBAN:</strong> PK44 SADA 0000 0030 0146 0822</p>
+                  <hr />
+                  <p className="upload-hint">Upload your payment receipt below:</p>
+                  <input 
+                    type="file" 
+                    accept="image/*,application/pdf" 
+                    onChange={(e) => setSelectedFile(e.target.files[0])} 
+                  />
+                </div>
+              )}
+
               <div className="purchase-price-section">
                 <p className="price-label">Price</p>
                 <p className="price-amount">
@@ -156,10 +193,16 @@ const PurchaseModal = ({
           </button>
           <button 
             className="btn-confirm" 
-            onClick={onConfirm}
-            disabled={isLoading}
+            onClick={() => {
+              if (paymentMethod === 'manual') {
+                if (onManualUpload) onManualUpload(selectedFile, item._id);
+              } else {
+                onConfirm();
+              }
+            }}
+            disabled={isLoading || (paymentMethod === 'manual' && !selectedFile)}
           >
-            {isLoading ? 'Processing...' : 'Confirm Purchase'}
+            {isLoading ? 'Processing...' : (paymentMethod === 'manual' ? 'Upload Receipt' : 'Confirm Purchase')}
           </button>
         </div>
       </div>

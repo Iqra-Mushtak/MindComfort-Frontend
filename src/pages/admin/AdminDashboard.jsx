@@ -204,6 +204,11 @@ const AdminDashboard = () => {
               <i className="bi bi-credit-card-fill"></i> Subscriptions
             </button>
           </li>
+          <li className="mc-nav-item">
+            <Link to="/admin/manual-transactions" className="mc-nav-link">
+              <i className="bi bi-bank"></i> Manual Transfers
+            </Link>
+          </li>
         </ul>
 
         <div className="mc-sidebar-footer">

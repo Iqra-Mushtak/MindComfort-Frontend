@@ -86,6 +86,80 @@
   gap: 0.5rem;
 }
 
+.payment-method-selector {
+  margin: 15px 0;
+  display: flex;
+  gap: 10px;
+}
+
+.payment-method-btn {
+  flex: 1;
+  padding: 10px;
+  border: 2px solid var(--mc-primary, #22625d);
+  background-color: transparent;
+  color: var(--mc-primary, #22625d);
+  border-radius: 8px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  font-size: 0.95rem;
+}
+
+.payment-method-btn.active {
+  background-color: var(--mc-primary, #22625d);
+  color: white;
+}
+
+.payment-method-btn:hover {
+  opacity: 0.9;
+}
+
+.manual-transfer-box {
+  background: #f8f9fa;
+  padding: 15px;
+  border-radius: 8px;
+  margin-bottom: 15px;
+  border: 1px solid #e9ecef;
+}
+
+.manual-transfer-box h6 {
+  font-weight: bold;
+  margin-top: 0;
+  margin-bottom: 10px;
+  color: var(--mc-text-dark, #333);
+}
+
+.manual-transfer-box p {
+  margin: 5px 0;
+  color: var(--mc-text-dark, #333);
+  font-size: 0.95rem;
+}
+
+.manual-transfer-box hr {
+  margin: 10px 0;
+  border: 0;
+  border-top: 1px solid #dee2e6;
+}
+
+.manual-transfer-box .upload-hint {
+  font-size: 0.9rem;
+  margin-bottom: 10px;
+  color: var(--mc-text-light, #666);
+}
+
+.manual-transfer-box input[type="file"] {
+  width: 100%;
+  padding: 8px;
+  border: 1px dashed #ccc;
+  border-radius: 6px;
+  background: white;
+  cursor: pointer;
+}
+
 .purchase-price-section {
   margin-bottom: 1.5rem;
   padding: 1rem;
@@ -239,5 +313,9 @@
   .btn-confirm {
     width: 100% !important;
     text-align: center !important;
+  }
+  
+  .payment-method-selector {
+    flex-direction: column;
   }
 }

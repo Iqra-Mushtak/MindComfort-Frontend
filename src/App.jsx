@@ -25,6 +25,7 @@ import MentorLiveDashboard from './pages/mentor/podcast/MentorLiveDashboard';
 import ClientLivePlayer from './pages/client/ClientLivePlayer';
 import AdminDashboard from './pages/admin/AdminDashboard';
 import ModeratorDashboard from './pages/moderator/ModeratorDashboard';
+import AdminManualTransactions from './pages/admin/AdminManualTransactions';
 
 function App() {
   return (
@@ -60,6 +61,7 @@ function App() {
       <Route path="/client/podcast/:id/live" element={<ClientLivePlayer />} />
       <Route path="/admin/dashboard" element={<AdminDashboard />} />
       <Route path="/moderator/dashboard" element={<ModeratorDashboard />} />
+      <Route path="/admin/manual-transactions" element={<AdminManualTransactions />} />
     </Routes>
       </ToastModalProvider>
     </NotificationProvider>
