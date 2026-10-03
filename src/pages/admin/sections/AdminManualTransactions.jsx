@@ -10,7 +10,7 @@ const AdminManualTransactions = () => {
   const fetchTransactions = async () => {
     try {
       setLoading(true);
-      const res = await api.get('/admin/manual-transactions');
+      const res = await api.get('/manual-transactions/pending');
       setTransactions(res.data);
     } catch (err) {
       console.error(err);
@@ -26,7 +26,7 @@ const AdminManualTransactions = () => {
 
   const handleAction = async (id, status) => {
     try {
-      await api.put(`/admin/manual-transactions/${id}`, { status });
+      await api.put(`/manual-transactions/${id}/review`, { status });
       setMessage(`Transaction ${status} successfully!`);
       fetchTransactions(); 
     } catch (err) {
