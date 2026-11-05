@@ -87,11 +87,3 @@ The frontend is deployed as a Static Site on Render, serving optimized productio
 4. Add the Environment Variables listed above in the Render dashboard.
 
 5. Deploy the site.
-
----
-
-## Project Information
-
-* **Developer**: Iqra Mushtaq (Roll No: 089350 / Reg No: 2021-ks-98)
-* **Project ID**: 22-KS-BSIT-35
-* **Institution**: Department of Computer Science, Govt. Graduate College, Civil Lines, Sheikhupura (University of the Punjab)
