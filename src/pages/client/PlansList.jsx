@@ -66,8 +66,12 @@ const PlansList = () => {
                 api.get('/manual-transactions/mine'),
                 api.get('/subscriptions/status')
             ]);
+            const now = new Date();
             const activeTypes = subscriptionsResponse.data.subscriptions
-                .filter((subscription) => subscription.status === 'active')
+                .filter((subscription) => (
+                    subscription.status === 'active' &&
+                    (!subscription.endDate || new Date(subscription.endDate) > now)
+                ))
                 .map((subscription) => subscription.type);
             const pendingTypes = transactionsResponse.data
                 .filter((transaction) => transaction.status === 'pending' && transaction.planId?.type)
